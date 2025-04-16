@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Rules
+
+## Environment
+- Project: `react`
+- Framework: `tailwindcss v4`, `shadcn`, `Nextjs 15`
+- Package Manager: `bun`
+- Bundler: `bunx`
+
+## App architecture
+
+- New apps are defined in src/apps/[app-name]/index.tsx
+- App components are defined in src/apps/[app-name]/components/[component-name].tsx
+- Apps are imported and registered in src/App.tsx
+- AppManager.tsx is the main entry point for the app, and is responsible for rendering the apps and managing the state of the apps.
