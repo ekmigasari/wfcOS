@@ -14,7 +14,7 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import Image from "next/image";
-import Clock from "./clock";
+import Clock from "../clock";
 
 export function Mainmenu() {
   return (
