@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { playSound } from "@/lib/utils"; // Import playSound
 
 const WORK_TIME = 25 * 60; // 25 minutes
 const SHORT_BREAK_TIME = 5 * 60; // 5 minutes
@@ -44,6 +45,7 @@ const PodomoroTimer: React.FC = () => {
       // Timer finished
       setIsRunning(false);
       // Play a sound or notification here? (Future enhancement)
+      playSound("/sounds/open.mp3"); // Play sound on mode switch
 
       if (mode === "work") {
         const newSessionCount = workSessionsCompleted + 1;
@@ -65,10 +67,12 @@ const PodomoroTimer: React.FC = () => {
   }, [isRunning, timeRemaining, mode, workSessionsCompleted, switchMode]);
 
   const handleStartPause = () => {
+    playSound("/sounds/click.mp3"); // Play click sound
     setIsRunning((prevIsRunning) => !prevIsRunning);
   };
 
   const handleReset = () => {
+    playSound("/sounds/click.mp3"); // Play click sound
     setIsRunning(false);
     // Reset to the current mode's default time
     switch (mode) {

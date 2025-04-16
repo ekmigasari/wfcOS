@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { playSound } from "@/lib/utils";
 
 const TodoList = () => {
   const [tasks, setTasks] = useState<string[]>([]);
@@ -6,12 +7,14 @@ const TodoList = () => {
 
   const handleAddTask = () => {
     if (newTask.trim() !== "") {
+      playSound("/sounds/click.mp3");
       setTasks([...tasks, newTask.trim()]);
       setNewTask("");
     }
   };
 
   const handleRemoveTask = (index: number) => {
+    playSound("/sounds/click.mp3");
     setTasks(tasks.filter((_, i) => i !== index));
   };
 

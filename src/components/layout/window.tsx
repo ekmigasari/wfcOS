@@ -39,7 +39,7 @@ const Window: React.FC<WindowProps> = ({
   const handleBaseClass = "absolute z-[1001] select-none";
 
   // --- Resize Handle Specific Classes ---
-  const cornerHandleClass = `${handleBaseClass} w-3 h-3`; // Use w-3 h-3 for 12px
+  const cornerHandleClass = `${handleBaseClass} w-5 h-5`; // Smaller size, more appropriate for corners
   const edgeHandleClass = handleBaseClass;
 
   // Specific handle positions and cursors using Tailwind classes
@@ -50,61 +50,77 @@ const Window: React.FC<WindowProps> = ({
   }[] = [
     // Corners
     {
-      className: cn(
-        cornerHandleClass,
-        "bottom-[-6px] right-[-6px] cursor-nwse-resize"
-      ),
+      className: cn(cornerHandleClass, "bottom-[-3px] right-[-3px]"),
       direction: "bottom-right",
+      style: {
+        cursor: "nwse-resize",
+        backgroundColor: "rgba(255, 255, 255, 0.05)", // Subtle visual indicator
+        borderRight: "1px solid rgba(255, 255, 255, 0.1)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+      },
     },
     {
-      className: cn(
-        cornerHandleClass,
-        "bottom-[-6px] left-[-6px] cursor-nesw-resize"
-      ),
+      className: cn(cornerHandleClass, "bottom-[-3px] left-[-3px]"),
       direction: "bottom-left",
+      style: {
+        cursor: "nesw-resize",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+      },
     },
     {
-      className: cn(
-        cornerHandleClass,
-        "top-[-6px] right-[-6px] cursor-nesw-resize"
-      ),
+      className: cn(cornerHandleClass, "top-[-3px] right-[-3px]"),
       direction: "top-right",
+      style: {
+        cursor: "nesw-resize",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        borderRight: "1px solid rgba(255, 255, 255, 0.1)",
+        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+      },
     },
     {
-      className: cn(
-        cornerHandleClass,
-        "top-[-6px] left-[-6px] cursor-nwse-resize"
-      ),
+      className: cn(cornerHandleClass, "top-[-3px] left-[-3px]"),
       direction: "top-left",
+      style: {
+        cursor: "nwse-resize",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
+        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+      },
     },
     // Edges
     {
       className: cn(
         edgeHandleClass,
-        "top-0 bottom-0 right-[-5px] w-[10px] cursor-ew-resize"
+        "top-[25%] bottom-[25%] right-[-3px] w-[6px]"
       ),
       direction: "right",
+      style: { cursor: "ew-resize" },
     },
     {
       className: cn(
         edgeHandleClass,
-        "top-0 bottom-0 left-[-5px] w-[10px] cursor-ew-resize"
+        "top-[25%] bottom-[25%] left-[-3px] w-[6px]"
       ),
       direction: "left",
+      style: { cursor: "ew-resize" },
     },
     {
       className: cn(
         edgeHandleClass,
-        "left-0 right-0 bottom-[-5px] h-[10px] cursor-ns-resize"
+        "left-[25%] right-[25%] bottom-[-3px] h-[6px]"
       ),
       direction: "bottom",
+      style: { cursor: "ns-resize" },
     },
     {
       className: cn(
         edgeHandleClass,
-        "left-0 right-0 top-[-5px] h-[10px] cursor-ns-resize"
+        "left-[25%] right-[25%] top-[-3px] h-[6px]"
       ),
       direction: "top",
+      style: { cursor: "ns-resize" },
     },
   ];
 
@@ -145,7 +161,7 @@ const Window: React.FC<WindowProps> = ({
         <div
           key={handle.direction}
           className={handle.className}
-          style={handle.style} // Keep style prop for potential overrides or dynamic styles if needed later
+          style={handle.style}
           data-resize-handle="true"
           onMouseDown={(e) => handleResizeStart(e, handle.direction)}
         />

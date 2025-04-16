@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Window from "./layout/window";
-import { appRegistry } from "../appRegistry";
+import { appRegistry } from "../config/appRegistry";
+import { playSound } from "../lib/utils"; // Import the sound utility
 
 // Define the props for the reusable AppIcon component
 interface AppIconProps {
@@ -73,6 +74,7 @@ export const AppsIcons = () => {
 
   // Handler for single click (selection)
   const handleSelect = (appName: string) => {
+    playSound("/sounds/click.mp3"); // Play click sound
     setSelectedApp(appName);
   };
 
@@ -82,8 +84,11 @@ export const AppsIcons = () => {
       if (prevOpenApps.includes(appName)) {
         // Optional: If double-clicking an open app, maybe just bring window to front?
         // For now, we'll keep the toggle behavior. If you want to change this, let me know.
+        // playSound("/sounds/close.mp3"); // Consider if close sound should play here too
         return prevOpenApps.filter((name) => name !== appName);
       } else {
+        // Open the app
+        playSound("/sounds/open.mp3"); // Play open sound
         // Open the app and potentially clear selection? Or keep selection?
         // setSelectedApp(null); // Option: Clear selection on open
         return [...prevOpenApps, appName];
@@ -94,6 +99,7 @@ export const AppsIcons = () => {
   };
 
   const handleCloseWindow = (appName: string) => {
+    playSound("/sounds/close.mp3"); // Play close sound
     setOpenApps((prevOpenApps) =>
       prevOpenApps.filter((name) => name !== appName)
     );

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Position, Size } from "../types";
+import { playSound } from "../lib/utils";
 
 // Define possible resize directions
 export type ResizeDirection =
@@ -51,12 +52,18 @@ export const useWindowManagement = ({
   const startSizeRef = useRef<Size>({ width: 0, height: 0 });
   const startMousePositionRef = useRef<Position>({ x: 0, y: 0 });
 
+  // Ref to store the currently playing sound instance
+  const activeSoundRef = useRef<HTMLAudioElement | null>(null);
+
   // --- Drag Logic ---
   const handleDragStart = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       // Prevent starting drag if clicking on a resize handle (if nested)
       if ((e.target as HTMLElement).dataset.resizeHandle) return;
 
+      // Stop any previous sound
+      activeSoundRef.current?.pause();
+      activeSoundRef.current = playSound("/sounds/loading.mp3");
       setIsDragging(true);
       setIsResizing(false); // Ensure not resizing
       startPositionRef.current = { ...position };
@@ -94,12 +101,21 @@ export const useWindowManagement = ({
   const handleDragEnd = useCallback(() => {
     if (isDragging) {
       setIsDragging(false);
+      // Stop the sound when dragging ends
+      if (activeSoundRef.current) {
+        activeSoundRef.current.pause();
+        activeSoundRef.current.currentTime = 0; // Reset time
+        activeSoundRef.current = null;
+      }
     }
   }, [isDragging]);
 
   // --- Resize Logic ---
   const handleResizeStart = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, direction: ResizeDirection) => {
+      // Stop any previous sound
+      activeSoundRef.current?.pause();
+      activeSoundRef.current = playSound("/sounds/loading.mp3");
       setIsResizing(true);
       setIsDragging(false); // Ensure not dragging
       setResizeDirection(direction);
@@ -125,38 +141,35 @@ export const useWindowManagement = ({
       let newX = startPositionRef.current.x;
       let newY = startPositionRef.current.y;
 
-      // Calculate new dimensions and position based on direction
+      // Handle diagonal and edge resizing
+      // Right edge resizing
       if (resizeDirection.includes("right")) {
         newWidth = Math.max(minSize.width, startSizeRef.current.width + deltaX);
       }
+      // Bottom edge resizing
       if (resizeDirection.includes("bottom")) {
         newHeight = Math.max(
           minSize.height,
           startSizeRef.current.height + deltaY
         );
       }
+      // Left edge resizing
       if (resizeDirection.includes("left")) {
-        newWidth = Math.max(minSize.width, startSizeRef.current.width - deltaX);
-        newX = startPositionRef.current.x + deltaX; // Adjust position
-        // Prevent width becoming too small while moving left edge
-        if (newWidth === minSize.width) {
-          newX =
-            startPositionRef.current.x +
-            (startSizeRef.current.width - minSize.width);
-        }
-      }
-      if (resizeDirection.includes("top")) {
-        newHeight = Math.max(
-          minSize.height,
-          startSizeRef.current.height - deltaY
+        const widthChange = Math.min(
+          deltaX,
+          startSizeRef.current.width - minSize.width
         );
-        newY = startPositionRef.current.y + deltaY; // Adjust position
-        // Prevent height becoming too small while moving top edge
-        if (newHeight === minSize.height) {
-          newY =
-            startPositionRef.current.y +
-            (startSizeRef.current.height - minSize.height);
-        }
+        newWidth = startSizeRef.current.width - widthChange;
+        newX = startPositionRef.current.x + widthChange;
+      }
+      // Top edge resizing
+      if (resizeDirection.includes("top")) {
+        const heightChange = Math.min(
+          deltaY,
+          startSizeRef.current.height - minSize.height
+        );
+        newHeight = startSizeRef.current.height - heightChange;
+        newY = startPositionRef.current.y + heightChange;
       }
 
       // Apply bounds checks for position if container exists
@@ -189,6 +202,12 @@ export const useWindowManagement = ({
     if (isResizing) {
       setIsResizing(false);
       setResizeDirection(null);
+      // Stop the sound when resizing ends
+      if (activeSoundRef.current) {
+        activeSoundRef.current.pause();
+        activeSoundRef.current.currentTime = 0; // Reset time
+        activeSoundRef.current = null;
+      }
     }
   }, [isResizing]);
 

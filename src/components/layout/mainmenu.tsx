@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -15,12 +17,13 @@ import {
 } from "@/components/ui/menubar";
 import Image from "next/image";
 import Clock from "../clock";
+import { playSound } from "@/lib/utils";
 
 export function Mainmenu() {
   return (
     <Menubar className="bg-primary border-secondary border-2 text-white">
       <MenubarMenu>
-        <MenubarTrigger>
+        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
           <Image src="/icons/coffee.png" alt="coffee" width={20} height={20} />
         </MenubarTrigger>
         <MenubarContent>
@@ -30,12 +33,14 @@ export function Mainmenu() {
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>File</MenubarTrigger>
+        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
+          File
+        </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem>
+          <MenubarItem onSelect={() => playSound("/sounds/click.mp3")}>
             New Tab <MenubarShortcut>⌘T</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem>
+          <MenubarItem onSelect={() => playSound("/sounds/click.mp3")}>
             New Window <MenubarShortcut>⌘N</MenubarShortcut>
           </MenubarItem>
           <MenubarItem disabled>New Incognito Window</MenubarItem>
@@ -43,7 +48,9 @@ export function Mainmenu() {
           <MenubarSub>
             <MenubarSubTrigger>Share</MenubarSubTrigger>
             <MenubarSubContent>
-              <MenubarItem>Email link</MenubarItem>
+              <MenubarItem onSelect={() => playSound("/sounds/click.mp3")}>
+                Email link
+              </MenubarItem>
               <MenubarItem>Messages</MenubarItem>
               <MenubarItem>Notes</MenubarItem>
             </MenubarSubContent>
@@ -55,9 +62,11 @@ export function Mainmenu() {
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>Edit</MenubarTrigger>
+        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
+          Edit
+        </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem>
+          <MenubarItem onSelect={() => playSound("/sounds/click.mp3")}>
             Undo <MenubarShortcut>⌘Z</MenubarShortcut>
           </MenubarItem>
           <MenubarItem>
@@ -81,14 +90,16 @@ export function Mainmenu() {
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>View</MenubarTrigger>
+        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
+          View
+        </MenubarTrigger>
         <MenubarContent>
           <MenubarCheckboxItem>Always Show Bookmarks Bar</MenubarCheckboxItem>
           <MenubarCheckboxItem checked>
             Always Show Full URLs
           </MenubarCheckboxItem>
           <MenubarSeparator />
-          <MenubarItem inset>
+          <MenubarItem inset onSelect={() => playSound("/sounds/click.mp3")}>
             Reload <MenubarShortcut>⌘R</MenubarShortcut>
           </MenubarItem>
           <MenubarItem disabled inset>
@@ -101,7 +112,9 @@ export function Mainmenu() {
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>Profiles</MenubarTrigger>
+        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
+          Profiles
+        </MenubarTrigger>
         <MenubarContent>
           <MenubarRadioGroup value="benoit">
             <MenubarRadioItem value="andy">Andy</MenubarRadioItem>
