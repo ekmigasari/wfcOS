@@ -1,21 +1,23 @@
 import React, { useState } from "react";
+import { useAtom } from "jotai";
+import { tasksAtom } from "../../atoms/todoListAtom"; // Adjust path as needed
 import { playSound } from "@/lib/utils";
 
 const TodoList = () => {
-  const [tasks, setTasks] = useState<string[]>([]);
+  const [tasks, setTasks] = useAtom(tasksAtom);
   const [newTask, setNewTask] = useState<string>("");
 
   const handleAddTask = () => {
     if (newTask.trim() !== "") {
       playSound("/sounds/click.mp3");
-      setTasks([...tasks, newTask.trim()]);
+      setTasks((currentTasks) => [...currentTasks, newTask.trim()]);
       setNewTask("");
     }
   };
 
   const handleRemoveTask = (index: number) => {
     playSound("/sounds/click.mp3");
-    setTasks(tasks.filter((_, i) => i !== index));
+    setTasks((currentTasks) => currentTasks.filter((_, i) => i !== index));
   };
 
   return (

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Itim } from "next/font/google";
 import "@/styles/globals.css";
+import JotaiProvider from "@/components/providers/JotaiProvider";
 
 const font = Itim({ weight: "400", subsets: ["latin"] });
 
@@ -16,7 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={font.className}>{children}</body>
+      <body className={font.className}>
+        <JotaiProvider>
+          {children}
+        </JotaiProvider>
+      </body>
     </html>
   );
 }

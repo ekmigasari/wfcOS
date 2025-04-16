@@ -3,39 +3,59 @@ import PodomoroTimer from "../components/apps/podomoro";
 import TodoList from "../components/apps/todoList";
 import React from "react";
 
+// Updated interface to include missing fields
 interface AppRegistryEntry {
+  name: string; // The display name of the app
+  src: string; // Path to the app icon
   defaultSize: Size;
+  minSize?: Size; // Optional minimum size for the window
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: React.ComponentType<any>;
   // Add other app-specific metadata here if needed in the future
 }
 
 // Define default sizes and components for different applications
+// Added name, src, and optional minSize
 export const appRegistry: Record<string, AppRegistryEntry> = {
-  Podomoro: {
+  // Using appId as the key (e.g., 'podomoro'), and name for display
+  podomoro: {
+    name: "Podomoro",
+    src: "/icons/clock.png",
     defaultSize: { width: 350, height: 400 },
+    minSize: { width: 250, height: 300 }, // Example minSize
     component: PodomoroTimer,
   },
-  Music: {
+  music: {
+    name: "Music",
+    src: "/icons/music.png",
     defaultSize: { width: 500, height: 300 },
     component: () =>
       React.createElement("div", null, "Music Player Coming Soon"),
   },
-  Photobox: {
+  photobox: {
+    name: "Photobox",
+    src: "/icons/camera.png",
     defaultSize: { width: 400, height: 450 },
     component: () => React.createElement("div", null, "Photobox Coming Soon"),
   },
-  "Cafe list": {
+  cafeList: {
+    name: "Cafe list",
+    src: "/icons/cafe.png",
     defaultSize: { width: 450, height: 500 },
     component: () => React.createElement("div", null, "Cafe List Coming Soon"),
   },
-  "To-do list": {
+  todoList: {
+    name: "To-do list",
+    src: "/icons/board.png",
     defaultSize: { width: 300, height: 400 },
+    minSize: { width: 200, height: 250 }, // Example minSize
     component: TodoList,
   },
-  "Chat room": {
+  chatRoom: {
+    name: "Chat room",
+    src: "/icons/phone.png",
     defaultSize: { width: 380, height: 550 },
     component: () => React.createElement("div", null, "Chat Room Coming Soon"),
   },
-  // Add other apps here
+  // Add other apps here using a unique key (appId)
 };

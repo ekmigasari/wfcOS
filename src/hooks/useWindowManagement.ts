@@ -16,31 +16,26 @@ export type ResizeDirection =
   | "bottom";
 
 interface UseWindowManagementProps {
-  initialPosition?: Position;
+  windowId: string;
+  initialPosition: Position;
   initialSize: Size;
-  minSize?: Size; // Optional minimum size
+  minSize?: Size;
   containerRef?: React.RefObject<HTMLElement>;
+  onInteractionEnd: (id: string, newPosition: Position, newSize: Size) => void;
+  onFocus: (id: string) => void;
 }
 
 export const useWindowManagement = ({
+  windowId,
   initialPosition,
   initialSize,
-  minSize = { width: 150, height: 100 }, // Default minimum size
+  minSize,
   containerRef,
+  onInteractionEnd,
+  onFocus,
 }: UseWindowManagementProps) => {
-  const getDefaultPosition = (size: Size): Position => {
-    const parentWidth = containerRef?.current?.clientWidth ?? window.innerWidth;
-    const parentHeight =
-      containerRef?.current?.clientHeight ?? window.innerHeight;
-    return {
-      x: Math.max(0, (parentWidth - size.width) / 2), // Ensure initial position is non-negative
-      y: Math.max(0, (parentHeight - size.height) / 2),
-    };
-  };
-
-  const [position, setPosition] = useState<Position>(
-    initialPosition ?? getDefaultPosition(initialSize)
-  );
+  // Initialize state directly from props
+  const [position, setPosition] = useState<Position>(initialPosition);
   const [size, setSize] = useState<Size>(initialSize);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -58,140 +53,136 @@ export const useWindowManagement = ({
   // --- Drag Logic ---
   const handleDragStart = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      // Prevent starting drag if clicking on a resize handle (if nested)
       if ((e.target as HTMLElement).dataset.resizeHandle) return;
-
-      // Stop any previous sound
+      onFocus(windowId);
       activeSoundRef.current?.pause();
       activeSoundRef.current = playSound("/sounds/loading.mp3");
       setIsDragging(true);
-      setIsResizing(false); // Ensure not resizing
+      setIsResizing(false);
       startPositionRef.current = { ...position };
       startMousePositionRef.current = { x: e.clientX, y: e.clientY };
       e.preventDefault();
     },
-    [position]
+    [position, windowId, onFocus]
   );
 
   const handleDragMove = useCallback(
     (e: MouseEvent) => {
       if (!isDragging) return;
-
       const deltaX = e.clientX - startMousePositionRef.current.x;
       const deltaY = e.clientY - startMousePositionRef.current.y;
-
       let newX = startPositionRef.current.x + deltaX;
       let newY = startPositionRef.current.y + deltaY;
-
-      // Constrain movement
+      const currentSize = size;
       if (containerRef?.current) {
         const parentRect = containerRef.current.getBoundingClientRect();
-        newX = Math.max(0, Math.min(newX, parentRect.width - size.width));
-        newY = Math.max(0, Math.min(newY, parentRect.height - size.height));
+        newX = Math.max(
+          0,
+          Math.min(newX, parentRect.width - currentSize.width)
+        );
+        newY = Math.max(
+          0,
+          Math.min(newY, parentRect.height - currentSize.height)
+        );
       } else {
-        newX = Math.max(0, Math.min(newX, window.innerWidth - size.width));
-        newY = Math.max(0, Math.min(newY, window.innerHeight - size.height));
+        newX = Math.max(
+          0,
+          Math.min(newX, window.innerWidth - currentSize.width)
+        );
+        newY = Math.max(
+          0,
+          Math.min(newY, window.innerHeight - currentSize.height)
+        );
       }
-
       setPosition({ x: newX, y: newY });
     },
-    [isDragging, size.width, size.height, containerRef]
+    [isDragging, size, containerRef]
   );
 
   const handleDragEnd = useCallback(() => {
     if (isDragging) {
       setIsDragging(false);
-      // Stop the sound when dragging ends
       if (activeSoundRef.current) {
         activeSoundRef.current.pause();
-        activeSoundRef.current.currentTime = 0; // Reset time
+        activeSoundRef.current.currentTime = 0;
         activeSoundRef.current = null;
       }
+      onInteractionEnd(windowId, position, size);
     }
-  }, [isDragging]);
+  }, [isDragging, windowId, position, size, onInteractionEnd]);
 
   // --- Resize Logic ---
   const handleResizeStart = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, direction: ResizeDirection) => {
-      // Stop any previous sound
+      onFocus(windowId);
       activeSoundRef.current?.pause();
       activeSoundRef.current = playSound("/sounds/loading.mp3");
       setIsResizing(true);
-      setIsDragging(false); // Ensure not dragging
+      setIsDragging(false);
       setResizeDirection(direction);
       startPositionRef.current = { ...position };
       startSizeRef.current = { ...size };
       startMousePositionRef.current = { x: e.clientX, y: e.clientY };
       e.preventDefault();
-      e.stopPropagation(); // Prevent drag start on title bar if handle overlaps
+      e.stopPropagation();
     },
-    [position, size]
+    [position, size, windowId, onFocus]
   );
 
   const handleResizeMove = useCallback(
     (e: MouseEvent) => {
       if (!isResizing || !resizeDirection) return;
-
       const currentMousePos = { x: e.clientX, y: e.clientY };
       const deltaX = currentMousePos.x - startMousePositionRef.current.x;
       const deltaY = currentMousePos.y - startMousePositionRef.current.y;
-
       let newWidth = startSizeRef.current.width;
       let newHeight = startSizeRef.current.height;
       let newX = startPositionRef.current.x;
       let newY = startPositionRef.current.y;
-
-      // Handle diagonal and edge resizing
-      // Right edge resizing
+      const effectiveMinSize = {
+        width: minSize?.width ?? 150,
+        height: minSize?.height ?? 100,
+      };
       if (resizeDirection.includes("right")) {
-        newWidth = Math.max(minSize.width, startSizeRef.current.width + deltaX);
+        newWidth = Math.max(
+          effectiveMinSize.width,
+          startSizeRef.current.width + deltaX
+        );
       }
-      // Bottom edge resizing
       if (resizeDirection.includes("bottom")) {
         newHeight = Math.max(
-          minSize.height,
+          effectiveMinSize.height,
           startSizeRef.current.height + deltaY
         );
       }
-      // Left edge resizing
       if (resizeDirection.includes("left")) {
         const widthChange = Math.min(
           deltaX,
-          startSizeRef.current.width - minSize.width
+          startSizeRef.current.width - effectiveMinSize.width
         );
         newWidth = startSizeRef.current.width - widthChange;
         newX = startPositionRef.current.x + widthChange;
       }
-      // Top edge resizing
       if (resizeDirection.includes("top")) {
         const heightChange = Math.min(
           deltaY,
-          startSizeRef.current.height - minSize.height
+          startSizeRef.current.height - effectiveMinSize.height
         );
         newHeight = startSizeRef.current.height - heightChange;
         newY = startPositionRef.current.y + heightChange;
       }
-
-      // Apply bounds checks for position if container exists
-      if (containerRef?.current) {
-        const parentRect = containerRef.current.getBoundingClientRect();
-        newX = Math.max(0, Math.min(newX, parentRect.width - newWidth));
-        newY = Math.max(0, Math.min(newY, parentRect.height - newHeight));
-      } else {
-        newX = Math.max(0, Math.min(newX, window.innerWidth - newWidth));
-        newY = Math.max(0, Math.min(newY, window.innerHeight - newHeight));
-      }
-
-      // Check bounds for size relative to container (if applicable)
       if (containerRef?.current) {
         const parentRect = containerRef.current.getBoundingClientRect();
         newWidth = Math.min(newWidth, parentRect.width - newX);
         newHeight = Math.min(newHeight, parentRect.height - newY);
+        newX = Math.max(0, Math.min(newX, parentRect.width - newWidth));
+        newY = Math.max(0, Math.min(newY, parentRect.height - newHeight));
       } else {
         newWidth = Math.min(newWidth, window.innerWidth - newX);
         newHeight = Math.min(newHeight, window.innerHeight - newY);
+        newX = Math.max(0, Math.min(newX, window.innerWidth - newWidth));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - newHeight));
       }
-
       setSize({ width: newWidth, height: newHeight });
       setPosition({ x: newX, y: newY });
     },
@@ -202,14 +193,14 @@ export const useWindowManagement = ({
     if (isResizing) {
       setIsResizing(false);
       setResizeDirection(null);
-      // Stop the sound when resizing ends
       if (activeSoundRef.current) {
         activeSoundRef.current.pause();
-        activeSoundRef.current.currentTime = 0; // Reset time
+        activeSoundRef.current.currentTime = 0;
         activeSoundRef.current = null;
       }
+      onInteractionEnd(windowId, position, size);
     }
-  }, [isResizing]);
+  }, [isResizing, windowId, position, size, onInteractionEnd]);
 
   // --- Global Event Listeners ---
   useEffect(() => {
@@ -217,25 +208,17 @@ export const useWindowManagement = ({
       if (isDragging) handleDragMove(e);
       if (isResizing) handleResizeMove(e);
     };
-
     const handleMouseUp = () => {
-      handleDragEnd();
-      handleResizeEnd();
+      if (isDragging) handleDragEnd();
+      if (isResizing) handleResizeEnd();
     };
-
     if (isDragging || isResizing) {
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
-      // Consider adding touch event listeners here as well for mobile
-      // window.addEventListener('touchmove', handleTouchMove);
-      // window.addEventListener('touchend', handleTouchEnd);
     }
-
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
-      // window.removeEventListener('touchmove', handleTouchMove);
-      // window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [
     isDragging,
