@@ -19,15 +19,15 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   Music: {
     defaultSize: { width: 500, height: 300 },
     component: () =>
-      React.createElement("div", null, "Music Player Placeholder"),
+      React.createElement("div", null, "Music Player Coming Soon"),
   },
   Photobox: {
     defaultSize: { width: 400, height: 450 },
-    component: () => React.createElement("div", null, "Photobox Placeholder"),
+    component: () => React.createElement("div", null, "Photobox Coming Soon"),
   },
   "Cafe list": {
     defaultSize: { width: 450, height: 500 },
-    component: () => React.createElement("div", null, "Cafe List Placeholder"),
+    component: () => React.createElement("div", null, "Cafe List Coming Soon"),
   },
   "To-do list": {
     defaultSize: { width: 300, height: 400 },
@@ -35,7 +35,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   },
   "Chat room": {
     defaultSize: { width: 380, height: 550 },
-    component: () => React.createElement("div", null, "Chat Room Placeholder"),
+    component: () => React.createElement("div", null, "Chat Room Coming Soon"),
   },
   // Add other apps here
 };

@@ -17,21 +17,20 @@ const TodoList = () => {
 
   return (
     <div className="p-4 flex flex-col h-full bg-gray-100">
-      <h2 className="text-lg font-semibold mb-4">To-do List</h2>
-      <div className="flex mb-4">
+      <div className="flex mb-4 border">
         <input
           type="text"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           placeholder="Add a new task"
-          className="flex-grow p-2 border rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
+          className="flex-grow bg-white p-2 border rounded-l "
+          onKeyPress={(e) => e.key === "Enter" && handleAddTask()}
         />
         <button
           onClick={handleAddTask}
-          className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-secondary text-white px-4 py-2 rounded-r hover:bg-primary "
         >
-          Add
+          +
         </button>
       </div>
       <ul className="flex-grow overflow-y-auto space-y-2">
@@ -57,4 +56,4 @@ const TodoList = () => {
   );
 };
 
-export default TodoList; 
+export default TodoList;

@@ -57,7 +57,8 @@
   --muted-foreground: oklch(0.556 0 0);
   --accent: rgba(166, 83, 48, 1);
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: rgba(195, 37, 37, 1);
+  --destructive-foreground: rgba(236, 220, 175, 1);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
