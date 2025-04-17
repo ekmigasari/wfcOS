@@ -10,6 +10,8 @@ import {
   loadEditorSettings,
   loadEditorContent,
 } from "../../atoms/textEditorAtom";
+import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 interface TextEditorProps {
   initialContent?: string;
@@ -236,147 +238,57 @@ const TextEditor: React.FC<TextEditorProps> = ({
     });
   };
 
-  // Toolbar button styling
-  const toolbarButtonStyle: React.CSSProperties = {
-    backgroundColor: "#f8f8f8",
-    border: "1px solid #e0e0e0",
-    padding: "6px 10px",
-    margin: "0 3px",
-    cursor: "pointer",
-    borderRadius: "4px",
-    color: "#444",
-    fontSize: "13px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: "28px",
-    transition: "all 0.2s ease",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-  };
-
-  // Action button styling (Save, Copy)
-  const actionButtonStyle: React.CSSProperties = {
-    ...toolbarButtonStyle,
-    backgroundColor: "#f0f7ff",
-    borderColor: "#b3d7ff",
-    color: "#0066cc",
-    padding: "6px 12px",
-    fontWeight: "bold",
-  };
-
-  const activeButtonStyle: React.CSSProperties = {
-    ...toolbarButtonStyle,
-    backgroundColor: "#e8e8e8",
-    borderColor: "#bbb",
-    color: "#000",
-    boxShadow: "inset 0 1px 2px rgba(0,0,0,0.1)",
-  };
-
-  const selectStyle: React.CSSProperties = {
-    ...toolbarButtonStyle,
-    minWidth: "85px",
-    appearance: "none",
-    backgroundImage:
-      'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23444%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "right 8px center",
-    backgroundSize: "10px",
-    paddingRight: "24px",
-  };
-
-  // Toolbar group style
-  const toolbarGroupStyle: React.CSSProperties = {
-    display: "flex",
-    marginRight: "8px",
-    borderRight: "1px solid #e0e0e0",
-    paddingRight: "8px",
-  };
-
-  // CSS for animations
-  const keyframes = `
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  `;
-
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        position: "relative",
-      }}
-    >
-      {/* Add style element for keyframes */}
-      <style>{keyframes}</style>
-
+    <div className="w-full h-full flex flex-col relative">
       {/* Toolbar */}
-      <div
-        style={{
-          display: "flex",
-          padding: "8px",
-          borderBottom: "1px solid #ddd",
-          backgroundColor: "#fafafa",
-          flexWrap: "wrap",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-        }}
-      >
+      <div className="flex p-2 border-b border-gray-200 bg-gray-50 flex-wrap shadow-sm">
         {/* File Operations Group */}
-        <div style={toolbarGroupStyle}>
-          <button
+        <div className="flex mr-2 pr-2 border-r border-gray-200">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 text-blue-700 mr-1"
             onClick={handleSaveToFile}
-            style={actionButtonStyle}
             title="Save as Text File"
           >
             💾 Save
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 text-blue-700 mr-1"
             onClick={handleCopyToClipboard}
-            style={actionButtonStyle}
             title="Copy All Text"
           >
             📋 Copy
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 text-blue-700 mr-1"
             onClick={handleClearText}
-            style={actionButtonStyle}
             title="Clear All Text"
           >
             🗑️ Clear
-          </button>
+          </Button>
 
           {/* Status message */}
           {statusMessage && (
-            <div
-              style={{
-                marginLeft: "10px",
-                padding: "5px 10px",
-                backgroundColor: "#4CAF50",
-                color: "white",
-                borderRadius: "4px",
-                fontSize: "13px",
-                display: "flex",
-                alignItems: "center",
-                animation: "fadeIn 0.3s",
-              }}
-            >
+            <div className="ml-2 px-2 py-1 bg-green-500 text-white rounded text-sm flex items-center animate-fadeIn">
               ✓ {statusMessage}
             </div>
           )}
         </div>
 
         {/* Font Settings Group */}
-        <div style={toolbarGroupStyle}>
+        <div className="flex mr-2 pr-2 border-r border-gray-200">
           {/* Font Family */}
           <select
             value={fontFamily}
             onChange={(e) => updateSetting("fontFamily", e.target.value)}
-            style={selectStyle}
+            className="bg-gray-100 border border-gray-300 rounded text-sm px-2 py-1 mr-1 h-8"
           >
             <option value="monospace">Monospace</option>
             <option value="Arial, sans-serif">Arial</option>
@@ -392,7 +304,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
             onChange={(e) =>
               updateSetting("fontSize", parseInt(e.target.value))
             }
-            style={selectStyle}
+            className="bg-gray-100 border border-gray-300 rounded text-sm px-2 py-1 mr-1 h-8"
           >
             {[8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 48, 72].map(
               (size) => (
@@ -405,96 +317,135 @@ const TextEditor: React.FC<TextEditorProps> = ({
         </div>
 
         {/* Text Formatting Group */}
-        <div style={toolbarGroupStyle}>
-          <button
+        <div className="flex mr-2 pr-2 border-r border-gray-200">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "min-w-[28px] p-0 h-8 w-8",
+              isBold ? "bg-gray-200 text-gray-900" : "text-gray-700"
+            )}
             onClick={() => updateSetting("isBold", !isBold)}
-            style={isBold ? activeButtonStyle : toolbarButtonStyle}
             title="Bold"
           >
             <b>B</b>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "min-w-[28px] p-0 h-8 w-8",
+              isItalic ? "bg-gray-200 text-gray-900" : "text-gray-700"
+            )}
             onClick={() => updateSetting("isItalic", !isItalic)}
-            style={isItalic ? activeButtonStyle : toolbarButtonStyle}
             title="Italic"
           >
             <i>I</i>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "min-w-[28px] p-0 h-8 w-8",
+              isUnderline ? "bg-gray-200 text-gray-900" : "text-gray-700"
+            )}
             onClick={() => updateSetting("isUnderline", !isUnderline)}
-            style={isUnderline ? activeButtonStyle : toolbarButtonStyle}
             title="Underline"
           >
             <u>U</u>
-          </button>
+          </Button>
         </div>
 
         {/* Alignment Group */}
-        <div style={toolbarGroupStyle}>
-          <button
+        <div className="flex mr-2 pr-2 border-r border-gray-200">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "min-w-[28px] p-0 h-8 w-8",
+              textAlign === "left"
+                ? "bg-gray-200 text-gray-900"
+                : "text-gray-700"
+            )}
             onClick={() => updateSetting("textAlign", "left")}
-            style={
-              textAlign === "left" ? activeButtonStyle : toolbarButtonStyle
-            }
             title="Align Left"
           >
             &#8676;
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "min-w-[28px] p-0 h-8 w-8",
+              textAlign === "center"
+                ? "bg-gray-200 text-gray-900"
+                : "text-gray-700"
+            )}
             onClick={() => updateSetting("textAlign", "center")}
-            style={
-              textAlign === "center" ? activeButtonStyle : toolbarButtonStyle
-            }
             title="Align Center"
           >
             &#8677;
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "min-w-[28px] p-0 h-8 w-8",
+              textAlign === "right"
+                ? "bg-gray-200 text-gray-900"
+                : "text-gray-700"
+            )}
             onClick={() => updateSetting("textAlign", "right")}
-            style={
-              textAlign === "right" ? activeButtonStyle : toolbarButtonStyle
-            }
             title="Align Right"
           >
             &#8678;
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "min-w-[28px] p-0 h-8 w-8",
+              textAlign === "justify"
+                ? "bg-gray-200 text-gray-900"
+                : "text-gray-700"
+            )}
             onClick={() => updateSetting("textAlign", "justify")}
-            style={
-              textAlign === "justify" ? activeButtonStyle : toolbarButtonStyle
-            }
             title="Justify"
           >
             &#8680;
-          </button>
+          </Button>
         </div>
 
         {/* Lists Group */}
-        <div style={{ ...toolbarGroupStyle, borderRight: "none" }}>
-          <button
-            style={toolbarButtonStyle}
-            title="Bullet List"
+        <div className="flex">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-700"
             onClick={() => {
               setContent(content + "\n• ");
             }}
+            title="Bullet List"
           >
             &#8226; List
-          </button>
+          </Button>
 
-          <button
-            style={toolbarButtonStyle}
-            title="Numbered List"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-700"
             onClick={() => {
               setContent(content + "\n1. ");
             }}
+            title="Numbered List"
           >
             1. List
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -502,26 +453,20 @@ const TextEditor: React.FC<TextEditorProps> = ({
       <textarea
         value={content}
         onChange={handleChange}
+        className={cn(
+          "w-full h-full flex-grow border-none outline-none resize-none p-4 shadow-inner transition-colors duration-300",
+          "caret-blue-500"
+        )}
         style={{
-          width: "100%",
-          height: "100%",
-          flexGrow: 1,
-          border: "none",
-          outline: "none",
-          resize: "none",
-          fontFamily: fontFamily,
+          fontFamily,
           fontSize: `${fontSize}px`,
-          textAlign: textAlign,
+          textAlign,
           fontWeight: isBold ? "bold" : "normal",
           fontStyle: isItalic ? "italic" : "normal",
           textDecoration: isUnderline ? "underline" : "none",
-          padding: "15px",
-          backgroundColor: backgroundColor,
+          backgroundColor,
           color: textColor,
           lineHeight: lineHeight.toString(),
-          boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)",
-          caretColor: "#3498db",
-          transition: "background-color 0.3s ease, color 0.3s ease",
           wordWrap: wordWrap ? "break-word" : "normal",
           whiteSpace: wordWrap ? "pre-wrap" : "pre",
           overflowWrap: wordWrap ? "break-word" : "normal",
@@ -529,6 +474,23 @@ const TextEditor: React.FC<TextEditorProps> = ({
         spellCheck={true}
         placeholder="Type your text here..."
       />
+
+      {/* CSS for animations */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s;
+        }
+      `}</style>
     </div>
   );
 };
