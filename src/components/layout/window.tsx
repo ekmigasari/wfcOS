@@ -79,23 +79,19 @@ const Window: React.FC<WindowProps> = ({
   // Adjust initial position and size for mobile/tablet
   const adjustedInitialPosition = isMobileOrTablet
     ? {
-        // Center the window with small margins on mobile
-        x: Math.max(10, windowDimensions.width * 0.05),
-        y: Math.max(10, windowDimensions.height * 0.1),
+        // Position the window to match the menubar's position (respecting parent container padding)
+        x: 0, // The menubar starts at x:0 relative to its container
+        y: 36 + 4, // Menubar height (36px) + 4px gap
       }
     : initialPosition;
 
   const adjustedInitialSize = isMobileOrTablet
     ? {
-        // Use a percentage of screen size instead of full screen
-        // This creates margins and a more app-like feel
-        width: Math.min(
-          windowDimensions.width * 0.9,
-          windowDimensions.width - 20
-        ),
+        // Match the width of the menubar (full width)
+        width: windowDimensions.width - 2 * 16, // Full width minus padding on both sides (p-4 = 16px)
         height: Math.min(
           windowDimensions.height * 0.8,
-          windowDimensions.height - 100
+          windowDimensions.height - (36 + 4 + 16) // Account for menubar + gap + bottom padding
         ),
       }
     : initialSize;
@@ -215,9 +211,11 @@ const Window: React.FC<WindowProps> = ({
   // Mobile-specific styling
   const mobileWindowStyles = isMobileOrTablet
     ? {
-        borderRadius: "12px",
+        borderRadius: "0.375rem", // Match menubar's rounded-md (0.375rem)
         boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3)",
         transition: "all 0.2s ease-in-out",
+        // Add border styling to match menubar
+        border: "2px solid var(--secondary)", // Match the menubar's border-secondary border-2
       }
     : {};
 
@@ -231,7 +229,11 @@ const Window: React.FC<WindowProps> = ({
         left: `${position.x}px`,
         width: `${size.width}px`,
         height: `${size.height}px`,
-        minWidth: minSize?.width ? `${minSize.width}px` : "150px",
+        minWidth: isMobileOrTablet
+          ? undefined
+          : minSize?.width
+          ? `${minSize.width}px`
+          : "150px",
         minHeight: minSize?.height ? `${minSize.height}px` : "100px",
         zIndex: zIndex, // Apply zIndex from global state
         ...mobileWindowStyles,
@@ -241,7 +243,9 @@ const Window: React.FC<WindowProps> = ({
       {/* Title Bar */}
       <div
         className={`bg-primary px-3 py-2 border-b border-secondary flex justify-between items-center select-none h-10 rounded-t-md shadow-md ${
-          isMobileOrTablet ? "mobile-title-bar" : "cursor-move"
+          isMobileOrTablet
+            ? "mobile-title-bar px-4 bg-primary rounded-t-[0.375rem]"
+            : "cursor-move"
         }`}
         onMouseDown={isMobileOrTablet ? undefined : handleDragStart} // Only allow dragging on desktop
       >
@@ -265,7 +269,7 @@ const Window: React.FC<WindowProps> = ({
       {/* Content Area */}
       <div
         className={`p-4 flex-grow overflow-auto bg-card ${
-          isMobileOrTablet ? "mobile-content" : ""
+          isMobileOrTablet ? "mobile-content px-4" : ""
         }`}
       >
         {children}
