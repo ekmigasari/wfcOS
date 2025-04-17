@@ -3,7 +3,7 @@ description:
 globs: 
 alwaysApply: false
 ---
-- Background cancel when close without apply
+- fix z on menu bar
 - to do list UI
 - Music Player
 - Ambience Sound

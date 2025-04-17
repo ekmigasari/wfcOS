@@ -50,8 +50,8 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   todoList: {
     name: "To-do list",
     src: "/icons/board.png",
-    defaultSize: { width: 300, height: 400 },
-    minSize: { width: 200, height: 250 }, // Example minSize
+    defaultSize: { width: 340, height: 500 },
+    minSize: { width: 300, height: 340 },
     component: TodoList,
   },
   chatRoom: {
