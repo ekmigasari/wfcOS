@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Window from "./layout/window";
 import { appRegistry } from "../config/appRegistry";
@@ -72,13 +72,35 @@ export const AppsIcons = () => {
   // Local state for selection might still be needed if we want desktop icon selection independent of window focus
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
 
+  // Mobile/tablet detection
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
+  // Check for mobile/tablet on component mount
+  useEffect(() => {
+    const checkDevice = () => {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobile =
+        /iphone|ipad|ipod|android|blackberry|windows phone/g.test(userAgent);
+      const isTablet =
+        /(ipad|tablet|playbook|silk)|(android(?!.*mobile))/g.test(userAgent);
+      setIsMobileOrTablet(isMobile || isTablet);
+    };
+
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+
+    return () => {
+      window.removeEventListener("resize", checkDevice);
+    };
+  }, []);
+
   // Convert appRegistry to an array for mapping (if it's an object)
   const apps = Object.entries(appRegistry).map(([id, config]) => ({
     id, // This is the appId
     ...config,
   }));
 
-  const handleDoubleClick = (appId: string) => {
+  const openAppWindow = (appId: string) => {
     const appConfig = appRegistry[appId];
     if (!appConfig) return;
 
@@ -103,6 +125,10 @@ export const AppsIcons = () => {
     setSelectedAppId(appId); // Optionally select the icon on double click
   };
 
+  const handleDoubleClick = (appId: string) => {
+    openAppWindow(appId);
+  };
+
   const handleCloseWindow = (windowId: string) => {
     playSound("/sounds/close.mp3"); // Play close sound
     closeWindow(windowId); // Use the Jotai action atom
@@ -113,6 +139,11 @@ export const AppsIcons = () => {
     setSelectedAppId(appId);
     // Maybe play a click sound?
     playSound("/sounds/click.mp3");
+
+    // For mobile/tablet, open the window on a single click
+    if (isMobileOrTablet) {
+      openAppWindow(appId);
+    }
   };
 
   return (
@@ -170,6 +201,7 @@ export const AppsIcons = () => {
             initialSize={windowState.size}
             minSize={windowState.minSize}
             zIndex={windowState.zIndex} // Pass zIndex down
+            isMobileOrTablet={isMobileOrTablet} // Pass mobile/tablet detection
             // onFocus will be handled inside Window
           >
             <AppComponent />

@@ -1,11 +1,21 @@
 const BASE_STORAGE_KEY = "wfcOS_state";
 
+// Helper to check if localStorage is available
+const isLocalStorageAvailable = (): boolean => {
+  return typeof window !== "undefined" && window.localStorage !== undefined;
+};
+
 // Helper to get the specific key for a feature
 const getFeatureKey = (feature: string): string =>
   `${BASE_STORAGE_KEY}_${feature}`;
 
 // Save state for a specific feature
 export const saveFeatureState = <T>(feature: string, state: T): void => {
+  if (!isLocalStorageAvailable()) {
+    console.warn("localStorage is not available");
+    return;
+  }
+
   try {
     const serializedState = JSON.stringify(state);
     localStorage.setItem(getFeatureKey(feature), serializedState);
@@ -19,6 +29,11 @@ export const saveFeatureState = <T>(feature: string, state: T): void => {
 
 // Load state for a specific feature
 export const loadFeatureState = <T>(feature: string): T | undefined => {
+  if (!isLocalStorageAvailable()) {
+    console.warn("localStorage is not available");
+    return undefined;
+  }
+
   try {
     const serializedState = localStorage.getItem(getFeatureKey(feature));
     if (serializedState === null) {
@@ -37,6 +52,11 @@ export const loadFeatureState = <T>(feature: string): T | undefined => {
 
 // Clear state for a specific feature
 export const clearFeatureState = (feature: string): void => {
+  if (!isLocalStorageAvailable()) {
+    console.warn("localStorage is not available");
+    return;
+  }
+
   try {
     localStorage.removeItem(getFeatureKey(feature));
   } catch (error) {
@@ -49,6 +69,11 @@ export const clearFeatureState = (feature: string): void => {
 
 // Optional: Clear all app state if needed later
 export const clearAllAppState = (): void => {
+  if (!isLocalStorageAvailable()) {
+    console.warn("localStorage is not available");
+    return;
+  }
+
   try {
     // Get all keys related to the app
     Object.keys(localStorage)
