@@ -7,7 +7,7 @@ const font = Itim({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "WFC OS",
-  description: "Work from coffee App",
+  description: "Remote worker App",
 };
 
 export default function RootLayout({
@@ -18,9 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={font.className}>
-        <JotaiProvider>
-          {children}
-        </JotaiProvider>
+        <JotaiProvider>{children}</JotaiProvider>
       </body>
     </html>
   );

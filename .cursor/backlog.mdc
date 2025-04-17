@@ -3,7 +3,6 @@ description:
 globs: 
 alwaysApply: false
 ---
-- Background
 - Text Editor
 - Music Player
 - Ambience Sound
