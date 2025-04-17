@@ -58,16 +58,20 @@ export function Mainmenu() {
   // Function to handle reset confirmation
   const handleResetConfirm = () => {
     playSound("/sounds/click.mp3");
-    setResetDialogOpen(false);
 
-    // Create a direct instance of the ResetSystem component
-    const resetSystem = () => {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.reload();
-    };
+    // Add a small delay to ensure the sound plays completely
+    setTimeout(() => {
+      setResetDialogOpen(false);
 
-    resetSystem();
+      // Create a direct instance of the ResetSystem component
+      const resetSystem = () => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.reload();
+      };
+
+      resetSystem();
+    }, 300); // 300ms delay
   };
 
   // Function to open reset dialog
@@ -104,6 +108,14 @@ export function Mainmenu() {
                 {app.name}
               </MenubarItem>
             ))}
+            <MenubarSeparator />
+            <MenubarItem
+              inset
+              onSelect={openResetDialog}
+              className="text-destructive"
+            >
+              Reset System
+            </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
@@ -139,38 +151,34 @@ export function Mainmenu() {
             </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
-        <MenubarMenu>
-          <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
-            System
-          </MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem
-              inset
-              onSelect={openResetDialog}
-              className="text-destructive"
-            >
-              Reset System<MenubarShortcut>⌘R</MenubarShortcut>
-            </MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
         <Clock />
       </Menubar>
 
       {/* Reset Confirmation Dialog */}
-      <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog
+        open={resetDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) playSound("/sounds/close.mp3");
+          setResetDialogOpen(open);
+        }}
+      >
+        <DialogContent className="sm:max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle>Reset System</DialogTitle>
+            <DialogTitle className="text-destructive">Reset System</DialogTitle>
             <DialogDescription>
               This will reset all settings and data to their default values.
               This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="sm:justify-between">
+          <DialogFooter className="sm:justify-end">
             <Button
               type="button"
               variant="outline"
-              onClick={() => setResetDialogOpen(false)}
+              onClick={() => {
+                playSound("/sounds/close.mp3");
+                setResetDialogOpen(false);
+              }}
+              className="bg-white hover:bg-gray-300"
             >
               Cancel
             </Button>
@@ -178,8 +186,9 @@ export function Mainmenu() {
               type="button"
               variant="destructive"
               onClick={handleResetConfirm}
+              className="hover:bg-accent"
             >
-              Reset Everything
+              Reset
             </Button>
           </DialogFooter>
         </DialogContent>

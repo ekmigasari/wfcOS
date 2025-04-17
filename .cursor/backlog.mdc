@@ -6,7 +6,6 @@ alwaysApply: false
 - Background cancel when close without apply
 - to do list UI
 - Music Player
-- reset to default all state and local storage
 - Ambience Sound
 - Photobox
 - Bookmark

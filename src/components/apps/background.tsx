@@ -69,6 +69,15 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
     // No cleanup needed here as preview is managed explicitly
   }, [tempSettings, savedSettings, setPreviewSettings]);
 
+  // Reset preview background when component unmounts (window closes without applying)
+  useEffect(() => {
+    // Return cleanup function that will run when component unmounts
+    return () => {
+      // Reset preview background to null when component unmounts
+      setPreviewSettings(null);
+    };
+  }, [setPreviewSettings]);
+
   const handleSelectBackground = (bgUrl: string | null) => {
     playSound("/sounds/click.mp3");
     setTempSettings((prev) => ({ ...prev, url: bgUrl }));
