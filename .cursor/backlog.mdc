@@ -3,11 +3,10 @@ description:
 globs: 
 alwaysApply: false
 ---
-- fix z on menu bar
-- to do list UI
-- Music Player
 - Ambience Sound
+- Fix Music Player
 - Photobox
+- Add log on podomoro
 - Bookmark
 - Chats
 

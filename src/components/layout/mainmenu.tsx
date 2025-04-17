@@ -82,7 +82,7 @@ export function Mainmenu() {
 
   return (
     <>
-      <Menubar className="bg-primary border-secondary border-2 text-white">
+      <Menubar className="bg-primary border-secondary border-2 text-white z-[1500] relative">
         <MenubarMenu>
           <div className="px-1">
             <Image
@@ -162,7 +162,7 @@ export function Mainmenu() {
           setResetDialogOpen(open);
         }}
       >
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="sm:max-w-md bg-white border-2 border-secondary z-[2500] shadow">
           <DialogHeader>
             <DialogTitle className="text-destructive">Reset System</DialogTitle>
             <DialogDescription>
