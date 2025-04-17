@@ -59,19 +59,20 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 380, height: 550 },
     component: () => React.createElement("div", null, "Chat Room Coming Soon"),
   },
+
+  textEditor: {
+    name: "Notepad",
+    src: "/icons/notepad.png",
+    defaultSize: { width: 500, height: 400 },
+    minSize: { width: 300, height: 500 },
+    component: TextEditor,
+  },
   background: {
     name: "Settings",
     src: "/icons/settings.png",
     defaultSize: { width: 520, height: 470 },
     minSize: { width: 470, height: 400 },
     component: BackgroundChanger,
-  },
-  textEditor: {
-    name: "Text Editor",
-    src: "/icons/notepad.png",
-    defaultSize: { width: 500, height: 400 },
-    minSize: { width: 300, height: 200 },
-    component: TextEditor,
   },
   // Add other apps here using a unique key (appId)
 };

@@ -239,49 +239,9 @@ const TextEditor: React.FC<TextEditorProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col relative">
+    <div className="w-full h-full flex flex-col relative ">
       {/* Toolbar */}
-      <div className="flex p-2 border-b border-gray-200 bg-gray-50 flex-wrap shadow-sm">
-        {/* File Operations Group */}
-        <div className="flex mr-2 pr-2 border-r border-gray-200">
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-blue-50 text-blue-700 mr-1"
-            onClick={handleSaveToFile}
-            title="Save as Text File"
-          >
-            💾 Save
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-blue-50 text-blue-700 mr-1"
-            onClick={handleCopyToClipboard}
-            title="Copy All Text"
-          >
-            📋 Copy
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-blue-50 text-blue-700 mr-1"
-            onClick={handleClearText}
-            title="Clear All Text"
-          >
-            🗑️ Clear
-          </Button>
-
-          {/* Status message */}
-          {statusMessage && (
-            <div className="ml-2 px-2 py-1 bg-green-500 text-white rounded text-sm flex items-center animate-fadeIn">
-              ✓ {statusMessage}
-            </div>
-          )}
-        </div>
-
+      <div className="flex p-2 border-b border-gray-200 bg-gray-50 flex-wrap gap-2 shadow-sm">
         {/* Font Settings Group */}
         <div className="flex mr-2 pr-2 border-r border-gray-200">
           {/* Font Family */}
@@ -422,7 +382,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
         </div>
 
         {/* Lists Group */}
-        <div className="flex">
+        <div className="flex mr-2 pr-2 border-r border-gray-200">
           <Button
             variant="ghost"
             size="sm"
@@ -446,6 +406,46 @@ const TextEditor: React.FC<TextEditorProps> = ({
           >
             1. List
           </Button>
+        </div>
+
+        {/* File Operations Group */}
+        <div className="flex">
+          <Button
+            variant="ghost"
+            size="sm"
+            className=" mr-1"
+            onClick={handleSaveToFile}
+            title="Save as Text File"
+          >
+            💾
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className=" mr-1"
+            onClick={handleCopyToClipboard}
+            title="Copy All Text"
+          >
+            📋
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className=" mr-1"
+            onClick={handleClearText}
+            title="Clear All Text"
+          >
+            🗑️
+          </Button>
+
+          {/* Status message */}
+          {statusMessage && (
+            <div className="ml-2 px-2 py-1 bg-green-500 text-white rounded text-sm flex items-center animate-fadeIn">
+              ✓ {statusMessage}
+            </div>
+          )}
         </div>
       </div>
 
