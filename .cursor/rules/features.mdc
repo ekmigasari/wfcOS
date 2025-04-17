@@ -1,0 +1,43 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Feature Development Guidelines
+
+When building a new feature or app module in the Cursor IDE project, follow these rules to ensure consistency, performance, and maintainability:
+
+## 1. UI Implementation
+- Use **Tailwind CSS v4** for styling.
+- Use **shadcn/ui** components for UI elements.
+- If shadcn components not available, install it using bun package.
+- Follow design best practices to ensure clean, modern, and accessible interfaces.
+- Use sematic color and style from `/src/styles/globals.css`
+
+## 2. File Structure & Component Location
+- Create each feature as a component under:  
+  `/src/components/apps/[featureName].tsx`
+
+## 3. Client-Side Components
+- If a component uses client-side interactivity, **add** `"use client"` **at the top** of the file.
+
+## 4. Next.js SSR Best Practices
+- Default to **server-side rendering** (SSR) where appropriate.
+- Use client-side logic **only when necessary**, and isolate it cleanly within components.
+
+## 5. App Registration
+- Register each new app or feature in the global app list at:  
+  `/src/config/appRegistry.ts`
+
+## 6. Global State Management
+- Use **Jotai** atoms for managing global state.
+- Place all atoms under:  
+  `/atoms`
+
+## 7. Local Storage Persistence
+- For persistent data, use helper functions in:  
+  `/src/utils/storage.ts`
+
+## 8. Window-Based Layout
+- All apps should render inside the reusable window layout:  
+  `/src/components/window.tsx`

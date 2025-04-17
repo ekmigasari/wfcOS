@@ -15,6 +15,7 @@
     "@eslint/js": "^9.24.0",
     "@radix-ui/react-dialog": "^1.1.7",
     "@radix-ui/react-menubar": "^1.1.7",
+    "@radix-ui/react-slider": "^1.2.4",
     "@radix-ui/react-slot": "^1.2.0",
     "@tailwindcss/postcss": "^4.1.4",
     "@types/uuid": "^10.0.0",
@@ -31,6 +32,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-draggable": "^4.4.6",
+    "react-player": "^2.16.0",
     "react-resizable": "^3.0.5",
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.4",
@@ -47,6 +49,6 @@
     "eslint-config-next": "15.2.4",
     "husky": "^9.1.7",
     "typescript": "^5.8.3",
-    "@types/bun": "^1.2.9"
+    "@types/bun": "^1.2.10"
   }
 }

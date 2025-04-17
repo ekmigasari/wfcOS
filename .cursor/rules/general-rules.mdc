@@ -3,9 +3,9 @@ description:
 globs: 
 alwaysApply: true
 ---
-# Project Rules
+# Work from Coffee
 
-Web OS like PC desktop
+WFCOS (Work From Cafe OS) is a web-based desktop envidesigned to centralize youral workflow and enhance  By providing a single,zed interface, it helps usduce clutter, streamline taskss essential tools and applicationiently from any browser
 
 ## Tech Stack
 
@@ -18,10 +18,11 @@ Web OS like PC desktop
 - **Containerization:** [Docker](mdc:https:/www.docker.com)
 - **Language:** [TypeScript](mdc:https:/www.typescriptlang.org) v5.8.3
 - **Package Manager:** [Bun](mdc:https:/bun.sh) v1.x
-- **UI Components:** [Radix UI](mdc:https:/www.radix-ui.com) v1.1.7
+- **UI Components:** [Radix UI](mdc:https:/www.radix-ui.com) v1.1.7, [shadcn/ui](mdc:https:/ui.shadcn.com)
 - **Icons:** [Lucide React](mdc:https:/lucide.dev) v0.488.0
 
-## Folder Structure
+
+## 📁 Folder Structure
 
 ```
 .
@@ -76,3 +77,7 @@ Web OS like PC desktop
 ├── postcss.config.mjs      # PostCSS configuration for Tailwind
 └── tsconfig.json           # TypeScript configuration
 ```
+
+
+
+

@@ -4,6 +4,7 @@ import TodoList from "../components/apps/todoList";
 import BackgroundChanger from "../components/apps/background";
 import React from "react";
 import TextEditor from "../components/apps/textEditor";
+import MusicPlayer from "../components/apps/musicPlayer";
 
 // Updated interface to include missing fields
 interface AppRegistryEntry {
@@ -31,8 +32,8 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     name: "Music",
     src: "/icons/music.png",
     defaultSize: { width: 500, height: 300 },
-    component: () =>
-      React.createElement("div", null, "Music Player Coming Soon"),
+    minSize: { width: 350, height: 250 },
+    component: MusicPlayer,
   },
   photobox: {
     name: "Photobox",
