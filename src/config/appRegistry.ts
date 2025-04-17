@@ -3,6 +3,7 @@ import PodomoroTimer from "../components/apps/podomoro";
 import TodoList from "../components/apps/todoList";
 import BackgroundChanger from "../components/apps/background";
 import React from "react";
+import TextEditor from "../components/apps/textEditor";
 
 // Updated interface to include missing fields
 interface AppRegistryEntry {
@@ -64,6 +65,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 520, height: 470 },
     minSize: { width: 470, height: 400 },
     component: BackgroundChanger,
+  },
+  textEditor: {
+    name: "Text Editor",
+    src: "/icons/notepad.png",
+    defaultSize: { width: 500, height: 400 },
+    minSize: { width: 300, height: 200 },
+    component: TextEditor,
   },
   // Add other apps here using a unique key (appId)
 };

@@ -3,6 +3,8 @@ description:
 globs: 
 alwaysApply: false
 ---
+- Background cancel when close without apply
+- to do list UI
 - Text Editor
 - Music Player
 - Ambience Sound
