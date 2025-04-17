@@ -38,19 +38,6 @@ export function Mainmenu() {
     });
   };
 
-  // Function to open background changer
-  const openBackgroundChanger = () => {
-    playSound("/sounds/open.mp3");
-
-    openWindow({
-      id: "background-changer-instance",
-      appId: "background",
-      title: "Background Settings",
-      minSize: { width: 470, height: 400 },
-      initialSize: { width: 520, height: 470 },
-    });
-  };
-
   // Function to open URL in the current window
   const openUrl = (url: string) => {
     playSound("/sounds/click.mp3");
@@ -79,19 +66,6 @@ export function Mainmenu() {
               {app.name}
             </MenubarItem>
           ))}
-          <MenubarSeparator />
-          <MenubarItem
-            onSelect={openBackgroundChanger}
-            className="flex items-center gap-2"
-          >
-            <Image
-              src="/icons/settings.png"
-              alt="Background"
-              width={16}
-              height={16}
-            />
-            Background
-          </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
