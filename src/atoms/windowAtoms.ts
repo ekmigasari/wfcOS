@@ -32,11 +32,24 @@ const getNextZIndex = (registry: WindowRegistryState): number => {
 
 // --- Atoms ---
 
-// Load initial state from localStorage or use default (empty object)
-const initialWindows = loadFeatureState<WindowRegistryState>(FEATURE_KEY) ?? {};
+// Create a default empty window registry - using empty object to handle SSR
+const defaultWindowRegistry: WindowRegistryState = {};
 
-// Create the base atom holding the registry of windows
-const baseWindowsAtom = atom<WindowRegistryState>(initialWindows);
+// Create initial state atom with safe client-side initialization
+const getInitialState = (): WindowRegistryState => {
+  // Only run localStorage access on the client side
+  if (typeof window === "undefined") {
+    return defaultWindowRegistry;
+  }
+
+  // Load from localStorage only on the client side
+  return (
+    loadFeatureState<WindowRegistryState>(FEATURE_KEY) ?? defaultWindowRegistry
+  );
+};
+
+// Create the base atom with proper initialization to handle hydration
+const baseWindowsAtom = atom<WindowRegistryState>(getInitialState());
 
 // Create a derived atom that saves to localStorage on change
 export const windowRegistryAtom = atom(

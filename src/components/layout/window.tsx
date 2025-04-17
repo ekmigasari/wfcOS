@@ -39,6 +39,9 @@ const Window: React.FC<WindowProps> = ({
   zIndex,
   isMobileOrTablet,
 }) => {
+  // Add mounted state to handle hydration issues
+  const [isMounted, setIsMounted] = useState(false);
+
   // State to store window dimensions
   const [windowDimensions, setWindowDimensions] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 0,
@@ -66,6 +69,11 @@ const Window: React.FC<WindowProps> = ({
 
     // Clean up
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Effect to handle client-side mounting
+  useEffect(() => {
+    setIsMounted(true);
   }, []);
 
   // Adjust initial position and size for mobile/tablet
@@ -117,8 +125,8 @@ const Window: React.FC<WindowProps> = ({
       // containerRef could be added here if needed
     });
 
-  // Don't render if not open (redundant if filtered upstream, but safe)
-  if (!isOpen) {
+  // Don't render if not mounted (to prevent hydration mismatch) or not open
+  if (!isMounted || !isOpen) {
     return null;
   }
 
