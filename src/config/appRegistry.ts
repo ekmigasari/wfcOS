@@ -1,6 +1,7 @@
 import { Size } from "../types";
 import PodomoroTimer from "../components/apps/podomoro";
 import TodoList from "../components/apps/todoList";
+import BackgroundChanger from "../components/apps/background";
 import React from "react";
 
 // Updated interface to include missing fields
@@ -56,6 +57,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     src: "/icons/phone.png",
     defaultSize: { width: 380, height: 550 },
     component: () => React.createElement("div", null, "Chat Room Coming Soon"),
+  },
+  background: {
+    name: "Settings",
+    src: "/icons/settings.png",
+    defaultSize: { width: 520, height: 470 },
+    minSize: { width: 470, height: 400 },
+    component: BackgroundChanger,
   },
   // Add other apps here using a unique key (appId)
 };

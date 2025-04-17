@@ -15,6 +15,7 @@
     "@eslint/js": "^9.24.0",
     "@radix-ui/react-dialog": "^1.1.7",
     "@radix-ui/react-menubar": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.0",
     "@tailwindcss/postcss": "^4.1.4",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.30.1",

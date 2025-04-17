@@ -204,7 +204,7 @@ export const AppsIcons = () => {
             isMobileOrTablet={isMobileOrTablet} // Pass mobile/tablet detection
             // onFocus will be handled inside Window
           >
-            <AppComponent />
+            <AppComponent onClose={() => handleCloseWindow(windowState.id)} />
           </Window>
         );
       })}
