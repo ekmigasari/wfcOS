@@ -86,7 +86,7 @@ Web OS like PC desktop
 
    ```bash
    git clone <your-repository-url>
-   cd kids-art
+   cd wfcOS
    ```
 
 2. Install dependencies with Bun:
@@ -125,13 +125,13 @@ bun run lint
 1. Build the Docker image:
 
    ```bash
-   docker build -t kids-art .
+   docker build -t wfcOS .
    ```
 
 2. Run the container:
 
    ```bash
-   docker run -p 3000:3000 kids-art
+   docker run -p 3000:3000 wfcOS
    ```
 
    Alternatively, using docker-compose:
