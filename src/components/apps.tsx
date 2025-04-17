@@ -39,7 +39,7 @@ const AppIcon: React.FC<AppIconProps> = ({
 
   return (
     <div
-      className={`flex flex-col items-center justify-center cursor-pointer group p-1 rounded transition-opacity duration-150 ease-in-out min-w-30`}
+      className={`flex flex-col items-center justify-center cursor-pointer group p-1 rounded transition-opacity duration-150 ease-in-out min-w-24`}
       //   onClick={onSelect} // Single click might focus desktop or select icon differently
       onDoubleClick={() => onDoubleClick(appId)} // Trigger open/focus action
     >
@@ -150,24 +150,24 @@ export const AppsIcons = () => {
     <>
       {/* Background click to clear selection */}
       <div
-        className="fixed inset-0 -z-10"
+        className="inset-0 -z-10"
         onClick={() => setSelectedAppId(null)}
       ></div>
 
       {/* Desktop Icons */}
-      <div className="fixed right-0 p-4 flex flex-col items-end space-y-2 z-10">
+      <div className="absolute top-4 right-4 flex flex-col flex-wrap-reverse gap-2z-10 max-h-[calc(100vh-80px)]">
         {apps.map((app) => (
           <div
             key={app.id}
-            onClick={() => handleSelectIcon(app.id)} // Wrap icon for selection click area
+            onClick={() => handleSelectIcon(app.id)}
             className={`p-1 rounded ${
               selectedAppId === app.id ? "brightness-50" : ""
-            }`} // Basic selection highlight
+            }`}
           >
             <AppIcon
               src={app.src}
               name={app.name}
-              appId={app.id} // Pass appId
+              appId={app.id}
               onDoubleClick={handleDoubleClick}
             />
           </div>
