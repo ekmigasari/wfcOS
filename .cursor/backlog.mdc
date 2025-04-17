@@ -3,4 +3,11 @@ description:
 globs: 
 alwaysApply: false
 ---
-- window resizer size t r l
+- Background
+- Text Editor
+- Music Player
+- Ambience Sound
+- Photobox
+- Bookmark
+- Chats
+

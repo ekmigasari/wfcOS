@@ -2,129 +2,101 @@
 
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
   MenubarSeparator,
   MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import Image from "next/image";
 import Clock from "../clock";
 import { playSound } from "@/lib/utils";
+import { appRegistry } from "@/config/appRegistry";
+import { useAtom } from "jotai";
+import { openWindowAtom } from "@/atoms/windowAtoms";
 
 export function Mainmenu() {
+  // Get the setter for opening windows
+  const openWindow = useAtom(openWindowAtom)[1];
+
+  // Function to open an app
+  const openApp = (appId: string) => {
+    const appConfig = appRegistry[appId];
+    if (!appConfig) return;
+
+    playSound("/sounds/open.mp3");
+
+    const windowInstanceId = `${appId}-instance`;
+
+    openWindow({
+      id: windowInstanceId,
+      appId: appId,
+      title: appConfig.name,
+      minSize: appConfig.minSize,
+      initialSize: appConfig.defaultSize,
+    });
+  };
+
+  // Function to open URL in the current window
+  const openUrl = (url: string) => {
+    playSound("/sounds/click.mp3");
+    window.open(url, "_blank");
+  };
+
   return (
     <Menubar className="bg-primary border-secondary border-2 text-white">
       <MenubarMenu>
-        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
+        <div className="px-1">
           <Image src="/icons/coffee.png" alt="coffee" width={20} height={20} />
+        </div>
+      </MenubarMenu>
+      <MenubarMenu>
+        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
+          Menu
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem>
-            About <MenubarShortcut>v 1.0</MenubarShortcut>
-          </MenubarItem>
+          {Object.entries(appRegistry).map(([appId, app]) => (
+            <MenubarItem
+              key={appId}
+              onSelect={() => openApp(appId)}
+              className="flex items-center gap-2"
+            >
+              <Image src={app.src} alt={app.name} width={16} height={16} />
+              {app.name}
+            </MenubarItem>
+          ))}
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
-          File
+          Bookmark
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onSelect={() => playSound("/sounds/click.mp3")}>
-            New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem onSelect={() => playSound("/sounds/click.mp3")}>
-            New Window <MenubarShortcut>⌘N</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem disabled>New Incognito Window</MenubarItem>
-          <MenubarSeparator />
-          <MenubarSub>
-            <MenubarSubTrigger>Share</MenubarSubTrigger>
-            <MenubarSubContent>
-              <MenubarItem onSelect={() => playSound("/sounds/click.mp3")}>
-                Email link
-              </MenubarItem>
-              <MenubarItem>Messages</MenubarItem>
-              <MenubarItem>Notes</MenubarItem>
-            </MenubarSubContent>
-          </MenubarSub>
-          <MenubarSeparator />
-          <MenubarItem>
-            Print... <MenubarShortcut>⌘P</MenubarShortcut>
-          </MenubarItem>
+          <MenubarItem disabled>Coming Soon</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
-          Edit
+          About
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onSelect={() => playSound("/sounds/click.mp3")}>
-            Undo <MenubarShortcut>⌘Z</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem>
-            Redo <MenubarShortcut>⇧⌘Z</MenubarShortcut>
+          <MenubarItem disabled>
+            WFC OS<MenubarShortcut>v 1.0</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarSub>
-            <MenubarSubTrigger>Find</MenubarSubTrigger>
-            <MenubarSubContent>
-              <MenubarItem>Search the web</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Find...</MenubarItem>
-              <MenubarItem>Find Next</MenubarItem>
-              <MenubarItem>Find Previous</MenubarItem>
-            </MenubarSubContent>
-          </MenubarSub>
-          <MenubarSeparator />
-          <MenubarItem>Cut</MenubarItem>
-          <MenubarItem>Copy</MenubarItem>
-          <MenubarItem>Paste</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
-          View
-        </MenubarTrigger>
-        <MenubarContent>
-          <MenubarCheckboxItem>Always Show Bookmarks Bar</MenubarCheckboxItem>
-          <MenubarCheckboxItem checked>
-            Always Show Full URLs
-          </MenubarCheckboxItem>
-          <MenubarSeparator />
-          <MenubarItem inset onSelect={() => playSound("/sounds/click.mp3")}>
-            Reload <MenubarShortcut>⌘R</MenubarShortcut>
+          <MenubarItem
+            inset
+            onSelect={() => openUrl("https://x.com/ekmigasari")}
+          >
+            Xmigas <MenubarShortcut>creator</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem disabled inset>
-            Force Reload <MenubarShortcut>⇧⌘R</MenubarShortcut>
+          <MenubarItem
+            inset
+            onSelect={() => openUrl("https://github.com/ekmigasari/wfcOS.git")}
+          >
+            Github<MenubarShortcut>repository</MenubarShortcut>
           </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem inset>Toggle Fullscreen</MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem inset>Hide Sidebar</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
-          Profiles
-        </MenubarTrigger>
-        <MenubarContent>
-          <MenubarRadioGroup value="benoit">
-            <MenubarRadioItem value="andy">Andy</MenubarRadioItem>
-            <MenubarRadioItem value="benoit">Benoit</MenubarRadioItem>
-            <MenubarRadioItem value="Luis">Luis</MenubarRadioItem>
-          </MenubarRadioGroup>
-          <MenubarSeparator />
-          <MenubarItem inset>Edit...</MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem inset>Add Profile...</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <Clock />
