@@ -13,7 +13,7 @@ Web OS like PC desktop
 - **Containerization:** [Docker](https://www.docker.com/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/) v5.8.3
 - **Package Manager:** [Bun](https://bun.sh/) v1.x
-- **UI Components:** [Radix UI](https://www.radix-ui.com/) v1.1.7
+- **UI Components:** [Radix UI](https://www.radix-ui.com/) v1.1.7, [shadcn/ui](https://ui.shadcn.com/)
 - **Icons:** [Lucide React](https://lucide.dev/) v0.488.0
 
 ## 📁 Folder Structure
@@ -183,6 +183,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🙏 Acknowledgements
 
+- Inspired by [ryos](https://github.com/ryokun6/ryos)
 - [Next.js](https://nextjs.org/) - The React Framework
 - [Tailwind CSS](https://tailwindcss.com/) - For utility-first CSS
 - [Radix UI](https://www.radix-ui.com/) - For accessible UI components
