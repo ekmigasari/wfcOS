@@ -1,6 +1,8 @@
-# WFCOS
+# Work from Coffee
 
-Web OS like PC desktop
+WFCOS (Work From Cafe OS) is a web-based desktop environment designed to centralize your digital workflow and enhance productivity. By providing a single, organized interface, it helps users reduce clutter, streamline tasks, and access essential tools and applications efficiently from any browser.
+
+Built with a cutting-edge stack including Next.js 15, React 19, and Tailwind CSS v4, WFCOS offers a customizable and performant workspace. Leveraging Radix UI and shadcn/ui, it provides a familiar, desktop-like environment tailored to your needs. Ideal for remote workers, developers, and anyone seeking a consistent and personalized command center for their online activities.
 
 ## 🛠️ Tech Stack
 
