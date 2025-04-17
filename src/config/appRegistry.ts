@@ -24,14 +24,14 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   podomoro: {
     name: "Podomoro",
     src: "/icons/clock.png",
-    defaultSize: { width: 350, height: 400 },
+    defaultSize: { width: 400, height: 650 },
     minSize: { width: 250, height: 300 }, // Example minSize
     component: PodomoroTimer,
   },
   music: {
     name: "Music",
     src: "/icons/music.png",
-    defaultSize: { width: 500, height: 300 },
+    defaultSize: { width: 400, height: 600 },
     minSize: { width: 350, height: 250 },
     component: MusicPlayer,
   },
@@ -50,7 +50,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   todoList: {
     name: "To-do list",
     src: "/icons/board.png",
-    defaultSize: { width: 340, height: 500 },
+    defaultSize: { width: 400, height: 400 },
     minSize: { width: 300, height: 340 },
     component: TodoList,
   },
@@ -64,14 +64,14 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   textEditor: {
     name: "Notepad",
     src: "/icons/notepad.png",
-    defaultSize: { width: 500, height: 400 },
+    defaultSize: { width: 600, height: 400 },
     minSize: { width: 300, height: 500 },
     component: TextEditor,
   },
   background: {
     name: "Settings",
     src: "/icons/settings.png",
-    defaultSize: { width: 520, height: 470 },
+    defaultSize: { width: 800, height: 650 },
     minSize: { width: 470, height: 400 },
     component: BackgroundChanger,
   },

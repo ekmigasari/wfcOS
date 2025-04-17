@@ -9,6 +9,15 @@ import {
   applyPreviewBackgroundAtom,
 } from "@/atoms/backgroundAtom";
 import { playSound } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 
 const backgrounds = [
   "/background/bg-1.png",
@@ -83,10 +92,10 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
     setTempSettings((prev) => ({ ...prev, url: bgUrl }));
   };
 
-  const handleChangeFit = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChangeFit = (value: string) => {
     setTempSettings((prev) => ({
       ...prev,
-      fit: e.target.value as BackgroundFit,
+      fit: value as BackgroundFit,
     }));
   };
 
@@ -138,20 +147,20 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
   const hasChanges = previewSettings !== null;
 
   return (
-    <div className="p-6 bg-card rounded-lg shadow-md text-card-foreground min-w-[500px]">
-      <div className="space-y-4">
+    <Card className="w-full max-w-[95vw] sm:max-w-[500px] lg:max-w-none bg-card text-card-foreground border-none shadow-none">
+      <CardContent className="p-4 sm:p-6 space-y-4">
         {/* Background Options */}
         <div>
           <h3 className="text-sm font-medium mb-2">Image</h3>
 
-          <div className="grid grid-cols-4 gap-2 space-y-4">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 mb-4">
             {/* No Image Option */}
             <div
               className={`cursor-pointer border-2 transition-colors ${
                 tempSettings.url === null
                   ? "border-primary bg-primary/10"
                   : "border-muted hover:border-primary/50 bg-muted"
-              } rounded-md overflow-hidden flex items-center justify-center h-[70px]`}
+              } rounded-md overflow-hidden flex items-center justify-center h-[60px] sm:h-[70px]`}
               onClick={() => handleSelectBackground(null)}
               role="button"
               tabIndex={0}
@@ -161,7 +170,9 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
                 }
               }}
             >
-              <div className="text-center text-sm font-medium">No Image</div>
+              <div className="text-center text-xs sm:text-sm font-medium">
+                No Image
+              </div>
             </div>
 
             {/* Upload Image Slot */}
@@ -170,7 +181,7 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
                 uploadedImage && tempSettings.url === uploadedImage
                   ? "border-primary"
                   : "border-muted hover:border-primary/50 bg-muted"
-              } rounded-md overflow-hidden flex items-center justify-center h-[70px]`}
+              } rounded-md overflow-hidden flex items-center justify-center h-[60px] sm:h-[70px]`}
               onClick={() => fileInputRef.current?.click()}
               role="button"
               tabIndex={0}
@@ -184,12 +195,14 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
                 <Image
                   src={uploadedImage}
                   alt="Uploaded Background"
-                  layout="fill"
-                  objectFit="cover"
-                  className="opacity-80 group-hover:opacity-100 transition-opacity"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 300px"
+                  className="object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                 />
               ) : (
-                <div className="text-center text-sm font-medium">+Upload</div>
+                <div className="text-center text-xs sm:text-sm font-medium">
+                  +Upload
+                </div>
               )}
               <input
                 type="file"
@@ -200,7 +213,7 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
             {/* Background Images */}
             {backgrounds.map((bg) => (
               <div
@@ -209,7 +222,7 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
                   tempSettings.url === bg
                     ? "border-primary"
                     : "border-transparent hover:border-primary/50"
-                } rounded-md overflow-hidden`}
+                } rounded-md overflow-hidden aspect-video`}
                 onClick={() => handleSelectBackground(bg)}
                 role="button"
                 tabIndex={0}
@@ -224,6 +237,7 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
                   alt={`Background ${bg.split("/").pop()?.split(".")[0]}`}
                   width={100}
                   height={70}
+                  sizes="(max-width: 640px) 150px, 200px"
                   className="object-cover w-full h-full"
                 />
               </div>
@@ -239,38 +253,42 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
           >
             Image Fit
           </label>
-          <select
-            id="fit-selector"
-            value={tempSettings.fit}
-            onChange={handleChangeFit}
-            className="w-full bg-card border border-input rounded-md p-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
-          >
-            {fitOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <Select value={tempSettings.fit} onValueChange={handleChangeFit}>
+            <SelectTrigger className="w-full" id="fit-selector">
+              <SelectValue placeholder="Select fit style" />
+            </SelectTrigger>
+            <SelectContent>
+              {fitOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-2 mt-6">
-        <button
-          onClick={handleCancel}
-          className="py-2 px-4 border border-secondary hover:bg-secondary/10 rounded-md text-secondary-foreground transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleApply}
-          className="py-2 px-4 bg-secondary hover:bg-secondary/90 rounded-md text-white transition-colors min-w-24"
-          disabled={!hasChanges}
-        >
-          Apply
-        </button>
-      </div>
-    </div>
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-2 mt-6">
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+            size="sm"
+            className="sm:size-default"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={handleApply}
+            disabled={!hasChanges}
+            size="sm"
+            className="sm:size-default min-w-20"
+          >
+            Apply
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
