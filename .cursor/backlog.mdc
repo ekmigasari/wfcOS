@@ -3,10 +3,9 @@ description:
 globs: 
 alwaysApply: false
 ---
-- minimum h on notepad
 - add type sound notepad
 
-- Ambience Sound
+- Fix Ambience Sound
 - Fix Music Player
 - Change the song list
 - Photobox
