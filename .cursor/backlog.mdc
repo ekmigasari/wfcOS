@@ -3,13 +3,14 @@ description:
 globs: 
 alwaysApply: false
 ---
+- Add about
 - add type sound notepad
-
-- Fix Ambience Sound
-- Fix Music Player
-- Change the song list
-- Photobox
 - Add log on podomoro
+
+
+# Future Feature
+- Minimize on window
+- Photobox
 - Bookmark
 - Chats
 

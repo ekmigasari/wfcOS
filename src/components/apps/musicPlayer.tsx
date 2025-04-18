@@ -9,6 +9,9 @@ import {
   currentSongIndexAtom,
   playingAtom,
   getYoutubeId,
+  isWindowOpenAtom,
+  currentTimeAtom,
+  persistMusicPlayerState,
 } from "../../atoms/musicPlayerAtom";
 
 // Define an extended Song interface with a sequence ID
@@ -19,11 +22,44 @@ interface Song {
   seqId: number; // Sequential ID for navigation
 }
 
+// Define a YouTube player interface for type safety
+interface YouTubePlayerWithMethods {
+  playVideo: () => void;
+  pauseVideo: () => void;
+  [key: string]: unknown; // Replace any with unknown for better type safety
+}
+
+// Create a global reference to ensure playback continues when window is closed
+let globalYoutubePlayer: YouTubePlayerWithMethods | null = null;
+
+// Flag to track if we're in a page unload state
+let isPageUnloading = false;
+
+// Set up beforeunload handler to prevent zombie audio
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
+    isPageUnloading = true;
+    if (globalYoutubePlayer) {
+      // Stop any playing audio when the page is about to unload
+      try {
+        if (typeof globalYoutubePlayer.pauseVideo === "function") {
+          globalYoutubePlayer.pauseVideo();
+        }
+      } catch (e) {
+        console.error("Error stopping YouTube playback on page unload:", e);
+      }
+    }
+  });
+}
+
 const MusicPlayer: React.FC = () => {
   // Global state
   const [playlist, setPlaylist] = useAtom(playlistAtom);
   const [currentSongIndex, setCurrentSongIndex] = useAtom(currentSongIndexAtom);
   const [playing, setPlaying] = useAtom(playingAtom);
+  const [isWindowOpen, setIsWindowOpen] = useAtom(isWindowOpenAtom);
+  const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
+  const [, persistState] = useAtom(persistMusicPlayerState);
 
   // Local state
   const [duration, setDuration] = useState(0);
@@ -34,9 +70,13 @@ const MusicPlayer: React.FC = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [nextSeqId, setNextSeqId] = useState(1); // Track the next sequential ID to assign
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialSyncDone, setInitialSyncDone] = useState(false);
 
   // Refs
   const playerRef = useRef<ReactPlayer>(null);
+  const ignoreEvents = useRef(false);
+  const timeUpdateInterval = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize the playlist with sequential IDs if they don't exist
   useEffect(() => {
@@ -66,9 +106,222 @@ const MusicPlayer: React.FC = () => {
   const currentSeqId =
     currentSong && "seqId" in currentSong ? (currentSong as Song).seqId : 0;
 
+  // Initial setup: register player cleanup on mount once
+  useEffect(() => {
+    const cleanup = () => {
+      if (
+        globalYoutubePlayer &&
+        typeof globalYoutubePlayer.pauseVideo === "function"
+      ) {
+        try {
+          // Ensure we persist the state one last time
+          if (playerRef.current) {
+            const newTime = playerRef.current.getCurrentTime() || 0;
+            persistState({ currentTime: newTime });
+          }
+
+          // If we're actually unloading the page, stop the player
+          if (isPageUnloading) {
+            globalYoutubePlayer.pauseVideo();
+            globalYoutubePlayer = null;
+          }
+        } catch (e) {
+          console.error("Error during cleanup:", e);
+        }
+      }
+    };
+
+    window.addEventListener("pagehide", cleanup);
+    return () => {
+      window.removeEventListener("pagehide", cleanup);
+    };
+  }, [persistState]);
+
+  // Mark window as open when component mounts and closed when unmounted
+  useEffect(() => {
+    setIsWindowOpen(true);
+    persistState({ isWindowOpen: true });
+
+    return () => {
+      setIsWindowOpen(false);
+      persistState({ isWindowOpen: false });
+      // Don't stop playback on unmount - audio will continue in background
+    };
+  }, [setIsWindowOpen, persistState]);
+
+  // Set up reference to the YouTube player instance
+  useEffect(() => {
+    const updatePlayerRef = () => {
+      if (playerRef.current) {
+        const player = playerRef.current.getInternalPlayer();
+        if (player) {
+          globalYoutubePlayer = player as YouTubePlayerWithMethods;
+        }
+      }
+    };
+
+    // Try immediately
+    updatePlayerRef();
+
+    // Also try after a delay to ensure player is ready
+    const timer = setTimeout(() => {
+      updatePlayerRef();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [playerRef.current, initialSyncDone]);
+
+  // Sync player state when it's ready
+  useEffect(() => {
+    if (
+      !playerRef.current ||
+      isPageUnloading ||
+      initialSyncDone ||
+      !currentSong
+    )
+      return;
+
+    const syncTimer = setTimeout(() => {
+      try {
+        setInitialSyncDone(true);
+        setIsLoading(true);
+        ignoreEvents.current = true;
+
+        // If we have a saved position, seek to it
+        if (currentTime > 0) {
+          playerRef.current?.seekTo(currentTime, "seconds");
+        }
+
+        // Update playing state based on saved state - but with a delay
+        setTimeout(() => {
+          try {
+            const player =
+              playerRef.current?.getInternalPlayer() as YouTubePlayerWithMethods;
+            if (player) {
+              if (playing) {
+                player.playVideo();
+              } else {
+                player.pauseVideo();
+              }
+            }
+
+            setIsLoading(false);
+            ignoreEvents.current = false;
+          } catch (error) {
+            console.error("Error applying play/pause state:", error);
+            setIsLoading(false);
+            ignoreEvents.current = false;
+          }
+        }, 1000);
+      } catch (error) {
+        console.error("Error syncing player state:", error);
+        setIsLoading(false);
+        ignoreEvents.current = false;
+      }
+    }, 1500);
+
+    return () => {
+      clearTimeout(syncTimer);
+    };
+  }, [currentSong, currentTime, playing, initialSyncDone, persistState]);
+
+  // Watch for playing state changes to sync with YouTube player
+  useEffect(() => {
+    if (!playerRef.current || ignoreEvents.current || !initialSyncDone) return;
+
+    try {
+      const player =
+        playerRef.current.getInternalPlayer() as YouTubePlayerWithMethods;
+      if (player) {
+        if (playing) {
+          player.playVideo();
+        } else {
+          player.pauseVideo();
+        }
+      }
+    } catch (error) {
+      console.error("Error applying play/pause state:", error);
+    }
+  }, [playing, initialSyncDone]);
+
+  // Set up position tracking interval to save current time periodically
+  useEffect(() => {
+    if (!playerRef.current) return;
+
+    // Save current position function
+    const saveCurrentPosition = () => {
+      if (playerRef.current && !seeking && playing) {
+        const newTime = playerRef.current.getCurrentTime() || 0;
+        // Only save if position has changed significantly (> 1 second)
+        if (Math.abs(newTime - currentTime) > 1) {
+          setCurrentTime(newTime);
+          persistState({ currentTime: newTime });
+        }
+      }
+    };
+
+    // Set up an interval to periodically save the current playback position
+    timeUpdateInterval.current = setInterval(() => {
+      if (playing) {
+        saveCurrentPosition();
+      }
+    }, 5000); // Save position every 5 seconds
+
+    return () => {
+      if (timeUpdateInterval.current) {
+        clearInterval(timeUpdateInterval.current);
+      }
+
+      // Save one last time on unmount
+      saveCurrentPosition();
+    };
+  }, [playing, currentTime, setCurrentTime, persistState, seeking]);
+
+  // Handle visibility changes (tab switching, etc.)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      // If the page becomes hidden (e.g., switched tabs)
+      if (document.visibilityState === "hidden" && !isWindowOpen) {
+        // Save the current state
+        if (playerRef.current) {
+          const newTime = playerRef.current.getCurrentTime() || 0;
+          setCurrentTime(newTime);
+          persistState({ currentTime: newTime });
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isWindowOpen, persistState, setCurrentTime]);
+
   // Handlers
   const handlePlayPause = () => {
-    setPlaying(!playing);
+    if (ignoreEvents.current) return;
+
+    // Force a short delay to make sure player is ready
+    setTimeout(() => {
+      const newPlayingState = !playing;
+      setPlaying(newPlayingState);
+      persistState({ isPlaying: newPlayingState });
+
+      try {
+        const player =
+          playerRef.current?.getInternalPlayer() as YouTubePlayerWithMethods;
+        if (player) {
+          if (newPlayingState) {
+            player.playVideo();
+          } else {
+            player.pauseVideo();
+          }
+        }
+      } catch (error) {
+        console.error("Error toggling play state:", error);
+      }
+    }, 50);
   };
 
   const handleNext = () => {
@@ -87,6 +340,7 @@ const MusicPlayer: React.FC = () => {
           (song as Song).seqId === (nextSongs[0] as Song).seqId
       );
       setCurrentSongIndex(nextSongIndex);
+      persistState({ currentSongIndex: nextSongIndex, currentTime: 0 });
     } else {
       // Cycle back to the lowest seqId if at the end
       const firstSong = [...playlist].sort(
@@ -98,10 +352,12 @@ const MusicPlayer: React.FC = () => {
           "seqId" in song && (song as Song).seqId === (firstSong as Song).seqId
       );
       setCurrentSongIndex(firstSongIndex);
+      persistState({ currentSongIndex: firstSongIndex, currentTime: 0 });
     }
 
     // Ensure it starts playing
     setPlaying(true);
+    persistState({ isPlaying: true });
   };
 
   const handlePrevious = () => {
@@ -120,6 +376,7 @@ const MusicPlayer: React.FC = () => {
           (song as Song).seqId === (prevSongs[0] as Song).seqId
       );
       setCurrentSongIndex(prevSongIndex);
+      persistState({ currentSongIndex: prevSongIndex, currentTime: 0 });
     } else {
       // Cycle to the highest seqId if at the beginning
       const lastSong = [...playlist].sort(
@@ -131,10 +388,12 @@ const MusicPlayer: React.FC = () => {
           "seqId" in song && (song as Song).seqId === (lastSong as Song).seqId
       );
       setCurrentSongIndex(lastSongIndex);
+      persistState({ currentSongIndex: lastSongIndex, currentTime: 0 });
     }
 
     // Ensure it starts playing
     setPlaying(true);
+    persistState({ isPlaying: true });
   };
 
   const handleProgress = (state: { playedSeconds: number }) => {
@@ -161,6 +420,8 @@ const MusicPlayer: React.FC = () => {
     const newTime = parseFloat((e.target as HTMLInputElement).value);
     if (playerRef.current) {
       playerRef.current.seekTo(newTime, "seconds");
+      setCurrentTime(newTime);
+      persistState({ currentTime: newTime });
     }
   };
 
@@ -190,6 +451,7 @@ const MusicPlayer: React.FC = () => {
         // If first song, select it
         if (playlist.length === 0) {
           setCurrentSongIndex(0);
+          persistState({ currentSongIndex: 0 });
         }
       } else {
         alert("Could not extract YouTube video ID");
@@ -216,6 +478,7 @@ const MusicPlayer: React.FC = () => {
     if (newPlaylist.length === 0) {
       setCurrentSongIndex(0);
       setPlaying(false);
+      persistState({ currentSongIndex: 0, isPlaying: false });
     } else if (indexToRemove === currentSongIndex) {
       // Find the next closest song by seqId
       const remainingSeqIds = newPlaylist
@@ -234,13 +497,18 @@ const MusicPlayer: React.FC = () => {
           (song) => "seqId" in song && (song as Song).seqId === targetSeqId
         );
 
-        setCurrentSongIndex(newIndex >= 0 ? newIndex : 0);
+        const updatedIndex = newIndex >= 0 ? newIndex : 0;
+        setCurrentSongIndex(updatedIndex);
+        persistState({ currentSongIndex: updatedIndex, currentTime: 0 });
       } else {
         setCurrentSongIndex(0);
+        persistState({ currentSongIndex: 0, currentTime: 0 });
       }
     } else if (indexToRemove < currentSongIndex) {
       // Adjust current index
-      setCurrentSongIndex(currentSongIndex - 1);
+      const updatedIndex = currentSongIndex - 1;
+      setCurrentSongIndex(updatedIndex);
+      persistState({ currentSongIndex: updatedIndex });
     }
   };
 
@@ -251,8 +519,15 @@ const MusicPlayer: React.FC = () => {
     if (index !== currentSongIndex) {
       setCurrentSongIndex(index);
       setPlaying(true);
+      persistState({
+        currentSongIndex: index,
+        isPlaying: true,
+        currentTime: 0,
+      });
     } else {
-      setPlaying(!playing);
+      const newPlayingState = !playing;
+      setPlaying(newPlayingState);
+      persistState({ isPlaying: newPlayingState });
     }
   };
 
@@ -305,13 +580,6 @@ const MusicPlayer: React.FC = () => {
     return `${mm}:${ss}`;
   };
 
-  // Reset player when song changes
-  useEffect(() => {
-    if (playerRef.current) {
-      setPlayedSeconds(0);
-    }
-  }, [currentSongIndex]);
-
   return (
     <div className="flex flex-col h-full bg-card text-card-foreground">
       {/* Player Section */}
@@ -330,9 +598,24 @@ const MusicPlayer: React.FC = () => {
           onEnded={() => {
             if (playlist.length <= 1) {
               setPlaying(false);
+              persistState({ isPlaying: false });
             } else {
               handleNext();
             }
+          }}
+          onReady={() => {
+            // Update the global player reference when ready
+            if (playerRef.current) {
+              globalYoutubePlayer =
+                playerRef.current.getInternalPlayer() as YouTubePlayerWithMethods;
+              if (isLoading) {
+                setIsLoading(false);
+              }
+            }
+          }}
+          onError={(e) => {
+            console.error("Player error:", e);
+            setIsLoading(false);
           }}
           width="100%"
           height="100%"
@@ -349,6 +632,20 @@ const MusicPlayer: React.FC = () => {
               disablekb: 1, // Disable keyboard controls (prevents space bar from activating YouTube UI)
               fs: 0, // Disable fullscreen button
             },
+            onUnstarted: () => {
+              // Handle case where YouTube API fails to auto-play
+              if (playing && playerRef.current) {
+                try {
+                  const player =
+                    playerRef.current.getInternalPlayer() as YouTubePlayerWithMethods;
+                  if (player && typeof player.playVideo === "function") {
+                    player.playVideo();
+                  }
+                } catch (e) {
+                  console.error("Error playing video:", e);
+                }
+              }
+            },
           }}
         />
       </div>
@@ -363,6 +660,16 @@ const MusicPlayer: React.FC = () => {
             {currentSong && "seqId" in currentSong && (
               <span className="text-sm font-normal ml-2 text-muted-foreground">
                 #{(currentSong as Song).seqId}
+              </span>
+            )}
+            {isLoading && (
+              <span className="text-sm font-normal ml-2 text-amber-500">
+                (loading...)
+              </span>
+            )}
+            {!isWindowOpen && playing && (
+              <span className="text-sm font-normal ml-2 text-primary">
+                (playing in background)
               </span>
             )}
           </h2>

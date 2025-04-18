@@ -118,14 +118,14 @@ export function Mainmenu() {
             </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
-        <MenubarMenu>
+        {/* <MenubarMenu>
           <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
             Bookmark
           </MenubarTrigger>
           <MenubarContent>
             <MenubarItem disabled>Coming Soon</MenubarItem>
           </MenubarContent>
-        </MenubarMenu>
+        </MenubarMenu> */}
         <MenubarMenu>
           <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
             About

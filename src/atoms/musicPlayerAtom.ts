@@ -1,10 +1,11 @@
 import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { loadFeatureState, saveFeatureState } from "../utils/storage";
 
 interface Song {
   url: string;
   title: string;
   id?: string;
+  seqId?: number;
 }
 
 const defaultSongs: Song[] = [
@@ -35,18 +36,35 @@ const defaultSongs: Song[] = [
   },
 ];
 
+// Get stored state or use defaults
+const getInitialState = () => {
+  const stored = loadFeatureState<{
+    playlist: Song[];
+    currentSongIndex: number;
+    isPlaying: boolean;
+    isWindowOpen: boolean;
+    currentTime: number;
+  }>("musicPlayer");
+
+  return {
+    playlist: stored?.playlist ?? defaultSongs,
+    currentSongIndex: stored?.currentSongIndex ?? 0,
+    isPlaying: stored?.isPlaying ?? false,
+    isWindowOpen: stored?.isWindowOpen ?? false,
+    currentTime: stored?.currentTime ?? 0,
+  };
+};
+
 // Persisted atoms
-export const playlistAtom = atomWithStorage<Song[]>(
-  "musicPlayer_playlist",
-  defaultSongs
+export const playlistAtom = atom<Song[]>(getInitialState().playlist);
+export const currentSongIndexAtom = atom<number>(
+  getInitialState().currentSongIndex
 );
-export const currentSongIndexAtom = atomWithStorage<number>(
-  "musicPlayer_currentIndex",
-  0
-);
+export const playingAtom = atom<boolean>(getInitialState().isPlaying);
+export const currentTimeAtom = atom<number>(getInitialState().currentTime);
+export const isWindowOpenAtom = atom<boolean>(getInitialState().isWindowOpen);
 
 // Non-persisted atoms for player state
-export const playingAtom = atom<boolean>(false);
 export const durationAtom = atom<number>(0);
 export const playedSecondsAtom = atom<number>(0);
 export const seekingAtom = atom<boolean>(false);
@@ -61,6 +79,66 @@ export const currentSongAtom = atom<Song | null>((get) => {
   return playlist[index] || playlist[0]; // Fallback to first song if index is invalid
 });
 
+// Function to persist state changes
+export const persistMusicPlayerState = atom(
+  (get) => ({
+    playlist: get(playlistAtom),
+    currentSongIndex: get(currentSongIndexAtom),
+    isPlaying: get(playingAtom),
+    isWindowOpen: get(isWindowOpenAtom),
+    currentTime: get(currentTimeAtom),
+  }),
+  (
+    _get,
+    set,
+    update: Partial<{
+      playlist: Song[];
+      currentSongIndex: number;
+      isPlaying: boolean;
+      currentTime: number;
+      isWindowOpen: boolean;
+    }>
+  ) => {
+    if (update.playlist !== undefined) {
+      set(playlistAtom, update.playlist);
+    }
+    if (update.currentSongIndex !== undefined) {
+      set(currentSongIndexAtom, update.currentSongIndex);
+    }
+    if (update.isPlaying !== undefined) {
+      set(playingAtom, update.isPlaying);
+    }
+    if (update.currentTime !== undefined) {
+      set(currentTimeAtom, update.currentTime);
+    }
+    if (update.isWindowOpen !== undefined) {
+      set(isWindowOpenAtom, update.isWindowOpen);
+    }
+
+    // Save to local storage
+    const currentState = {
+      playlist:
+        update.playlist !== undefined ? update.playlist : _get(playlistAtom),
+      currentSongIndex:
+        update.currentSongIndex !== undefined
+          ? update.currentSongIndex
+          : _get(currentSongIndexAtom),
+      isPlaying:
+        update.isPlaying !== undefined ? update.isPlaying : _get(playingAtom),
+      isWindowOpen:
+        update.isWindowOpen !== undefined
+          ? update.isWindowOpen
+          : _get(isWindowOpenAtom),
+      currentTime:
+        update.currentTime !== undefined
+          ? update.currentTime
+          : _get(currentTimeAtom),
+    };
+
+    saveFeatureState("musicPlayer", currentState);
+  }
+);
+
 // Action atoms
 export const setCurrentSongIndexAtom = atom(null, (get, set, index: number) => {
   const playlist = get(playlistAtom);
@@ -72,6 +150,16 @@ export const setCurrentSongIndexAtom = atom(null, (get, set, index: number) => {
   const safeIndex =
     ((index % playlist.length) + playlist.length) % playlist.length;
   set(currentSongIndexAtom, safeIndex);
+
+  // Also persist the change
+  const currentState = {
+    playlist: get(playlistAtom),
+    currentSongIndex: safeIndex,
+    isPlaying: get(playingAtom),
+    isWindowOpen: get(isWindowOpenAtom),
+    currentTime: 0, // Reset time when changing song
+  };
+  saveFeatureState("musicPlayer", currentState);
 });
 
 export const nextSongAtom = atom(null, (get, set) => {

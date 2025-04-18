@@ -36,25 +36,19 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 350, height: 250 },
     component: MusicPlayer,
   },
-  ambience: {
-    name: "Ambience",
-    src: "/icons/ambience.png",
-    defaultSize: { width: 375, height: 190 },
-    minSize: { width: 375, height: 190 },
-    component: AmbiencePlayer,
-  },
-  photobox: {
-    name: "Photobox",
-    src: "/icons/camera.png",
-    defaultSize: { width: 400, height: 450 },
-    component: () => React.createElement("div", null, "Photobox Coming Soon"),
-  },
-  cafeList: {
-    name: "Cafe list",
-    src: "/icons/cafe.png",
-    defaultSize: { width: 450, height: 500 },
-    component: () => React.createElement("div", null, "Cafe List Coming Soon"),
-  },
+
+  // photobox: {
+  //   name: "Photobox",
+  //   src: "/icons/camera.png",
+  //   defaultSize: { width: 400, height: 450 },
+  //   component: () => React.createElement("div", null, "Photobox Coming Soon"),
+  // },
+  // cafeList: {
+  //   name: "Cafe list",
+  //   src: "/icons/cafe.png",
+  //   defaultSize: { width: 450, height: 500 },
+  //   component: () => React.createElement("div", null, "Cafe List Coming Soon"),
+  // },
   todoList: {
     name: "To-do list",
     src: "/icons/board.png",
@@ -62,12 +56,12 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 300, height: 340 },
     component: TodoList,
   },
-  chatRoom: {
-    name: "Chat room",
-    src: "/icons/phone.png",
-    defaultSize: { width: 380, height: 550 },
-    component: () => React.createElement("div", null, "Chat Room Coming Soon"),
-  },
+  // chatRoom: {
+  //   name: "Chat room",
+  //   src: "/icons/phone.png",
+  //   defaultSize: { width: 380, height: 550 },
+  //   component: () => React.createElement("div", null, "Chat Room Coming Soon"),
+  // },
 
   textEditor: {
     name: "Notepad",
@@ -75,6 +69,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 600, height: 400 },
     minSize: { width: 300, height: 320 },
     component: TextEditor,
+  },
+  ambience: {
+    name: "Ambience",
+    src: "/icons/ambience.png",
+    defaultSize: { width: 375, height: 190 },
+    minSize: { width: 375, height: 190 },
+    component: AmbiencePlayer,
   },
   background: {
     name: "Settings",
