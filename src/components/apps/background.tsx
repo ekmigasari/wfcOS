@@ -273,7 +273,7 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
             variant="outline"
             onClick={handleCancel}
             size="sm"
-            className="sm:size-default"
+            className="sm:size-default bg-white hover:bg-stone-200"
           >
             Cancel
           </Button>
@@ -282,7 +282,7 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
             onClick={handleApply}
             disabled={!hasChanges}
             size="sm"
-            className="sm:size-default min-w-20"
+            className="sm:size-default min-w-20 hover:bg-accent text-white"
           >
             Apply
           </Button>

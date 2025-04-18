@@ -5,6 +5,7 @@ import BackgroundChanger from "../components/apps/background";
 import React from "react";
 import TextEditor from "../components/apps/textEditor";
 import MusicPlayer from "../components/apps/musicPlayer";
+import AmbiencePlayer from "../components/apps/ambiencePlayer";
 
 // Updated interface to include missing fields
 interface AppRegistryEntry {
@@ -34,6 +35,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 350, height: 250 },
     component: MusicPlayer,
+  },
+  ambience: {
+    name: "Ambience",
+    src: "/icons/ambience.png",
+    defaultSize: { width: 375, height: 190 },
+    minSize: { width: 375, height: 190 },
+    component: AmbiencePlayer,
   },
   photobox: {
     name: "Photobox",
@@ -65,14 +73,14 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     name: "Notepad",
     src: "/icons/notepad.png",
     defaultSize: { width: 600, height: 400 },
-    minSize: { width: 300, height: 500 },
+    minSize: { width: 300, height: 320 },
     component: TextEditor,
   },
   background: {
     name: "Settings",
     src: "/icons/settings.png",
-    defaultSize: { width: 800, height: 650 },
-    minSize: { width: 470, height: 400 },
+    defaultSize: { width: 600, height: 450 },
+    minSize: { width: 470, height: 340 },
     component: BackgroundChanger,
   },
   // Add other apps here using a unique key (appId)

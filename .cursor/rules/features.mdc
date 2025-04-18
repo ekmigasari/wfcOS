@@ -40,4 +40,4 @@ When building a new feature or app module in the Cursor IDE project, follow thes
 
 ## 8. Window-Based Layout
 - All apps should render inside the reusable window layout:  
-  `/src/components/window.tsx`
+  `/src/components/layout/window.tsx`
