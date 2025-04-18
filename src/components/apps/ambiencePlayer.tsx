@@ -178,7 +178,7 @@ const AmbiencePlayer: React.FC = () => {
       // Clean up function - do not pause or stop the audio
       // to allow background playback
     };
-  }, []);
+  }, [volume]);
 
   // Initial sync on component mount
   useEffect(() => {
