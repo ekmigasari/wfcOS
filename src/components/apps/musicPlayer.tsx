@@ -169,7 +169,7 @@ const MusicPlayer: React.FC = () => {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [playerRef.current, initialSyncDone]);
+  }, [initialSyncDone]);
 
   // Sync player state when it's ready
   useEffect(() => {

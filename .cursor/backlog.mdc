@@ -3,13 +3,14 @@ description:
 globs: 
 alwaysApply: false
 ---
+# Backlog
 - Add about
 - add type sound notepad
 - Add log on podomoro
 
 
 # Future Feature
-- Minimize on window
+- Minimize window
 - Photobox
 - Bookmark
 - Chats
