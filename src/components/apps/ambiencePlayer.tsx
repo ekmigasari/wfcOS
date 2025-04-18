@@ -615,7 +615,7 @@ const AmbiencePlayer: React.FC = () => {
           </p>
           <p className="text-sm text-muted-foreground">
             <span>Sound {currentSoundIndex + 1}</span>
-            <span>of {ambienceSounds.length}</span>
+            <span> of {ambienceSounds.length}</span>
           </p>
         </div>
 

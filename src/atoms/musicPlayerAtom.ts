@@ -9,29 +9,29 @@ interface Song {
 
 const defaultSongs: Song[] = [
   {
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    title: "Never Gonna Give You Up",
-    id: "dQw4w9WgXcQ",
+    url: "https://www.youtube.com/watch?v=lTRiuFIWV54",
+    title: "Lo-fi Study Session",
+    id: "lTRiuFIWV54",
   },
   {
-    url: "https://www.youtube.com/watch?v=3tmd-ClpJxA",
-    title: "Bohemian Rhapsody",
-    id: "3tmd-ClpJxA",
+    url: "https://www.youtube.com/watch?v=Fp5ghKduTK8",
+    title: "Ghibli Piano",
+    id: "Fp5ghKduTK8",
   },
   {
-    url: "https://www.youtube.com/watch?v=hTWKbfoikeg",
-    title: "Uptown Funk",
-    id: "hTWKbfoikeg",
+    url: "https://www.youtube.com/watch?v=KxJrYKoTeXA",
+    title: "Jazzjeans",
+    id: "KxJrYKoTeXA",
   },
   {
-    url: "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
-    title: "Despacito",
-    id: "kJQP7kiw5Fk",
+    url: "https://www.youtube.com/watch?v=pfU0QORkRpY",
+    title: "FKJ Live",
+    id: "pfU0QORkRpY",
   },
   {
-    url: "https://www.youtube.com/watch?v=C0DPdy98e4c",
-    title: "Shape of You",
-    id: "C0DPdy98e4c",
+    url: "https://www.youtube.com/watch?v=ot5UsNymqgQ",
+    title: "Cozy Room",
+    id: "ot5UsNymqgQ",
   },
 ];
 
