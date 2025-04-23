@@ -44,6 +44,7 @@ const getInitialState = () => {
     isPlaying: boolean;
     isWindowOpen: boolean;
     currentTime: number;
+    volume: number;
   }>("musicPlayer");
 
   return {
@@ -52,6 +53,7 @@ const getInitialState = () => {
     isPlaying: stored?.isPlaying ?? false,
     isWindowOpen: stored?.isWindowOpen ?? false,
     currentTime: stored?.currentTime ?? 0,
+    volume: stored?.volume ?? 0.7,
   };
 };
 
@@ -63,6 +65,7 @@ export const currentSongIndexAtom = atom<number>(
 export const playingAtom = atom<boolean>(getInitialState().isPlaying);
 export const currentTimeAtom = atom<number>(getInitialState().currentTime);
 export const isWindowOpenAtom = atom<boolean>(getInitialState().isWindowOpen);
+export const volumeAtom = atom<number>(getInitialState().volume);
 
 // Non-persisted atoms for player state
 export const durationAtom = atom<number>(0);
@@ -87,6 +90,7 @@ export const persistMusicPlayerState = atom(
     isPlaying: get(playingAtom),
     isWindowOpen: get(isWindowOpenAtom),
     currentTime: get(currentTimeAtom),
+    volume: get(volumeAtom),
   }),
   (
     _get,
@@ -97,6 +101,7 @@ export const persistMusicPlayerState = atom(
       isPlaying: boolean;
       currentTime: number;
       isWindowOpen: boolean;
+      volume: number;
     }>
   ) => {
     if (update.playlist !== undefined) {
@@ -113,6 +118,9 @@ export const persistMusicPlayerState = atom(
     }
     if (update.isWindowOpen !== undefined) {
       set(isWindowOpenAtom, update.isWindowOpen);
+    }
+    if (update.volume !== undefined) {
+      set(volumeAtom, update.volume);
     }
 
     // Save to local storage
@@ -133,6 +141,7 @@ export const persistMusicPlayerState = atom(
         update.currentTime !== undefined
           ? update.currentTime
           : _get(currentTimeAtom),
+      volume: update.volume !== undefined ? update.volume : _get(volumeAtom),
     };
 
     saveFeatureState("musicPlayer", currentState);

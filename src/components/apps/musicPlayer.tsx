@@ -3,6 +3,19 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import ReactPlayer from "react-player/youtube";
+import {
+  Volume2,
+  VolumeX,
+  SkipBack,
+  Play,
+  Pause,
+  SkipForward,
+  Video,
+  Check,
+  X,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 
 import {
   playlistAtom,
@@ -12,7 +25,10 @@ import {
   isWindowOpenAtom,
   currentTimeAtom,
   persistMusicPlayerState,
+  volumeAtom,
 } from "../../atoms/musicPlayerAtom";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 
 // Define an extended Song interface with a sequence ID
 interface Song {
@@ -26,6 +42,7 @@ interface Song {
 interface YouTubePlayerWithMethods {
   playVideo: () => void;
   pauseVideo: () => void;
+  setVolume: (volume: number) => void;
   [key: string]: unknown; // Replace any with unknown for better type safety
 }
 
@@ -60,6 +77,7 @@ const MusicPlayer: React.FC = () => {
   const [isWindowOpen, setIsWindowOpen] = useAtom(isWindowOpenAtom);
   const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
   const [, persistState] = useAtom(persistMusicPlayerState);
+  const [volume, setVolume] = useAtom(volumeAtom);
 
   // Local state
   const [duration, setDuration] = useState(0);
@@ -72,6 +90,9 @@ const MusicPlayer: React.FC = () => {
   const [nextSeqId, setNextSeqId] = useState(1); // Track the next sequential ID to assign
   const [isLoading, setIsLoading] = useState(false);
   const [initialSyncDone, setInitialSyncDone] = useState(false);
+  // Volume related state
+  const [isMuted, setIsMuted] = useState(false);
+  const [prevVolume, setPrevVolume] = useState(volume);
 
   // Refs
   const playerRef = useRef<ReactPlayer>(null);
@@ -156,6 +177,14 @@ const MusicPlayer: React.FC = () => {
         const player = playerRef.current.getInternalPlayer();
         if (player) {
           globalYoutubePlayer = player as YouTubePlayerWithMethods;
+
+          // Apply volume settings when player is ready
+          if (
+            globalYoutubePlayer &&
+            typeof globalYoutubePlayer.setVolume === "function"
+          ) {
+            globalYoutubePlayer.setVolume(isMuted ? 0 : volume * 100);
+          }
         }
       }
     };
@@ -169,7 +198,18 @@ const MusicPlayer: React.FC = () => {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [initialSyncDone]);
+  }, [initialSyncDone, volume, isMuted]);
+
+  // Apply volume changes to the player
+  useEffect(() => {
+    if (
+      globalYoutubePlayer &&
+      typeof globalYoutubePlayer.setVolume === "function"
+    ) {
+      const volumeToSet = isMuted ? 0 : volume * 100;
+      globalYoutubePlayer.setVolume(volumeToSet);
+    }
+  }, [volume, isMuted]);
 
   // Sync player state when it's ready
   useEffect(() => {
@@ -190,6 +230,13 @@ const MusicPlayer: React.FC = () => {
         // If we have a saved position, seek to it
         if (currentTime > 0) {
           playerRef.current?.seekTo(currentTime, "seconds");
+        }
+
+        // Apply volume settings
+        const player =
+          playerRef.current?.getInternalPlayer() as YouTubePlayerWithMethods;
+        if (player && typeof player.setVolume === "function") {
+          player.setVolume(isMuted ? 0 : volume * 100);
         }
 
         // Update playing state based on saved state - but with a delay
@@ -223,7 +270,15 @@ const MusicPlayer: React.FC = () => {
     return () => {
       clearTimeout(syncTimer);
     };
-  }, [currentSong, currentTime, playing, initialSyncDone, persistState]);
+  }, [
+    currentSong,
+    currentTime,
+    playing,
+    initialSyncDone,
+    persistState,
+    volume,
+    isMuted,
+  ]);
 
   // Watch for playing state changes to sync with YouTube player
   useEffect(() => {
@@ -580,6 +635,53 @@ const MusicPlayer: React.FC = () => {
     return `${mm}:${ss}`;
   };
 
+  // Handlers for volume control
+  const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    setVolume(newVolume);
+    setIsMuted(newVolume === 0);
+    persistState({ volume: newVolume });
+
+    // Also update the YouTube player volume directly
+    if (
+      globalYoutubePlayer &&
+      typeof globalYoutubePlayer.setVolume === "function"
+    ) {
+      globalYoutubePlayer.setVolume(newVolume * 100);
+    }
+  };
+
+  const toggleMute = () => {
+    if (isMuted) {
+      // Unmute
+      setIsMuted(false);
+      const newVolume = prevVolume > 0 ? prevVolume : 0.5;
+      setVolume(newVolume);
+      persistState({ volume: newVolume });
+
+      // Also update the YouTube player volume directly
+      if (
+        globalYoutubePlayer &&
+        typeof globalYoutubePlayer.setVolume === "function"
+      ) {
+        globalYoutubePlayer.setVolume(newVolume * 100);
+      }
+    } else {
+      // Mute
+      setPrevVolume(volume);
+      setIsMuted(true);
+      persistState({ volume });
+
+      // Also update the YouTube player volume directly
+      if (
+        globalYoutubePlayer &&
+        typeof globalYoutubePlayer.setVolume === "function"
+      ) {
+        globalYoutubePlayer.setVolume(0);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-card text-card-foreground">
       {/* Player Section */}
@@ -608,6 +710,12 @@ const MusicPlayer: React.FC = () => {
             if (playerRef.current) {
               globalYoutubePlayer =
                 playerRef.current.getInternalPlayer() as YouTubePlayerWithMethods;
+
+              // Set volume when player is ready
+              if (typeof globalYoutubePlayer.setVolume === "function") {
+                globalYoutubePlayer.setVolume(isMuted ? 0 : volume * 100);
+              }
+
               if (isLoading) {
                 setIsLoading(false);
               }
@@ -714,20 +822,7 @@ const MusicPlayer: React.FC = () => {
               aria-label="Previous"
               disabled={playlist.length <= 1}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 16.811c0 .864-.933 1.405-1.683.977l-7.108-4.057a1.125 1.125 0 010-1.953l7.108-4.057c.75-.428 1.683.113 1.683.977v8.11zM3 16.811c0 .864-.933 1.405-1.683.977l-7.108-4.057a1.125 1.125 0 010-1.953l7.108-4.057c.75-.428 1.683.113 1.683.977v8.11z"
-                />
-              </svg>
+              <SkipBack className="w-5 h-5" />
             </button>
             <button
               onClick={handlePlayPause}
@@ -736,35 +831,9 @@ const MusicPlayer: React.FC = () => {
               disabled={playlist.length === 0}
             >
               {playing ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 5.25v13.5m-7.5-13.5v13.5"
-                  />
-                </svg>
+                <Pause className="w-6 h-6" />
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
-                  />
-                </svg>
+                <Play className="w-6 h-6" />
               )}
             </button>
             <button
@@ -773,21 +842,33 @@ const MusicPlayer: React.FC = () => {
               aria-label="Next"
               disabled={playlist.length <= 1}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 8.188c0-.864.933-1.405 1.683-.977l7.108 4.057a1.125 1.125 0 010 1.953l-7.108 4.057A1.125 1.125 0 013 16.813V8.188zm18 0c0-.864.933-1.405 1.683-.977l7.108 4.057a1.125 1.125 0 010 1.953l-7.108 4.057A1.125 1.125 0 0121 16.813V8.188z"
-                />
-              </svg>
+              <SkipForward className="w-5 h-5" />
             </button>
+          </div>
+
+          {/* Volume Control */}
+          <div className="flex items-center space-x-2 mb-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMute}
+              className="h-8 w-8 rounded-full p-0"
+            >
+              {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            </Button>
+
+            <Slider
+              value={[isMuted ? 0 : volume]}
+              min={0}
+              max={1}
+              step={0.01}
+              onValueChange={handleVolumeChange}
+              className="flex-1"
+            />
+
+            <span className="text-xs text-muted-foreground w-8 text-right">
+              {Math.round((isMuted ? 0 : volume) * 100)}%
+            </span>
           </div>
 
           {/* Video Toggle */}
@@ -797,19 +878,7 @@ const MusicPlayer: React.FC = () => {
               className="px-3 py-1 text-sm rounded-md border border-border bg-muted hover:bg-muted/80 text-foreground flex items-center gap-2"
               disabled={playlist.length === 0}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"
-                />
-              </svg>
+              <Video className="w-4 h-4" />
               {showVideo ? "Hide Video" : "Show Video"}
             </button>
           </div>
@@ -855,18 +924,7 @@ const MusicPlayer: React.FC = () => {
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         {index === currentSongIndex && playing ? (
                           <span className="text-primary flex-shrink-0">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              className="w-4 h-4"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                            <Play className="w-4 h-4" />
                           </span>
                         ) : (
                           <span className="w-4 h-4 flex-shrink-0"></span>
@@ -887,40 +945,14 @@ const MusicPlayer: React.FC = () => {
                               className="text-primary p-1"
                               title="Save"
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="w-4 h-4"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M4.5 12.75l6 6 9-13.5"
-                                />
-                              </svg>
+                              <Check className="w-4 h-4" />
                             </button>
                             <button
                               onClick={cancelEditing}
                               className="text-muted-foreground p-1"
                               title="Cancel"
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="w-4 h-4"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                              </svg>
+                              <X className="w-4 h-4" />
                             </button>
                           </div>
                         ) : (
@@ -948,40 +980,14 @@ const MusicPlayer: React.FC = () => {
                             className="text-muted-foreground hover:text-primary p-1 rounded-full hover:bg-muted flex-shrink-0"
                             aria-label={`Edit ${song.title}`}
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="w-4 h-4"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                              />
-                            </svg>
+                            <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={(e) => handleRemoveSong(e, index)}
                             className="text-muted-foreground hover:text-destructive p-1 rounded-full hover:bg-muted flex-shrink-0"
                             aria-label={`Remove ${song.title}`}
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="w-4 h-4"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                              />
-                            </svg>
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       )}
