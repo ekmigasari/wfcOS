@@ -7,7 +7,15 @@ const font = Itim({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "WFC OS",
-  description: "Remote worker App",
+  description:
+    "A minimal virtual desktop on the web, built for productive & vibey work sessions.",
+  openGraph: {
+    images: "/wfc-og.png",
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: "/wfc-og.png",
+  },
 };
 
 export default function RootLayout({
