@@ -1,0 +1,29 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Feature Development Guidelines
+
+When building a new feature or app module in the Cursor IDE project, follow these rules to ensure consistency, performance, and maintainability:
+
+## 1. File Structure & Component Location
+- Create each feature as a component under:  
+  `/src/components/apps/[featureName].tsx`
+
+## 2. App Registration
+- Register each new app or feature in the global app list at:  
+  `/src/config/appRegistry.ts`
+
+## 3. Global State Management
+- Use **Jotai** atoms for managing global state.
+- Place all atoms under:  
+  `/atoms`
+
+## 4. Local Storage Persistence
+- For persistent data, use helper functions in:  
+  `/src/utils/storage.ts`
+
+## 5. Window-Based Layout
+- All apps should render inside the reusable window layout:  
+  `/src/components/layout/window.tsx`

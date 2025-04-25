@@ -23,7 +23,7 @@ interface AppRegistryEntry {
 export const appRegistry: Record<string, AppRegistryEntry> = {
   // Using appId as the key (e.g., 'podomoro'), and name for display
   podomoro: {
-    name: "Podomoro",
+    name: "Pomodoro",
     src: "/icons/clock.png",
     defaultSize: { width: 400, height: 650 },
     minSize: { width: 250, height: 300 }, // Example minSize
