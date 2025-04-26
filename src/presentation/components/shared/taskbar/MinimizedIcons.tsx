@@ -32,6 +32,7 @@ export const MinimizedIcons = () => {
       {minimizedWindows.map((window) => {
         // Get app info from registry for the icon
         const appInfo = appRegistry[window.appId];
+        console.log(appInfo);
 
         return (
           <button

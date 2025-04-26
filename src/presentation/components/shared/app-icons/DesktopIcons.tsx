@@ -72,7 +72,7 @@ export const DesktopIcons = () => {
               name={app.name}
               appId={app.id}
               onOpenApp={handleOpenApp}
-              onSelect={setSelectedAppId} 
+              onSelect={setSelectedAppId}
             />
           </div>
         ))}
