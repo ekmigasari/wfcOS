@@ -3,23 +3,35 @@
 import React from "react";
 import Image from "next/image";
 import { useDeviceDetect } from "@/application/hooks";
+import { playSound } from "@/infrastructure/lib/utils";
 
 interface AppIconProps {
   src: string;
   name: string;
   appId: string;
   onOpenApp: (appId: string) => void;
+  onSelect?: (appId: string) => void;
 }
 
 //Single App Icon
-export const AppIcon = ({ src, name, appId, onOpenApp }: AppIconProps) => {
+export const AppIcon = ({
+  src,
+  name,
+  appId,
+  onOpenApp,
+  onSelect,
+}: AppIconProps) => {
   // Use the new hook instead of the local state and useEffect
   const { isMobileOrTablet } = useDeviceDetect();
 
   const handleClick = () => {
-    // For mobile/tablet, open on single click
     if (isMobileOrTablet) {
+      // For mobile/tablet, open on single click
       onOpenApp(appId);
+    } else {
+      // For desktop, select on single click
+      playSound("/sounds/click.mp3");
+      onSelect?.(appId);
     }
   };
 

@@ -9,7 +9,7 @@ When building a new feature or app module in the Cursor IDE project, follow thes
 
 ## 1. File Structure & Component Location
 - Create each feature as a component under:  
-  `/src/apps/(featureName)/[featureName].tsx`
+  `/src/app/(featureName)/[featureName].tsx`
 
 ## 2. App Registration
 - Register each new app or feature in the global app list at:  

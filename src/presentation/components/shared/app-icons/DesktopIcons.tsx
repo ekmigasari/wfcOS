@@ -72,6 +72,7 @@ export const DesktopIcons = () => {
               name={app.name}
               appId={app.id}
               onOpenApp={handleOpenApp}
+              onSelect={setSelectedAppId} 
             />
           </div>
         ))}
@@ -81,6 +82,8 @@ export const DesktopIcons = () => {
       {openWindows.map((window) => {
         const appConfig = appRegistry[window.appId];
         if (!appConfig) return null;
+
+        const AppComponent = appConfig.component;
 
         return (
           <Window
@@ -94,10 +97,7 @@ export const DesktopIcons = () => {
             minSize={window.minSize}
             zIndex={window.zIndex}
           >
-            {/* Show placeholder content until actual component is available */}
-            <div className="flex items-center justify-center h-full bg-slate-800 text-white p-4">
-              <p>Content for {window.title} will be displayed here</p>
-            </div>
+            {AppComponent && <AppComponent />}
           </Window>
         );
       })}
