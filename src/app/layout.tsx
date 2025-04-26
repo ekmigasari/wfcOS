@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Itim } from "next/font/google";
-import "@/styles/globals.css";
-import JotaiProvider from "@/components/providers/JotaiProvider";
+import "@/presentation/styles/globals.css";
+import JotaiProvider from "@/providers/JotaiProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 const font = Itim({ weight: "400", subsets: ["latin"] });

@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { loadFeatureState } from "../utils/storage";
+import { loadFeatureState } from "../infrastructure/utils/storage";
 
 // Define keys for storage
 export const TEXT_EDITOR_STORAGE_KEY = "textEditorContent";
@@ -41,8 +41,13 @@ export const defaultEditorSettings: EditorSettings = {
 // Note: We now only load the default instance's content and settings for atom initialization
 // The individual editor instances will load their specific settings
 const defaultInstanceId = "default";
-const initialContent = loadFeatureState<string>(`${TEXT_EDITOR_STORAGE_KEY}_${defaultInstanceId}`) || "";
-const initialSettings = loadFeatureState<EditorSettings>(`${TEXT_EDITOR_SETTINGS_KEY}_${defaultInstanceId}`) || defaultEditorSettings;
+const initialContent =
+  loadFeatureState<string>(`${TEXT_EDITOR_STORAGE_KEY}_${defaultInstanceId}`) ||
+  "";
+const initialSettings =
+  loadFeatureState<EditorSettings>(
+    `${TEXT_EDITOR_SETTINGS_KEY}_${defaultInstanceId}`
+  ) || defaultEditorSettings;
 
 // Create atoms
 export const textEditorContentAtom = atom<string>(initialContent);
@@ -54,10 +59,16 @@ export const getNextTextEditorId = () => `textEditor_${nextId++}`;
 
 // Helper function to get editor settings for a specific instance
 export const loadEditorSettings = (editorId: string): EditorSettings => {
-  return loadFeatureState<EditorSettings>(`${TEXT_EDITOR_SETTINGS_KEY}_${editorId}`) || defaultEditorSettings;
+  return (
+    loadFeatureState<EditorSettings>(
+      `${TEXT_EDITOR_SETTINGS_KEY}_${editorId}`
+    ) || defaultEditorSettings
+  );
 };
 
 // Helper function to get editor content for a specific instance
 export const loadEditorContent = (editorId: string): string => {
-  return loadFeatureState<string>(`${TEXT_EDITOR_STORAGE_KEY}_${editorId}`) || "";
+  return (
+    loadFeatureState<string>(`${TEXT_EDITOR_STORAGE_KEY}_${editorId}`) || ""
+  );
 };

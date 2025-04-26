@@ -1,5 +1,8 @@
 import { atom } from "jotai";
-import { loadFeatureState, saveFeatureState } from "../utils/storage";
+import {
+  loadFeatureState,
+  saveFeatureState,
+} from "../infrastructure/utils/storage";
 
 const FEATURE_KEY = "podomoro";
 const DEFAULT_WORK_TIME = 25 * 60; // 25 minutes

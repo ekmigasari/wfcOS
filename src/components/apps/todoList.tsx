@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAtom } from "jotai";
 import { tasksAtom, TaskItem } from "../../atoms/todoListAtom"; // Adjust path as needed
-import { playSound } from "@/lib/utils";
+import { playSound } from "@/infrastructure/lib/utils";
 import { ArrowRightIcon } from "lucide-react";
 import { ArrowDownIcon } from "lucide-react";
 import { XCircle } from "lucide-react";

@@ -8,7 +8,7 @@ import {
   MenubarSeparator,
   MenubarShortcut,
   MenubarTrigger,
-} from "@/components/ui/menubar";
+} from "@/presentation/components/ui/menubar";
 import {
   Dialog,
   DialogContent,
@@ -16,11 +16,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/presentation/components/ui/dialog";
+import { Button } from "@/presentation/components/ui/button";
 import Image from "next/image";
 import Clock from "../clock";
-import { playSound } from "@/lib/utils";
+import { playSound } from "@/infrastructure/lib/utils";
 import { appRegistry } from "@/config/appRegistry";
 import { useAtom } from "jotai";
 import { openWindowAtom } from "@/atoms/windowAtoms";

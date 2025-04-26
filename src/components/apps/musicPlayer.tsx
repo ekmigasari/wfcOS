@@ -27,8 +27,8 @@ import {
   persistMusicPlayerState,
   volumeAtom,
 } from "../../atoms/musicPlayerAtom";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+import { Button } from "@/presentation/components/ui/button";
+import { Slider } from "@/presentation/components/ui/slider";
 
 // Define an extended Song interface with a sequence ID
 interface Song {

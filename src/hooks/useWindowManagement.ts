@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Position, Size } from "../types";
-import { playSound } from "../lib/utils";
+import { playSound } from "../infrastructure/lib/utils";
 
 // Define possible resize directions
 export type ResizeDirection =

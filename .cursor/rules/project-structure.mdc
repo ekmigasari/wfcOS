@@ -13,34 +13,34 @@ This Next.js application follows a structured organization:
   - Each page route has its own directory with `page.tsx`, `layout.tsx`, etc.
   - Page-specific components go in `app/[page]/components/`
 
-- `src/components/`: Reusable UI components
+- `src/presentation/components/`: Reusable UI components
   - `components/ui/`: Shadcn components
   - `components/layout/`: Layout components like `window.tsx`
   - `components/apps/`: Application feature components
 
-- `src/atoms/`: State management with Jotai atoms
+- `src/application/atoms/`: State management with Jotai atoms
   - Each atom or related group of atoms should be in separate files
 
-- `src/hooks/`: Custom React hooks
+- `src/application/hooks/`: Custom React hooks
   - Named according to their functionality (e.g., `useWindowSize.ts`)
 
-- `src/utils/`: Utility functions
+- `src/infrastructure/utils/`: Utility functions
   - Including `storage.ts` for local storage operations
 
-- `src/config/`: Configuration files
+- `src/infrastructure/config/`: Configuration files
   - Contains `appRegistry.ts` for app/feature registration
 
-- `src/types/`: TypeScript type definitions
+- `src/application/types/`: TypeScript type definitions
   - Shared types and interfaces used across the application
 
-- `src/styles/`: Global styles and Tailwind configuration
+- `src/presentation/styles/`: Global styles and Tailwind configuration
   - Includes `globals.css` for application-wide styles
 
-- `src/lib/`: Shared libraries and integrations
+- `src/infrastructure/lib/`: Shared libraries and integrations
   - External service integrations and wrappers
 
   ### Key Files
-- `/src/config/appRegistry.ts`: Registry for all apps and features
-- `/src/utils/storage.ts`: Helpers for local storage persistence
-- `/src/components/layout/window.tsx`: Reusable window layout for apps
-- `/src/styles/globals.css`: Global styling
+- `/src/infrastructure/config/appRegistry.ts`: Registry for all apps and features
+- `/src/infrastructure/utils/storage.ts`: Helpers for local storage persistence
+- `/src/presentation/components/layout/window.tsx`: Reusable window layout for apps
+- `/src/presentation/styles/globals.css`: Global styling

@@ -5,7 +5,7 @@ import {
   ResizeDirection,
 } from "../../hooks/useWindowManagement";
 import { Size, Position } from "../../types"; // Updated path, added Position
-import { cn } from "../../lib/utils";
+import { cn } from "../../infrastructure/lib/utils";
 import {
   focusWindowAtom,
   updateWindowPositionSizeAtom,

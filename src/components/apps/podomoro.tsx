@@ -13,7 +13,7 @@ import {
   setDurationSettingAtom,
   setCustomDurationAtom,
 } from "../../atoms/podomoroAtom";
-import { playSound } from "@/lib/utils";
+import { playSound } from "@/infrastructure/lib/utils";
 
 // Global Timer Runner Component
 export const GlobalPodomoroTimer = () => {

@@ -1,5 +1,8 @@
 import { atom } from "jotai";
-import { loadFeatureState, saveFeatureState } from "../utils/storage";
+import {
+  loadFeatureState,
+  saveFeatureState,
+} from "../infrastructure/utils/storage";
 import { Position, Size } from "../types"; // Assuming types are defined here
 
 const FEATURE_KEY = "windows";

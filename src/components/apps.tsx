@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Window from "./layout/window";
 import { appRegistry } from "../config/appRegistry";
-import { playSound } from "../lib/utils"; // Import the sound utility
+import { playSound } from "../infrastructure/lib/utils"; // Import the sound utility
 import { useAtom } from "jotai";
 import {
   openWindowsAtom, // Read atom for currently open windows

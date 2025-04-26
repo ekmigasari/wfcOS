@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useAtom } from "jotai";
-import { saveFeatureState } from "../../utils/storage";
+import { saveFeatureState } from "../../infrastructure/utils/storage";
 import {
   textEditorContentAtom,
   textEditorSettingsAtom,
@@ -10,8 +10,8 @@ import {
   loadEditorSettings,
   loadEditorContent,
 } from "../../atoms/textEditorAtom";
-import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "../../presentation/components/ui/button";
+import { cn } from "@/infrastructure/lib/utils";
 
 interface TextEditorProps {
   initialContent?: string;

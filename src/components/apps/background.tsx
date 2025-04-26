@@ -8,16 +8,16 @@ import {
   previewBackgroundAtom,
   applyPreviewBackgroundAtom,
 } from "@/atoms/backgroundAtom";
-import { playSound } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { playSound } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
+} from "@/presentation/components/ui/select";
+import { Card, CardContent } from "@/presentation/components/ui/card";
 
 const backgrounds = [
   "/background/bg-1.png",

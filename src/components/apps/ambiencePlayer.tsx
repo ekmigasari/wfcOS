@@ -12,7 +12,7 @@ import {
   isWindowOpenAtom,
   currentTimeAtom,
 } from "../../atoms/ambiencePlayerAtom";
-import { playSound } from "@/lib/utils";
+import { playSound } from "@/infrastructure/lib/utils";
 
 // Icons
 import {
@@ -25,8 +25,8 @@ import {
 } from "lucide-react";
 
 // UI Components
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+import { Button } from "@/presentation/components/ui/button";
+import { Slider } from "@/presentation/components/ui/slider";
 
 // Create a global audio element to ensure playback continues when window is closed
 let globalAudio: HTMLAudioElement | null = null;

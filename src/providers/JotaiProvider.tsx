@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Provider } from "jotai";
-import { GlobalPodomoroTimer } from "../apps/podomoro";
+import { GlobalPodomoroTimer } from "../components/apps/podomoro";
 
 export default function JotaiProvider({
   children,
