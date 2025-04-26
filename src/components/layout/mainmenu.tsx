@@ -23,8 +23,9 @@ import Clock from "../clock";
 import { playSound } from "@/infrastructure/lib/utils";
 import { appRegistry } from "@/config/appRegistry";
 import { useAtom } from "jotai";
-import { openWindowAtom } from "@/atoms/windowAtoms";
+import { openWindowAtom } from "@/application/atoms/windowAtoms";
 import { useState } from "react";
+import { Taskbar } from "@/presentation/components/shared/taskbar";
 
 export function Mainmenu() {
   // Get the setter for opening windows
@@ -153,6 +154,9 @@ export function Mainmenu() {
         </MenubarMenu>
         <Clock />
       </Menubar>
+
+      {/* Taskbar for minimized windows */}
+      <Taskbar />
 
       {/* Reset Confirmation Dialog */}
       <Dialog

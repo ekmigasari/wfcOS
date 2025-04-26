@@ -12,7 +12,7 @@ import {
   closeWindowAtom, // Write atom to close a window
   // focusWindowAtom, // Write atom to bring window to front (used by Window component later)
   // WindowState, // Import type if needed
-} from "../atoms/windowAtoms"; // Adjust path as necessary
+} from "../application/atoms/windowAtoms"; // Adjust path as necessary
 // import { v4 as uuidv4 } from "uuid"; // Import uuid for generating unique window IDs
 
 // Define the props for the reusable AppIcon component

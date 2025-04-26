@@ -2,8 +2,8 @@ import { atom } from "jotai";
 import {
   loadFeatureState,
   saveFeatureState,
-} from "../infrastructure/utils/storage";
-import { Position, Size } from "../types"; // Assuming types are defined here
+} from "../../infrastructure/utils/storage";
+import { Position, Size } from "../../types"; // Assuming types are defined here
 
 const FEATURE_KEY = "windows";
 
@@ -16,7 +16,7 @@ export interface WindowState {
   size: Size;
   minSize?: Size;
   isOpen: boolean; // To track if the window should be rendered
-  isMinimized?: boolean; // Future enhancement?
+  isMinimized: boolean; // Track if window is minimized to taskbar
   zIndex: number; // To manage stacking order
 }
 
@@ -25,31 +25,26 @@ export type WindowRegistryState = {
   [id: string]: WindowState; // Store windows in an object for easier access by ID
 };
 
-// --- Helper Functions ---
+// Helper function to get the next highest zIndex
+function getNextZIndex(registry: WindowRegistryState): number {
+  const windows = Object.values(registry);
+  if (windows.length === 0) return 100; // Start at 100 for the first window
+  // Find the highest current zIndex
+  const maxZIndex = windows.reduce((max, win) => Math.max(max, win.zIndex), 0);
+  return maxZIndex + 1; // Make the new one 1 higher
+}
 
-// Function to get the next highest zIndex
-const getNextZIndex = (registry: WindowRegistryState): number => {
-  const zIndexes = Object.values(registry).map((win) => win.zIndex);
-  return zIndexes.length > 0 ? Math.max(...zIndexes) + 1 : 1000; // Start z-index from 1000
-};
-
-// --- Atoms ---
-
-// Create a default empty window registry - using empty object to handle SSR
-const defaultWindowRegistry: WindowRegistryState = {};
-
-// Create initial state atom with safe client-side initialization
-const getInitialState = (): WindowRegistryState => {
-  // Only run localStorage access on the client side
-  if (typeof window === "undefined") {
-    return defaultWindowRegistry;
+// Initialize from localStorage if available, or with defaults
+function getInitialState(): WindowRegistryState {
+  // Try to load saved state
+  const savedState = loadFeatureState<WindowRegistryState>(FEATURE_KEY);
+  if (savedState && typeof savedState === "object") {
+    // Validate or transform the saved state if needed
+    return savedState;
   }
-
-  // Load from localStorage only on the client side
-  return (
-    loadFeatureState<WindowRegistryState>(FEATURE_KEY) ?? defaultWindowRegistry
-  );
-};
+  // Default to an empty registry
+  return {};
+}
 
 // Create the base atom with proper initialization to handle hydration
 const baseWindowsAtom = atom<WindowRegistryState>(getInitialState());
@@ -77,8 +72,16 @@ export const windowRegistryAtom = atom(
 export const openWindowsAtom = atom(
   (get) =>
     Object.values(get(windowRegistryAtom))
-      .filter((win) => win.isOpen)
+      .filter((win) => win.isOpen && !win.isMinimized)
       .sort((a, b) => a.zIndex - b.zIndex) // Render lower zIndex first (behind)
+);
+
+// Atom to get minimized windows for the taskbar
+export const minimizedWindowsAtom = atom(
+  (get) =>
+    Object.values(get(windowRegistryAtom))
+      .filter((win) => win.isOpen && win.isMinimized)
+      .sort((a, b) => a.appId.localeCompare(b.appId)) // Sort by app ID for consistent order
 );
 
 // --- Window Management Action Atoms (Write-only) ---
@@ -91,7 +94,7 @@ export const openWindowAtom = atom(
     set,
     windowConfig: Omit<
       WindowState,
-      "isOpen" | "zIndex" | "position" | "size"
+      "isOpen" | "zIndex" | "position" | "size" | "isMinimized"
     > & { initialPosition?: Position; initialSize: Size }
   ) => {
     const currentRegistry = get(windowRegistryAtom);
@@ -125,6 +128,7 @@ export const openWindowAtom = atom(
         position: defaultPosition,
         size: windowConfig.initialSize,
         isOpen: true,
+        isMinimized: false,
         zIndex: nextZIndex,
       };
       set(windowRegistryAtom, (prev) => ({
@@ -153,11 +157,42 @@ export const closeWindowAtom = atom(null, (get, set, windowId: string) => {
   // This allows reopening it in the same place later via openWindowAtom
 });
 
+// Atom to minimize a window
+export const minimizeWindowAtom = atom(null, (get, set, windowId: string) => {
+  set(windowRegistryAtom, (prev) => {
+    const windowToMinimize = prev[windowId];
+    if (!windowToMinimize || !windowToMinimize.isOpen) return prev;
+
+    return {
+      ...prev,
+      [windowId]: { ...windowToMinimize, isMinimized: true },
+    };
+  });
+});
+
+// Atom to restore a minimized window
+export const restoreWindowAtom = atom(null, (get, set, windowId: string) => {
+  set(windowRegistryAtom, (prev) => {
+    const windowToRestore = prev[windowId];
+    if (!windowToRestore || !windowToRestore.isOpen) return prev;
+
+    return {
+      ...prev,
+      [windowId]: {
+        ...windowToRestore,
+        isMinimized: false,
+        zIndex: getNextZIndex(prev), // Bring to front when restored
+      },
+    };
+  });
+});
+
 // Atom to bring a window to the front
 export const focusWindowAtom = atom(null, (get, set, windowId: string) => {
   set(windowRegistryAtom, (prev) => {
     const windowToFocus = prev[windowId];
-    if (!windowToFocus || !windowToFocus.isOpen) return prev; // Don't focus closed/non-existent windows
+    if (!windowToFocus || !windowToFocus.isOpen || windowToFocus.isMinimized)
+      return prev; // Don't focus closed/minimized/non-existent windows
 
     const maxZIndex = getNextZIndex(prev) - 1; // Get current max zIndex
 
@@ -191,9 +226,6 @@ export const updateWindowPositionSizeAtom = atom(
     });
   }
 );
-
-// Atom to minimize a window (placeholder for future)
-// export const minimizeWindowAtom = atom(...)
 
 // Atom to maximize a window (placeholder for future)
 // export const maximizeWindowAtom = atom(...)

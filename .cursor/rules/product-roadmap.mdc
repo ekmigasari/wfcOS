@@ -7,12 +7,14 @@ alwaysApply: false
 
 This document outlines the planned development roadmap for the wfcOS platform, serving as a checkpoint and to-do list for implementation. Features are organized by priority and development phase.
 
-## Current Sprint
+## Current Sprint (REFACTOR V2)
 These features should be prioritized for immediate implementation:
 
-- [ ] Restructure the Project, to make it easy to maintenance and scaling
-- [ ] Window minimization capability and change how apps behave
-- [ ] Refactor each Application 
+- [x] Restructure the Project, to make it easy to maintenance and scaling
+- [x] Apps Icons
+- [ ] Make Window Desktop and Mobile in different component
+- [ ] Pomodoro
+- [ ] Music
 
 ## Near-Term Roadmap
 These features are planned for the next development cycle:

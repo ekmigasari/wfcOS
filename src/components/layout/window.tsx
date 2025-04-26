@@ -9,7 +9,7 @@ import { cn } from "../../infrastructure/lib/utils";
 import {
   focusWindowAtom,
   updateWindowPositionSizeAtom,
-} from "../../atoms/windowAtoms"; // Import Jotai atoms
+} from "../../application/atoms/windowAtoms"; // Import Jotai atoms
 
 interface WindowProps {
   windowId: string; // Unique identifier for this window instance
