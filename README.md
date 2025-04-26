@@ -188,5 +188,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Inspired by [ryos](https://github.com/ryokun6/ryos)
 - [Next.js](https://nextjs.org/) - The React Framework
 - [Tailwind CSS](https://tailwindcss.com/) - For utility-first CSS
+- [Shadcn](https://ui.shadcn.com/) - For UI components
 - [Radix UI](https://www.radix-ui.com/) - For accessible UI components
 - [Bun](https://bun.sh/) - For fast JavaScript runtime and package management
