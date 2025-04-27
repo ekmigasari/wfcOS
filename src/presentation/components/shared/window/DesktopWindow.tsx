@@ -8,7 +8,6 @@ import {
   updateWindowPositionSizeAtom,
   minimizeWindowAtom,
 } from "../../../../application/atoms/windowAtoms";
-import { playSound } from "../../../../infrastructure/lib/utils";
 import { WindowBase } from "./WindowBase";
 
 /**
@@ -36,6 +35,7 @@ type DesktopWindowProps = {
   initialPosition: { x: number; y: number };
   minSize?: { width: number; height: number };
   zIndex: number;
+  playSounds?: boolean;
 };
 
 export const DesktopWindow = ({
@@ -48,6 +48,7 @@ export const DesktopWindow = ({
   initialPosition,
   minSize = { width: 150, height: 100 },
   zIndex,
+  playSounds = true,
 }: DesktopWindowProps) => {
   // Client-side only state to avoid hydration issues
   const [isMounted, setIsMounted] = useState(false);
@@ -64,13 +65,11 @@ export const DesktopWindow = ({
 
   // Handle window minimize
   const handleMinimize = () => {
-    playSound("/sounds/minimize.mp3");
     minimizeWindow(windowId);
   };
 
   // Handle window close
   const handleClose = () => {
-    playSound("/sounds/close.mp3");
     onClose();
   };
 
@@ -127,6 +126,7 @@ export const DesktopWindow = ({
       handleResizeStart={handleResizeStart}
       showResizeHandles={true}
       titleBarClassName="cursor-move"
+      playSounds={playSounds}
     >
       {children}
     </WindowBase>

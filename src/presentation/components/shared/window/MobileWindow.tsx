@@ -8,7 +8,6 @@ import {
   updateWindowPositionSizeAtom,
   minimizeWindowAtom,
 } from "../../../../application/atoms/windowAtoms";
-import { playSound } from "../../../../infrastructure/lib/utils";
 
 /**
  * MobileWindow Component
@@ -35,6 +34,7 @@ type MobileWindowProps = {
   initialPosition: { x: number; y: number }; // Not used but kept for API consistency
   minSize?: { width: number; height: number };
   zIndex: number;
+  playSounds?: boolean;
 };
 
 export const MobileWindow = ({
@@ -45,6 +45,7 @@ export const MobileWindow = ({
   onClose,
   // initialSize and initialPosition not used as mobile windows use calculated positions
   zIndex,
+  playSounds = true,
 }: MobileWindowProps) => {
   // Client-side only state to avoid hydration issues
   const [isMounted, setIsMounted] = useState(false);
@@ -67,13 +68,11 @@ export const MobileWindow = ({
 
   // Handle window minimize
   const handleMinimize = () => {
-    playSound("/sounds/minimize.mp3");
     minimizeWindow(windowId);
   };
 
   // Handle window close
   const handleClose = () => {
-    playSound("/sounds/close.mp3");
     onClose();
   };
 
@@ -168,6 +167,7 @@ export const MobileWindow = ({
       contentClassName="mobile-content px-4"
       style={mobileStyle}
       showResizeHandles={false} // Mobile doesn't use resize handles
+      playSounds={playSounds}
     >
       {children}
     </WindowBase>

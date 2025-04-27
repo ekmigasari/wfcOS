@@ -19,6 +19,9 @@ export interface TimerState {
   timerSetting: TimerSetting;
   customDurationMinutes: number;
   customTitle: string;
+  windowId: string | null;
+  isMinimized: boolean;
+  isActive: boolean;
 }
 
 // Helper function to get the correct duration in seconds based on the current setting
@@ -55,6 +58,9 @@ const initialTimerState: TimerState = (() => {
     timerSetting: "work25",
     customDurationMinutes: DEFAULT_CUSTOM_MINUTES,
     customTitle: "Custom Timer",
+    windowId: null,
+    isMinimized: false,
+    isActive: false,
   };
 
   // Merge saved state with defaults, ensuring new fields have defaults
@@ -194,22 +200,44 @@ export const setCustomTitleAtom = atom(null, (get, set, newTitle: string) => {
   }));
 });
 
-// Decrement timer by one second
-export const decrementTimerAtom = atom(null, (get, set) => {
-  const { timeRemaining, isRunning } = get(timerAtom);
+// Set window ID for the timer
+export const setTimerWindowIdAtom = atom(
+  null,
+  (get, set, windowId: string | null) => {
+    set(timerAtom, (prev) => ({
+      ...prev,
+      windowId,
+      isActive: windowId !== null,
+    }));
+  }
+);
 
-  // Only decrement if running and time remains
-  if (isRunning && timeRemaining > 0) {
+// Handle window minimize/restore
+export const setTimerWindowMinimizedAtom = atom(
+  null,
+  (get, set, isMinimized: boolean) => {
     set(timerAtom, (prev) => ({
       ...prev,
-      timeRemaining: prev.timeRemaining - 1,
+      isMinimized,
+      // Keep the timer active even when minimized
     }));
   }
-  // Stop timer when it reaches zero
-  else if (isRunning && timeRemaining <= 0) {
-    set(timerAtom, (prev) => ({
+);
+
+// Handle window close - reset timer and clear window association
+export const handleTimerWindowCloseAtom = atom(null, (get, set) => {
+  set(timerAtom, (prev) => {
+    const newTimeRemaining = getDurationForSetting(
+      prev.timerSetting,
+      prev.customDurationMinutes
+    );
+    return {
       ...prev,
+      timeRemaining: newTimeRemaining,
       isRunning: false,
-    }));
-  }
+      windowId: null,
+      isMinimized: false,
+      isActive: false,
+    };
+  });
 });

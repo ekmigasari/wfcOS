@@ -6,6 +6,10 @@ import { MobileWindow } from "./MobileWindow";
 import { useAtom } from "jotai";
 import { focusWindowAtom } from "@/application/atoms/windowAtoms";
 import { useDeviceDetect } from "@/application/hooks";
+import {
+  setTimerWindowIdAtom,
+  handleTimerWindowCloseAtom,
+} from "@/atoms/timerAtom";
 
 /**
  * Window Component
@@ -38,14 +42,49 @@ type WindowProps = {
   initialPosition: { x: number; y: number };
   minSize?: { width: number; height: number };
   zIndex: number;
+  playSounds?: boolean;
 };
 
 export const Window = (props: WindowProps) => {
-  const { windowId, isOpen, ...restProps } = props;
+  const {
+    windowId,
+    isOpen,
+    onClose,
+    title,
+    playSounds = true,
+    ...restProps
+  } = props;
   const focusWindow = useAtom(focusWindowAtom)[1];
+  const setTimerWindowId = useAtom(setTimerWindowIdAtom)[1];
+  const handleTimerWindowClose = useAtom(handleTimerWindowCloseAtom)[1];
 
   // Use the new hook instead of requiring isMobileOrTablet as a prop
   const { isMobileOrTablet } = useDeviceDetect();
+
+  // Determine if this is a timer window by checking the title
+  const isTimerWindow = title.toLowerCase().includes("timer");
+
+  // Handle window open/close for timer persistence
+  useEffect(() => {
+    if (isOpen && isTimerWindow) {
+      // When timer window opens, associate it with the timer
+      setTimerWindowId(windowId);
+    }
+
+    // Cleanup function for when window closes or component unmounts
+    return () => {
+      if (isTimerWindow && !isOpen) {
+        // Reset timer when timer window is closed
+        handleTimerWindowClose();
+      }
+    };
+  }, [
+    isOpen,
+    windowId,
+    isTimerWindow,
+    setTimerWindowId,
+    handleTimerWindowClose,
+  ]);
 
   // Auto-focus the window when it's opened
   useEffect(() => {
@@ -54,10 +93,37 @@ export const Window = (props: WindowProps) => {
     }
   }, [isOpen, windowId, focusWindow]);
 
+  // Custom close handler that integrates with timer
+  const handleClose = () => {
+    if (isTimerWindow) {
+      // Handle timer cleanup when window is closed
+      handleTimerWindowClose();
+    }
+
+    // Call the original onClose handler
+    onClose();
+  };
+
+  // Custom minimize handler
+
   // Render the appropriate window component based on device type
   return isMobileOrTablet ? (
-    <MobileWindow windowId={windowId} isOpen={isOpen} {...restProps} />
+    <MobileWindow
+      windowId={windowId}
+      isOpen={isOpen}
+      title={title}
+      onClose={handleClose}
+      playSounds={playSounds}
+      {...restProps}
+    />
   ) : (
-    <DesktopWindow windowId={windowId} isOpen={isOpen} {...restProps} />
+    <DesktopWindow
+      windowId={windowId}
+      isOpen={isOpen}
+      title={title}
+      onClose={handleClose}
+      playSounds={playSounds}
+      {...restProps}
+    />
   );
 };

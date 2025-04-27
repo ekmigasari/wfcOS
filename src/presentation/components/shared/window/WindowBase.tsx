@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { cn } from "../../../../infrastructure/lib/utils";
+import { cn, playSound } from "../../../../infrastructure/lib/utils";
 import { ResizeDirection } from "../../../../application/hooks/useWindowManagement";
 
 /**
@@ -37,6 +37,7 @@ export type WindowBaseProps = {
     direction: ResizeDirection
   ) => void;
   showResizeHandles?: boolean;
+  playSounds?: boolean;
 };
 
 export const WindowBase = ({
@@ -58,11 +59,30 @@ export const WindowBase = ({
   minSize = { width: 150, height: 100 },
   handleResizeStart,
   showResizeHandles = false,
+  playSounds = true,
 }: WindowBaseProps) => {
   // Don't render if not open
   if (!isOpen) {
     return null;
   }
+
+  // Handle window close with sound
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (playSounds) {
+      playSound("/sounds/close.mp3");
+    }
+    onClose();
+  };
+
+  // Handle window minimize with sound
+  const handleMinimize = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (playSounds) {
+      playSound("/sounds/minimize.mp3");
+    }
+    onMinimize();
+  };
 
   // Define resize handles for window
   const handleBaseClass = "absolute z-[1001] select-none";
@@ -170,20 +190,14 @@ export const WindowBase = ({
         <div className="flex items-center gap-1">
           <button
             className="cursor-pointer bg-yellow-500 text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
-            onClick={(e) => {
-              e.stopPropagation();
-              onMinimize();
-            }}
+            onClick={handleMinimize}
             title="Minimize"
           >
             -
           </button>
           <button
             className="cursor-pointer bg-destructive text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
+            onClick={handleClose}
             title="Close"
           >
             X
