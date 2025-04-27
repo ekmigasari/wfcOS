@@ -13,7 +13,7 @@ These features should be prioritized for immediate implementation:
 - [x] Restructure the Project, to make it easy to maintenance and scaling
 - [x] Apps Icons
 - [x] Make Window Desktop and Mobile in different components
-- [ ] Main Menu
+- [x] Main Menu
 - [ ] Window resizer
 - [ ] Fix Timer
 - [ ] to-do list

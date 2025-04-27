@@ -12,6 +12,8 @@ import { cn } from "../../../../infrastructure/lib/utils";
  *
  * The component accepts common window properties like position, size, and styling options,
  * while providing extension points for specialized behaviors like dragging and resizing.
+ *
+ * For now it only use at mobile window
  */
 export type WindowBaseProps = {
   windowId: string;

@@ -3,7 +3,7 @@ import { useAtom } from "jotai"; // Import useAtom
 import {
   useWindowManagement,
   ResizeDirection,
-} from "../../hooks/useWindowManagement";
+} from "../../application/hooks/useWindowManagement";
 import { Size, Position } from "../../types"; // Updated path, added Position
 import { cn } from "../../infrastructure/lib/utils";
 import {
@@ -79,8 +79,8 @@ const Window: React.FC<WindowProps> = ({
   // Adjust initial position and size for mobile/tablet
   const adjustedInitialPosition = isMobileOrTablet
     ? {
-        // Position the window to match the menubar's position (respecting parent container padding)
-        x: 0, // The menubar starts at x:0 relative to its container
+        // Position the window to match the menubar's position (respecting parent containe r padding)
+        x: 0, // The menubar starts at x:0 relative to its containe r
         y: 36 + 4, // Menubar height (36px) + 4px gap
       }
     : initialPosition;
