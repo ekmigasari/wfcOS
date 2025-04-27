@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useAtom } from "jotai";
 import { WindowBase } from "./WindowBase";
 import {
@@ -101,19 +101,25 @@ export const MobileWindow = ({
     setIsMounted(true);
   }, []);
 
-  // Calculate position and size for mobile
-  const mobilePosition = {
-    x: 0, // Fixed position at left
-    y: 36 + 4, // Menubar height (36px) + 4px gap
-  };
+  // Calculate position and size for mobile using useMemo
+  const mobilePosition = useMemo(
+    () => ({
+      x: 0, // Fixed position at left
+      y: 36 + 4, // Menubar height (36px) + 4px gap
+    }),
+    []
+  );
 
-  const mobileSize = {
-    width: windowDimensions.width - 2 * 16, // Full width minus padding
-    height: Math.min(
-      windowDimensions.height * 0.8,
-      windowDimensions.height - (36 + 4 + 16) // Account for menubar + gap + bottom padding
-    ),
-  };
+  const mobileSize = useMemo(
+    () => ({
+      width: windowDimensions.width - 2 * 16, // Full width minus padding
+      height: Math.min(
+        windowDimensions.height * 0.8,
+        windowDimensions.height - (36 + 4 + 16) // Account for menubar + gap + bottom padding
+      ),
+    }),
+    [windowDimensions.width, windowDimensions.height]
+  );
 
   // Report position and size changes to global state when window is shown
   useEffect(() => {
