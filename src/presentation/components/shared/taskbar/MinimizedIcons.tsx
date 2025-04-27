@@ -7,9 +7,9 @@ import {
   minimizedWindowsAtom,
   restoreWindowAtom,
 } from "@/application/atoms/windowAtoms";
-import { appRegistry } from "@/config/appRegistry";
+import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { playSound } from "@/infrastructure/lib/utils";
-import { cn } from "@/infrastructure/lib/utils";
+import { Button } from "../../ui/button";
 
 export const MinimizedIcons = () => {
   // Get minimized windows from state
@@ -28,41 +28,33 @@ export const MinimizedIcons = () => {
   }
 
   return (
-    <div className="minimized-icons flex gap-2">
+    <div className="minimized-icons flex gap-1">
       {minimizedWindows.map((window) => {
         // Get app info from registry for the icon
         const appInfo = appRegistry[window.appId];
-        console.log(appInfo);
 
         return (
-          <button
+          <Button
             key={window.id}
-            className={cn(
-              "taskbar-item relative flex items-center justify-center",
-              "w-10 h-10 rounded p-1 transition-all",
-              "hover:bg-secondary/30 active:scale-95",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-            )}
             onClick={() => handleRestoreWindow(window.id)}
             title={window.title}
+            variant="ghost"
+            size="icon"
+            className="size-7"
           >
             {appInfo?.src ? (
               <Image
                 src={appInfo.src}
                 alt={window.title}
-                width={24}
-                height={24}
-                className="w-6 h-6"
+                width={20}
+                height={20}
               />
             ) : (
               <div className="w-6 h-6 bg-secondary/50 rounded-sm flex items-center justify-center text-xs text-white">
                 {window.title.charAt(0)}
               </div>
             )}
-
-            {/* Active indicator dot */}
-            <div className="absolute -bottom-0.5 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white" />
-          </button>
+          </Button>
         );
       })}
     </div>

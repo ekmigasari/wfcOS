@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import {
   MenubarContent,
@@ -11,12 +11,14 @@ import {
   MenubarTrigger,
 } from "@/presentation/components/ui/menubar";
 import { playSound } from "@/infrastructure/lib/utils";
-import { appRegistry } from "@/config/appRegistry";
+import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { useAtom } from "jotai";
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
+import { ResetDialog } from "./ResetDialog";
 
 export const TaskbarMenu = () => {
   const openWindow = useAtom(openWindowAtom)[1];
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   // Function to open an app
   const openApp = (appId: string) => {
@@ -42,6 +44,12 @@ export const TaskbarMenu = () => {
     window.open(url, "_blank");
   };
 
+  // Function to open reset dialog
+  const openResetDialog = () => {
+    playSound("/sounds/click.mp3");
+    setResetDialogOpen(true);
+  };
+
   return (
     <>
       <MenubarMenu>
@@ -64,6 +72,14 @@ export const TaskbarMenu = () => {
               {app.name}
             </MenubarItem>
           ))}
+          <MenubarSeparator />
+          <MenubarItem
+            inset
+            onSelect={openResetDialog}
+            className="text-destructive"
+          >
+            Reset System
+          </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
@@ -89,6 +105,9 @@ export const TaskbarMenu = () => {
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+
+      {/* Reset Dialog */}
+      <ResetDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen} />
     </>
   );
 };

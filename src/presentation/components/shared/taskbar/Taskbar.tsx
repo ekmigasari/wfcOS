@@ -16,17 +16,14 @@ export const Taskbar = () => {
   return (
     <>
       {/* Main menubar with logo, menu and clock */}
-      <Menubar className="bg-primary border-secondary border-2 text-white z-[1500] relative">
+      <Menubar className="bg-primary border-secondary border-2 text-white z-[1500] relative justify-between">
         <TaskbarMenu />
+        {/* Minimized icons display */}
+        {hasMinimizedWindows && (
+          <MinimizedIcons />
+        )}
         <TaskbarClock />
       </Menubar>
-
-      {/* Minimized icons display */}
-      {hasMinimizedWindows && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[1000] flex gap-2 p-1 rounded-lg bg-primary/80 backdrop-blur-sm border border-secondary shadow-lg">
-          <MinimizedIcons />
-        </div>
-      )}
     </>
   );
 };
