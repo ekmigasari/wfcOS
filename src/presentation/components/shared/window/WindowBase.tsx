@@ -2,18 +2,18 @@
 
 import React from "react";
 import { cn } from "../../../../infrastructure/lib/utils";
+import { ResizeDirection } from "../../../../application/hooks/useWindowManagement";
 
 /**
  * WindowBase Component
  *
  * A base component for window UI that provides the foundation for both desktop and mobile window implementations.
  * This component handles the basic window structure with title bar and content area,
- * but delegates device-specific behaviors to specialized implementations.
+ * with support for common window operations including resizing.
  *
  * The component accepts common window properties like position, size, and styling options,
  * while providing extension points for specialized behaviors like dragging and resizing.
  *
- * For now it only use at mobile window
  */
 export type WindowBaseProps = {
   windowId: string;
@@ -31,6 +31,12 @@ export type WindowBaseProps = {
   contentClassName?: string;
   style?: React.CSSProperties;
   onTitleBarMouseDown?: (event: React.MouseEvent<Element, MouseEvent>) => void;
+  minSize?: { width: number; height: number };
+  handleResizeStart?: (
+    e: React.MouseEvent<HTMLDivElement>,
+    direction: ResizeDirection
+  ) => void;
+  showResizeHandles?: boolean;
 };
 
 export const WindowBase = ({
@@ -49,11 +55,88 @@ export const WindowBase = ({
   contentClassName = "",
   style = {},
   onTitleBarMouseDown,
+  minSize = { width: 150, height: 100 },
+  handleResizeStart,
+  showResizeHandles = false,
 }: WindowBaseProps) => {
   // Don't render if not open
   if (!isOpen) {
     return null;
   }
+
+  // Define resize handles for window
+  const handleBaseClass = "absolute z-[1001] select-none";
+  const cornerHandleClass = `${handleBaseClass} w-5 h-5`;
+  const edgeHandleClass = handleBaseClass;
+
+  const resizeHandles: {
+    className: string;
+    direction: ResizeDirection;
+    style?: React.CSSProperties;
+  }[] = [
+    // Corners
+    {
+      className: cn(cornerHandleClass, "bottom-[-3px] right-[-3px]"),
+      direction: "bottom-right",
+      style: {
+        cursor: "nwse-resize",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        borderRight: "1px solid rgba(255, 255, 255, 0.1)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+      },
+    },
+    {
+      className: cn(cornerHandleClass, "bottom-[-3px] left-[-3px]"),
+      direction: "bottom-left",
+      style: {
+        cursor: "nesw-resize",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+      },
+    },
+    {
+      className: cn(cornerHandleClass, "top-[-3px] right-[-3px]"),
+      direction: "top-right",
+      style: {
+        cursor: "nesw-resize",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        borderRight: "1px solid rgba(255, 255, 255, 0.1)",
+        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+      },
+    },
+    {
+      className: cn(cornerHandleClass, "top-[-3px] left-[-3px]"),
+      direction: "top-left",
+      style: {
+        cursor: "nwse-resize",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
+        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+      },
+    },
+    // Edges
+    {
+      className: cn(edgeHandleClass, "top-5 bottom-5 right-[-3px] w-[6px]"),
+      direction: "right",
+      style: { cursor: "ew-resize" },
+    },
+    {
+      className: cn(edgeHandleClass, "top-5 bottom-5 left-[-3px] w-[6px]"),
+      direction: "left",
+      style: { cursor: "ew-resize" },
+    },
+    {
+      className: cn(edgeHandleClass, "left-5 right-5 bottom-[-3px] h-[6px]"),
+      direction: "bottom",
+      style: { cursor: "ns-resize" },
+    },
+    {
+      className: cn(edgeHandleClass, "left-5 right-5 top-[-3px] h-[6px]"),
+      direction: "top",
+      style: { cursor: "ns-resize" },
+    },
+  ];
 
   return (
     <div
@@ -66,6 +149,8 @@ export const WindowBase = ({
         left: `${position.x}px`,
         width: `${size.width}px`,
         height: `${size.height}px`,
+        minWidth: minSize?.width ? `${minSize.width}px` : "150px",
+        minHeight: minSize?.height ? `${minSize.height}px` : "100px",
         zIndex,
         ...style,
       }}
@@ -112,6 +197,22 @@ export const WindowBase = ({
       >
         {children}
       </div>
+
+      {/* Resize Handles */}
+      {showResizeHandles &&
+        handleResizeStart &&
+        resizeHandles.map((handle) => (
+          <div
+            key={handle.direction}
+            className={handle.className}
+            style={handle.style}
+            data-resize-handle="true"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              handleResizeStart(e, handle.direction);
+            }}
+          />
+        ))}
     </div>
   );
 };

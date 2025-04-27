@@ -129,10 +129,8 @@ export const MobileWindow = ({
     isMounted,
     windowId,
     updateWindowPositionSize,
-    mobilePosition.x,
-    mobilePosition.y,
-    mobileSize.width,
-    mobileSize.height,
+    mobilePosition,
+    mobileSize,
   ]);
 
   // Don't render until mounted to avoid hydration issues
@@ -163,6 +161,7 @@ export const MobileWindow = ({
       titleBarClassName="mobile-title-bar px-4 bg-primary rounded-t-[0.375rem]"
       contentClassName="mobile-content px-4"
       style={mobileStyle}
+      showResizeHandles={false} // Mobile doesn't use resize handles
     >
       {children}
     </WindowBase>
