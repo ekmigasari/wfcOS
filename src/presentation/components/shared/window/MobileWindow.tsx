@@ -29,12 +29,14 @@ type MobileWindowProps = {
   title: string;
   children: React.ReactNode;
   isOpen: boolean;
+  isMinimized?: boolean;
   onClose: () => void;
-  initialSize: { width: number; height: number }; // Not used but kept for API consistency
-  initialPosition: { x: number; y: number }; // Not used but kept for API consistency
+  initialSize: { width: number; height: number };
+  initialPosition: { x: number; y: number };
   minSize?: { width: number; height: number };
   zIndex: number;
   playSounds?: boolean;
+  onMinimizeStateChange?: (isMinimized: boolean) => void;
 };
 
 export const MobileWindow = ({
@@ -42,10 +44,11 @@ export const MobileWindow = ({
   title,
   children,
   isOpen,
+  isMinimized = false,
   onClose,
-  // initialSize and initialPosition not used as mobile windows use calculated positions
   zIndex,
   playSounds = true,
+  onMinimizeStateChange,
 }: MobileWindowProps) => {
   // Client-side only state to avoid hydration issues
   const [isMounted, setIsMounted] = useState(false);
@@ -156,6 +159,7 @@ export const MobileWindow = ({
       windowId={windowId}
       title={title}
       isOpen={isOpen}
+      isMinimized={isMinimized}
       onClose={handleClose}
       onMinimize={handleMinimize}
       zIndex={zIndex}
@@ -168,6 +172,7 @@ export const MobileWindow = ({
       style={mobileStyle}
       showResizeHandles={false} // Mobile doesn't use resize handles
       playSounds={playSounds}
+      onMinimizeStateChange={onMinimizeStateChange}
     >
       {children}
     </WindowBase>

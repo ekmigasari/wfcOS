@@ -33,8 +33,8 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   musicPlayer: {
     name: "Music Player",
     src: "/icons/music.png",
-    defaultSize: { width: 450, height: 600 },
-    minSize: { width: 300, height: 400 },
+    defaultSize: { width: 400, height: 600 },
+    minSize: { width: 320, height: 400 },
     component: MusicPlayer,
   },
 };

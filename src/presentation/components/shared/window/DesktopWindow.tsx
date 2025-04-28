@@ -30,12 +30,14 @@ type DesktopWindowProps = {
   title: string;
   children: React.ReactNode;
   isOpen: boolean;
+  isMinimized?: boolean;
   onClose: () => void;
   initialSize: { width: number; height: number };
   initialPosition: { x: number; y: number };
   minSize?: { width: number; height: number };
   zIndex: number;
   playSounds?: boolean;
+  onMinimizeStateChange?: (isMinimized: boolean) => void;
 };
 
 export const DesktopWindow = ({
@@ -43,12 +45,14 @@ export const DesktopWindow = ({
   title,
   children,
   isOpen,
+  isMinimized = false,
   onClose,
   initialSize,
   initialPosition,
   minSize = { width: 150, height: 100 },
   zIndex,
   playSounds = true,
+  onMinimizeStateChange,
 }: DesktopWindowProps) => {
   // Client-side only state to avoid hydration issues
   const [isMounted, setIsMounted] = useState(false);
@@ -115,6 +119,7 @@ export const DesktopWindow = ({
       windowId={windowId}
       title={title}
       isOpen={isOpen}
+      isMinimized={isMinimized}
       onClose={handleClose}
       onMinimize={handleMinimize}
       zIndex={zIndex}
@@ -127,6 +132,7 @@ export const DesktopWindow = ({
       showResizeHandles={true}
       titleBarClassName="cursor-move"
       playSounds={playSounds}
+      onMinimizeStateChange={onMinimizeStateChange}
     >
       {children}
     </WindowBase>

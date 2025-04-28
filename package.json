@@ -37,6 +37,7 @@
     "react-draggable": "^4.4.6",
     "react-player": "^2.16.0",
     "react-resizable": "^3.0.5",
+    "react-youtube": "^10.1.0",
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.4",
     "tw-animate-css": "^1.2.8",

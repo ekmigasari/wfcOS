@@ -4,182 +4,246 @@ import {
   saveFeatureState,
 } from "@/infrastructure/utils/storage";
 
-// Feature key for localStorage
-const FEATURE_KEY = "musicPlayer";
-
-// Define the Song interface
 export interface Song {
-  id: string; // YouTube video ID
-  url: string; // YouTube URL
-  title: string; // Song title
-  seqId: number; // Sequential ID for ordering
+  url: string;
+  title: string;
+  id: string;
+  seqId?: number;
 }
 
-// Default songs to populate the music player
+export interface MusicPlayerState {
+  playlist: Song[];
+  currentSongIndex: number;
+  isPlaying: boolean;
+  isWindowOpen: boolean;
+  currentTime: number;
+  volume: number;
+  isLoading: boolean;
+  showVideo: boolean;
+  duration: number;
+  playedSeconds: number;
+  seeking: boolean;
+  isMuted: boolean;
+  currentSong: Song | null;
+}
+
+// Default songs to include in the playlist
 const defaultSongs: Song[] = [
   {
     url: "https://www.youtube.com/watch?v=lTRiuFIWV54",
     title: "Lo-fi Study Session",
     id: "lTRiuFIWV54",
-    seqId: 1,
   },
   {
     url: "https://www.youtube.com/watch?v=Fp5ghKduTK8",
     title: "Ghibli Piano",
     id: "Fp5ghKduTK8",
-    seqId: 2,
   },
   {
     url: "https://www.youtube.com/watch?v=KxJrYKoTeXA",
     title: "Jazzjeans",
     id: "KxJrYKoTeXA",
-    seqId: 3,
   },
   {
     url: "https://www.youtube.com/watch?v=pfU0QORkRpY",
     title: "FKJ Live",
     id: "pfU0QORkRpY",
-    seqId: 4,
   },
   {
     url: "https://www.youtube.com/watch?v=ot5UsNymqgQ",
     title: "Cozy Room",
     id: "ot5UsNymqgQ",
-    seqId: 5,
   },
 ];
 
-// Define the MusicPlayerState interface
-export interface MusicPlayerState {
-  playlist: Song[];
-  currentSongIndex: number;
-  isPlaying: boolean;
-  volume: number;
-  currentTime: number;
-  isWindowOpen: boolean;
-}
+// Get stored state or use defaults
+const getInitialState = () => {
+  const stored = loadFeatureState<{
+    playlist: Song[];
+    currentSongIndex: number;
+    isPlaying: boolean;
+    isWindowOpen: boolean;
+    currentTime: number;
+    volume: number;
+  }>("musicPlayer");
 
-// Initialize with saved state or defaults
-const initialMusicPlayerState: MusicPlayerState = (() => {
-  const savedState = loadFeatureState<MusicPlayerState>(FEATURE_KEY);
-
-  const defaults: MusicPlayerState = {
-    playlist: defaultSongs, // Initialize with default songs
-    currentSongIndex: 0,
-    isPlaying: false,
-    volume: 0.7,
-    currentTime: 0,
-    isWindowOpen: false,
-  };
+  const playlist = stored?.playlist ?? defaultSongs;
+  const currentSongIndex = stored?.currentSongIndex ?? 0;
 
   return {
-    ...defaults,
-    ...savedState,
-    // Always reset transient states on initialization
-    isPlaying: false,
-    isWindowOpen: false,
+    playlist,
+    currentSongIndex: currentSongIndex < playlist.length ? currentSongIndex : 0,
+    isPlaying: stored?.isPlaying ?? false,
+    isWindowOpen: stored?.isWindowOpen ?? false,
+    currentTime: stored?.currentTime ?? 0,
+    volume: stored?.volume ?? 0.7,
+    isLoading: false,
+    showVideo: false,
+    duration: 0,
+    playedSeconds: 0,
+    seeking: false,
+    isMuted: false,
+    currentSong: playlist.length > 0 ? playlist[currentSongIndex] : null,
   };
-})();
+};
 
-// Create base atom
-const baseMusicPlayerAtom = atom<MusicPlayerState>(initialMusicPlayerState);
+// Main state atom for the music player
+export const musicPlayerAtom = atom<MusicPlayerState>(getInitialState());
 
-// Create derived atom for reading state
-export const musicPlayerAtom = atom((get) => get(baseMusicPlayerAtom));
-
-// Create derived atom for updating state with persistence
-export const updateMusicPlayerStateAtom = atom(
-  (get) => get(baseMusicPlayerAtom),
+// Action to persist state changes
+export const persistMusicPlayerState = atom(
+  (get) => get(musicPlayerAtom),
   (get, set, update: Partial<MusicPlayerState>) => {
-    const currentState = get(baseMusicPlayerAtom);
-    const updatedState = { ...currentState, ...update };
+    const currentState = get(musicPlayerAtom);
+    const newState = { ...currentState, ...update };
 
-    // Only update and save if state has changed
-    if (JSON.stringify(currentState) !== JSON.stringify(updatedState)) {
-      set(baseMusicPlayerAtom, updatedState);
-      saveFeatureState(FEATURE_KEY, updatedState);
-    }
+    set(musicPlayerAtom, newState);
+
+    // Only persist essential state to localStorage
+    saveFeatureState("musicPlayer", {
+      playlist: newState.playlist,
+      currentSongIndex: newState.currentSongIndex,
+      isPlaying: newState.isPlaying,
+      isWindowOpen: newState.isWindowOpen,
+      currentTime: newState.currentTime,
+      volume: newState.volume,
+    });
   }
 );
 
-// Helper function to extract YouTube ID from URL
+// Helper to extract YouTube video ID from URL
 export const getYoutubeId = (url: string): string | null => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
   return match && match[2].length === 11 ? match[2] : null;
 };
 
-// Specific action atoms
+// Actions for player control
+export const playPauseAtom = atom(null, (get, set) => {
+  const state = get(musicPlayerAtom);
+  const newPlayingState = !state.isPlaying;
 
-// Toggle play/pause
-export const togglePlayingAtom = atom(null, (get, set) => {
-  const current = get(baseMusicPlayerAtom);
-  set(updateMusicPlayerStateAtom, { isPlaying: !current.isPlaying });
+  set(persistMusicPlayerState, {
+    isPlaying: newPlayingState,
+  });
 });
 
-// Next song
 export const nextSongAtom = atom(null, (get, set) => {
-  const current = get(baseMusicPlayerAtom);
-  if (current.playlist.length <= 1) return;
+  const state = get(musicPlayerAtom);
+  if (state.playlist.length <= 1) return;
 
-  const nextIndex = (current.currentSongIndex + 1) % current.playlist.length;
-  set(updateMusicPlayerStateAtom, {
+  const nextIndex = (state.currentSongIndex + 1) % state.playlist.length;
+
+  set(persistMusicPlayerState, {
     currentSongIndex: nextIndex,
     currentTime: 0,
     isPlaying: true,
+    currentSong: state.playlist[nextIndex],
   });
 });
 
-// Previous song
-export const previousSongAtom = atom(null, (get, set) => {
-  const current = get(baseMusicPlayerAtom);
-  if (current.playlist.length <= 1) return;
+export const prevSongAtom = atom(null, (get, set) => {
+  const state = get(musicPlayerAtom);
+  if (state.playlist.length <= 1) return;
 
   const prevIndex =
-    (current.currentSongIndex - 1 + current.playlist.length) %
-    current.playlist.length;
-  set(updateMusicPlayerStateAtom, {
+    (state.currentSongIndex - 1 + state.playlist.length) %
+    state.playlist.length;
+
+  set(persistMusicPlayerState, {
     currentSongIndex: prevIndex,
     currentTime: 0,
     isPlaying: true,
+    currentSong: state.playlist[prevIndex],
   });
 });
 
-// Update volume
 export const setVolumeAtom = atom(null, (get, set, volume: number) => {
-  set(updateMusicPlayerStateAtom, { volume });
+  set(persistMusicPlayerState, {
+    volume,
+    isMuted: volume === 0,
+  });
 });
 
-// Add song to playlist
+export const toggleMuteAtom = atom(null, (get, set) => {
+  const state = get(musicPlayerAtom);
+  const isMuted = !state.isMuted;
+
+  set(persistMusicPlayerState, {
+    isMuted,
+    volume: isMuted ? 0 : state.volume || 0.7,
+  });
+});
+
 export const addSongAtom = atom(null, (get, set, song: Song) => {
-  const current = get(baseMusicPlayerAtom);
-  const updatedPlaylist = [...current.playlist, song];
-  set(updateMusicPlayerStateAtom, { playlist: updatedPlaylist });
+  const state = get(musicPlayerAtom);
+  const newPlaylist = [...state.playlist, song];
+
+  set(persistMusicPlayerState, {
+    playlist: newPlaylist,
+    currentSongIndex: newPlaylist.length === 1 ? 0 : state.currentSongIndex,
+    currentSong: newPlaylist.length === 1 ? song : state.currentSong,
+  });
 });
 
-// Remove song from playlist
 export const removeSongAtom = atom(null, (get, set, index: number) => {
-  const current = get(baseMusicPlayerAtom);
-  if (index < 0 || index >= current.playlist.length) return;
+  const state = get(musicPlayerAtom);
+  if (index < 0 || index >= state.playlist.length) return;
 
-  const updatedPlaylist = current.playlist.filter((_, i) => i !== index);
+  const newPlaylist = state.playlist.filter((_, i) => i !== index);
+  let newIndex = state.currentSongIndex;
 
-  // Adjust currentSongIndex if needed
-  let updatedIndex = current.currentSongIndex;
-  if (updatedPlaylist.length === 0) {
-    updatedIndex = 0;
-  } else if (index === current.currentSongIndex) {
-    // Select next song or first if at end
-    updatedIndex = Math.min(index, updatedPlaylist.length - 1);
-  } else if (index < current.currentSongIndex) {
-    // Adjust index down by one
-    updatedIndex = current.currentSongIndex - 1;
+  // Adjust current index after removal
+  if (newPlaylist.length === 0) {
+    newIndex = 0;
+  } else if (index === state.currentSongIndex) {
+    newIndex = Math.min(index, newPlaylist.length - 1);
+  } else if (index < state.currentSongIndex) {
+    newIndex = state.currentSongIndex - 1;
   }
 
-  set(updateMusicPlayerStateAtom, {
-    playlist: updatedPlaylist,
-    currentSongIndex: updatedIndex,
-    // Stop playing if removed current and was playing
-    isPlaying: index === current.currentSongIndex ? false : current.isPlaying,
+  set(persistMusicPlayerState, {
+    playlist: newPlaylist,
+    currentSongIndex: newIndex,
+    isPlaying: newPlaylist.length > 0 ? state.isPlaying : false,
+    currentSong: newPlaylist.length > 0 ? newPlaylist[newIndex] : null,
   });
 });
+
+export const setSeekPositionAtom = atom(null, (get, set, time: number) => {
+  set(persistMusicPlayerState, {
+    currentTime: time,
+    playedSeconds: time,
+  });
+});
+
+export const toggleVideoAtom = atom(null, (get, set) => {
+  const state = get(musicPlayerAtom);
+  set(persistMusicPlayerState, {
+    showVideo: !state.showVideo,
+  });
+});
+
+export const updateSongTitleAtom = atom(
+  null,
+  (get, set, params: { index: number; title: string }) => {
+    const { index, title } = params;
+    const state = get(musicPlayerAtom);
+
+    if (index < 0 || index >= state.playlist.length) return;
+
+    const newPlaylist = [...state.playlist];
+    newPlaylist[index] = {
+      ...newPlaylist[index],
+      title: title.trim() || `Song ${index + 1}`,
+    };
+
+    set(persistMusicPlayerState, {
+      playlist: newPlaylist,
+      currentSong:
+        index === state.currentSongIndex
+          ? newPlaylist[index]
+          : state.currentSong,
+    });
+  }
+);

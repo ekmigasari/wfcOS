@@ -91,6 +91,7 @@ export const DesktopIcons = () => {
             windowId={window.id}
             title={window.title}
             isOpen={true}
+            isMinimized={window.isMinimized}
             onClose={() => handleCloseWindow(window.id)}
             initialSize={window.size}
             initialPosition={window.position}

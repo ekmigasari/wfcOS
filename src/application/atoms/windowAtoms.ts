@@ -18,6 +18,7 @@ export interface WindowState {
   isOpen: boolean; // To track if the window should be rendered
   isMinimized: boolean; // Track if window is minimized to taskbar
   zIndex: number; // To manage stacking order
+  onMinimize?: (isMinimized: boolean) => void; // Optional callback when window is minimized/restored
 }
 
 // Define the shape of the overall window management state
@@ -72,7 +73,7 @@ export const windowRegistryAtom = atom(
 export const openWindowsAtom = atom(
   (get) =>
     Object.values(get(windowRegistryAtom))
-      .filter((win) => win.isOpen && !win.isMinimized)
+      .filter((win) => win.isOpen) // Include all open windows, even if minimized
       .sort((a, b) => a.zIndex - b.zIndex) // Render lower zIndex first (behind)
 );
 
@@ -83,6 +84,12 @@ export const minimizedWindowsAtom = atom(
       .filter((win) => win.isOpen && win.isMinimized)
       .sort((a, b) => a.appId.localeCompare(b.appId)) // Sort by app ID for consistent order
 );
+
+// Atom that notifies when a window's minimize state changes
+export const minimizeChangeAtom = atom<{
+  windowId: string;
+  isMinimized: boolean;
+} | null>(null);
 
 // --- Window Management Action Atoms (Write-only) ---
 
@@ -163,6 +170,14 @@ export const minimizeWindowAtom = atom(null, (get, set, windowId: string) => {
     const windowToMinimize = prev[windowId];
     if (!windowToMinimize || !windowToMinimize.isOpen) return prev;
 
+    // Execute onMinimize callback if defined - this allows apps to react to minimization
+    if (windowToMinimize.onMinimize) {
+      windowToMinimize.onMinimize(true);
+    }
+
+    // Emit minimize change event
+    set(minimizeChangeAtom, { windowId, isMinimized: true });
+
     return {
       ...prev,
       [windowId]: { ...windowToMinimize, isMinimized: true },
@@ -175,6 +190,14 @@ export const restoreWindowAtom = atom(null, (get, set, windowId: string) => {
   set(windowRegistryAtom, (prev) => {
     const windowToRestore = prev[windowId];
     if (!windowToRestore || !windowToRestore.isOpen) return prev;
+
+    // Execute onMinimize callback if defined - this allows apps to react to restoration
+    if (windowToRestore.onMinimize) {
+      windowToRestore.onMinimize(false);
+    }
+
+    // Emit minimize change event
+    set(minimizeChangeAtom, { windowId, isMinimized: false });
 
     return {
       ...prev,

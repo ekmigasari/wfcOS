@@ -20,6 +20,7 @@ export type WindowBaseProps = {
   title: string;
   children: React.ReactNode;
   isOpen: boolean;
+  isMinimized?: boolean;
   onClose: () => void;
   onMinimize: () => void;
   zIndex: number;
@@ -38,6 +39,7 @@ export type WindowBaseProps = {
   ) => void;
   showResizeHandles?: boolean;
   playSounds?: boolean;
+  onMinimizeStateChange?: (isMinimized: boolean) => void;
 };
 
 export const WindowBase = ({
@@ -45,6 +47,7 @@ export const WindowBase = ({
   title,
   children,
   isOpen,
+  isMinimized = false,
   onClose,
   onMinimize,
   zIndex,
@@ -60,6 +63,7 @@ export const WindowBase = ({
   handleResizeStart,
   showResizeHandles = false,
   playSounds = true,
+  onMinimizeStateChange,
 }: WindowBaseProps) => {
   // Don't render if not open
   if (!isOpen) {
@@ -88,6 +92,37 @@ export const WindowBase = ({
   const handleBaseClass = "absolute z-[1001] select-none";
   const cornerHandleClass = `${handleBaseClass} w-5 h-5`;
   const edgeHandleClass = handleBaseClass;
+
+  // Skip rendering the visible part if minimized
+  if (isMinimized) {
+    // Notify the application of minimize state change via the optional callback
+    if (onMinimizeStateChange) {
+      onMinimizeStateChange(true);
+    }
+
+    return (
+      <div
+        className="absolute opacity-0 pointer-events-none"
+        style={{
+          position: "fixed", // Fixed position to ensure it stays in viewport
+          left: "-9999px", // Move it off-screen
+          top: 0,
+          width: `${size.width}px`,
+          height: `${size.height}px`,
+          zIndex: -1, // Keep it in the background
+          visibility: "hidden", // Hide it from view
+          // But don't use display: none as it would stop audio
+        }}
+        aria-hidden="true" // For accessibility
+      >
+        {/* Still render the children so media keeps playing */}
+        {children}
+      </div>
+    );
+  } else if (onMinimizeStateChange) {
+    // Notify the application that it's not minimized (visible)
+    onMinimizeStateChange(false);
+  }
 
   const resizeHandles: {
     className: string;

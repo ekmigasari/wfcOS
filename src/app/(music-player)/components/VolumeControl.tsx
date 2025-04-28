@@ -1,24 +1,23 @@
 "use client";
 
-import React from "react";
+import { useAtom } from "jotai";
 import { Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/presentation/components/ui/button";
 import { Slider } from "@/presentation/components/ui/slider";
+import {
+  musicPlayerAtom,
+  setVolumeAtom,
+  toggleMuteAtom,
+} from "@/application/atoms/musicPlayerAtom";
 
-interface VolumeControlProps {
-  volume: number;
-  isMuted: boolean;
-  handleVolumeChange: (value: number[]) => void;
-  toggleMute: () => void;
-}
+const VolumeControl = () => {
+  const [playerState] = useAtom(musicPlayerAtom);
+  const [, setVolume] = useAtom(setVolumeAtom);
+  const [, toggleMute] = useAtom(toggleMuteAtom);
 
-export const VolumeControl = ({
-  volume,
-  isMuted,
-  handleVolumeChange,
-  toggleMute,
-}: VolumeControlProps) => {
-  const displayVolume = isMuted ? 0 : volume;
+  const handleVolumeChange = (values: number[]) => {
+    setVolume(values[0]);
+  };
 
   return (
     <div className="flex items-center space-x-2 mb-4">
@@ -28,11 +27,11 @@ export const VolumeControl = ({
         onClick={toggleMute}
         className="h-8 w-8 rounded-full p-0"
       >
-        {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        {playerState.isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
       </Button>
 
       <Slider
-        value={[displayVolume]}
+        value={[playerState.isMuted ? 0 : playerState.volume]}
         min={0}
         max={1}
         step={0.01}
@@ -41,7 +40,7 @@ export const VolumeControl = ({
       />
 
       <span className="text-xs text-muted-foreground w-8 text-right">
-        {Math.round(displayVolume * 100)}%
+        {Math.round((playerState.isMuted ? 0 : playerState.volume) * 100)}%
       </span>
     </div>
   );

@@ -59,6 +59,28 @@ export interface WindowState {
 - `focusWindowAtom` - Brings window to front
 - `updateWindowPositionSizeAtom` - Updates position/size after drag/resize
 
+## Minimized Window Behavior
+
+When a window is minimized:
+
+1. The window remains in the DOM but is hidden from view using CSS properties:
+   - `position: fixed`
+   - `left: -9999px`
+   - `opacity: 0`
+   - `pointer-events: none`
+   - `zIndex: -1`
+   - `visibility: hidden`
+
+2. The window's content continues running (audio playback, timers, etc.)
+   - We use `display: none` is avoided to prevent interrupting audio playback
+   - This enables background processes to continue functioning
+
+3. The window appears in the taskbar via [MinimizedIcons.tsx](mdc:src/presentation/components/shared/taskbar/MinimizedIcons.tsx)
+   - Clicking a taskbar icon restores the window using `restoreWindowAtom`
+   - Restored windows are brought to the front with a new highest z-index
+
+4. State is tracked in the window registry via the `isMinimized` flag
+
 ## Using the Window System
 
 ### Opening a Window

@@ -31,24 +31,29 @@ import {
  * - Window minimization (both desktop and mobile)
  * - Focus management
  * - Automatic focus when opened from icon clicks
+ * - Preserves component state when minimized (no remounting)
+ * - Supports callbacks for minimization state changes to notify applications
  */
 type WindowProps = {
   windowId: string;
   title: string;
   children: React.ReactNode;
   isOpen: boolean;
+  isMinimized?: boolean;
   onClose: () => void;
   initialSize: { width: number; height: number };
   initialPosition: { x: number; y: number };
   minSize?: { width: number; height: number };
   zIndex: number;
   playSounds?: boolean;
+  onMinimizeStateChange?: (isMinimized: boolean) => void; // App notification callback
 };
 
 export const Window = (props: WindowProps) => {
   const {
     windowId,
     isOpen,
+    isMinimized,
     onClose,
     title,
     playSounds = true,
@@ -86,12 +91,12 @@ export const Window = (props: WindowProps) => {
     handleTimerWindowClose,
   ]);
 
-  // Auto-focus the window when it's opened
+  // Auto-focus the window when it's opened or restored from minimization
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isMinimized) {
       focusWindow(windowId);
     }
-  }, [isOpen, windowId, focusWindow]);
+  }, [isOpen, isMinimized, windowId, focusWindow]);
 
   // Custom close handler that integrates with timer
   const handleClose = () => {
@@ -104,25 +109,31 @@ export const Window = (props: WindowProps) => {
     onClose();
   };
 
-  // Custom minimize handler
+  // If window is not open, don't render anything
+  if (!isOpen) return null;
 
   // Render the appropriate window component based on device type
+  // Note: We always render the component even when minimized to preserve state
   return isMobileOrTablet ? (
     <MobileWindow
       windowId={windowId}
       isOpen={isOpen}
+      isMinimized={isMinimized}
       title={title}
       onClose={handleClose}
       playSounds={playSounds}
+      onMinimizeStateChange={props.onMinimizeStateChange}
       {...restProps}
     />
   ) : (
     <DesktopWindow
       windowId={windowId}
       isOpen={isOpen}
+      isMinimized={isMinimized}
       title={title}
       onClose={handleClose}
       playSounds={playSounds}
+      onMinimizeStateChange={props.onMinimizeStateChange}
       {...restProps}
     />
   );

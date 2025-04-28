@@ -27,6 +27,8 @@ export const MinimizedIcons = () => {
   // Restore a window when clicked in taskbar
   const handleRestoreWindow = (windowId: string) => {
     playSound("/sounds/click.mp3");
+
+    // Restore the window without disrupting any audio playback
     restoreWindow(windowId);
   };
 

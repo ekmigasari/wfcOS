@@ -4,7 +4,7 @@ import React from "react";
 import { Provider } from "jotai";
 import { GlobalPodomoroTimer } from "../components/apps/podomoro";
 import { GlobalTimerManager } from "../app/(timer)/components/GlobalTimerManager";
-import { GlobalMusicManager } from "../app/(music-player)/components/GlobalMusicManager";
+import { GlobalMusicPlayerManager } from "../app/(music-player)/components/GlobalMusicPlayerManager";
 
 export default function JotaiProvider({
   children,
@@ -16,7 +16,7 @@ export default function JotaiProvider({
       {/* Mount global managers to maintain state regardless of window UI status */}
       <GlobalPodomoroTimer />
       <GlobalTimerManager />
-      <GlobalMusicManager />
+      <GlobalMusicPlayerManager />
       {children}
     </Provider>
   );
