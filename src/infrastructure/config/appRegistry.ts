@@ -2,6 +2,7 @@ import { Size } from "@/application/types/window";
 import React from "react";
 import { Timer } from "@/app/(timer)/Timer";
 import { BackgroundChanger } from "@/app/(settings)/(background)/background";
+import { MusicPlayer } from "@/app/(music-player)/MusicPlayer";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -28,6 +29,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 250, height: 300 },
     component: BackgroundChanger,
+  },
+  musicPlayer: {
+    name: "Music Player",
+    src: "/icons/music.png",
+    defaultSize: { width: 450, height: 600 },
+    minSize: { width: 300, height: 400 },
+    component: MusicPlayer,
   },
 };
 

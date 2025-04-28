@@ -1,106 +1,108 @@
-const BASE_STORAGE_KEY = "wfcOS_state";
+/**
+ * Storage utilities for localStorage persistence
+ * This module provides helper functions for saving and loading feature state to/from localStorage
+ */
 
-// Helper to check if localStorage is available
-const isLocalStorageAvailable = (): boolean => {
-  try {
-    // Additional check for SSR
-    if (typeof window === "undefined") return false;
+// Base storage key prefix
+const STORAGE_KEY_PREFIX = "wfcOS";
 
-    // Check if localStorage exists
-    if (!window.localStorage) return false;
-
-    // Perform a test to confirm it's working
-    const testKey = `${BASE_STORAGE_KEY}_test`;
-    window.localStorage.setItem(testKey, "_");
-    window.localStorage.removeItem(testKey);
-    return true;
-  } catch (e) {
-    console.error("Error checking localStorage:", e);
-    return false; // Error accessing localStorage (could be disabled or in private mode)
-  }
-};
-
-// Helper to get the specific key for a feature
-const getFeatureKey = (feature: string): string =>
-  `${BASE_STORAGE_KEY}_${feature}`;
-
-// Save state for a specific feature
-export const saveFeatureState = <T>(feature: string, state: T): boolean => {
-  if (!isLocalStorageAvailable()) {
-    console.warn("localStorage is not available");
-    return false;
-  }
+/**
+ * Save state for a specific feature to localStorage
+ * @param feature - Feature identifier
+ * @param state - State object to save
+ * @returns boolean indicating success
+ */
+export function saveFeatureState<T>(feature: string, state: T): boolean {
+  if (typeof window === "undefined") return false;
 
   try {
+    const key = `${STORAGE_KEY_PREFIX}.${feature}`;
     const serializedState = JSON.stringify(state);
-    localStorage.setItem(getFeatureKey(feature), serializedState);
+    localStorage.setItem(key, serializedState);
     return true;
   } catch (error) {
-    console.error(
-      `Could not save state for feature '${feature}' to localStorage:`,
-      error
-    );
+    console.error(`Error saving ${feature} state:`, error);
     return false;
   }
-};
+}
 
-// Load state for a specific feature
-export const loadFeatureState = <T>(feature: string): T | undefined => {
-  if (!isLocalStorageAvailable()) {
-    console.warn("localStorage is not available");
-    return undefined;
-  }
+/**
+ * Load state for a specific feature from localStorage
+ * @param feature - Feature identifier
+ * @returns The loaded state or undefined if not found
+ */
+export function loadFeatureState<T>(feature: string): T | undefined {
+  if (typeof window === "undefined") return undefined;
 
   try {
-    const serializedState = localStorage.getItem(getFeatureKey(feature));
-    if (serializedState === null) {
-      return undefined;
-    }
+    const key = `${STORAGE_KEY_PREFIX}.${feature}`;
+    const serializedState = localStorage.getItem(key);
+
+    if (!serializedState) return undefined;
+
     return JSON.parse(serializedState) as T;
   } catch (error) {
-    console.error(
-      `Could not load state for feature '${feature}' from localStorage:`,
-      error
-    );
+    console.error(`Error loading ${feature} state:`, error);
     return undefined;
   }
-};
+}
 
-// Clear state for a specific feature
-export const clearFeatureState = (feature: string): boolean => {
-  if (!isLocalStorageAvailable()) {
-    console.warn("localStorage is not available");
-    return false;
-  }
+/**
+ * Clear state for a specific feature from localStorage
+ * @param feature - Feature identifier
+ * @returns boolean indicating success
+ */
+export function clearFeatureState(feature: string): boolean {
+  if (typeof window === "undefined") return false;
 
   try {
-    localStorage.removeItem(getFeatureKey(feature));
+    const key = `${STORAGE_KEY_PREFIX}.${feature}`;
+    localStorage.removeItem(key);
     return true;
   } catch (error) {
-    console.error(
-      `Could not clear state for feature '${feature}' from localStorage:`,
-      error
-    );
+    console.error(`Error clearing ${feature} state:`, error);
     return false;
   }
-};
+}
 
-// Optional: Clear all app state if needed later
-export const clearAllAppState = (): boolean => {
-  if (!isLocalStorageAvailable()) {
-    console.warn("localStorage is not available");
-    return false;
-  }
+/**
+ * Clear all app state from localStorage
+ * @returns boolean indicating success
+ */
+export function clearAllAppState(): boolean {
+  if (typeof window === "undefined") return false;
 
   try {
-    // Get all keys related to the app
-    Object.keys(localStorage)
-      .filter((key) => key.startsWith(BASE_STORAGE_KEY))
+    const keys = Object.keys(localStorage);
+
+    // Remove only keys with our prefix
+    keys
+      .filter((key) => key.startsWith(`${STORAGE_KEY_PREFIX}.`))
       .forEach((key) => localStorage.removeItem(key));
-    console.log("Cleared all wfcOS state from localStorage.");
+
     return true;
   } catch (error) {
-    console.error("Could not clear all app state from localStorage:", error);
+    console.error("Error clearing all app state:", error);
     return false;
   }
-};
+}
+
+/**
+ * Get all saved features
+ * @returns Array of feature names that have saved state
+ */
+export function getSavedFeatures(): string[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const keys = Object.keys(localStorage);
+    const prefix = `${STORAGE_KEY_PREFIX}.`;
+
+    return keys
+      .filter((key) => key.startsWith(prefix))
+      .map((key) => key.substring(prefix.length));
+  } catch (error) {
+    console.error("Error getting saved features:", error);
+    return [];
+  }
+}
