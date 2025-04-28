@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import Image from "next/image";
 import {
@@ -12,9 +12,17 @@ import { playSound } from "@/infrastructure/lib/utils";
 import { Button } from "../../ui/button";
 
 export const MinimizedIcons = () => {
+  // Client-side only state to prevent hydration mismatch
+  const [mounted, setMounted] = useState(false);
+
   // Get minimized windows from state
   const [minimizedWindows] = useAtom(minimizedWindowsAtom);
   const restoreWindow = useAtom(restoreWindowAtom)[1];
+
+  // Use useEffect to mark component as mounted on the client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Restore a window when clicked in taskbar
   const handleRestoreWindow = (windowId: string) => {
@@ -22,8 +30,8 @@ export const MinimizedIcons = () => {
     restoreWindow(windowId);
   };
 
-  // Don't render if no minimized windows
-  if (minimizedWindows.length === 0) {
+  // Don't render during SSR or if no minimized windows
+  if (!mounted || minimizedWindows.length === 0) {
     return null;
   }
 
