@@ -7,7 +7,7 @@ import {
   BackgroundSettings,
   previewBackgroundAtom,
   applyPreviewBackgroundAtom,
-} from "@/atoms/backgroundAtom";
+} from "@/application/atoms/backgroundAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 import { Button } from "@/presentation/components/ui/button";
 import {

@@ -1,6 +1,7 @@
 import { Size } from "@/application/types/window";
 import React from "react";
 import { Timer } from "@/app/(timer)/Timer";
+import { BackgroundChanger } from "@/app/(settings)/(background)/background";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -21,12 +22,12 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 250, height: 300 },
     component: Timer,
   },
-  timer2: {
-    name: "Timer",
-    src: "/icons/clock.png",
+  settings: {
+    name: "Settings",
+    src: "/icons/settings.png",
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 250, height: 300 },
-    component: Timer,
+    component: BackgroundChanger,
   },
 };
 

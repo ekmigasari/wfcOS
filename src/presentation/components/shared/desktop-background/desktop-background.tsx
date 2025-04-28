@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useAtomValue } from "jotai";
-import { activeBackgroundAtom } from "@/atoms/backgroundAtom";
+import { activeBackgroundAtom } from "@/application/atoms/backgroundAtom";
 import Image from "next/image";
 
 export const DesktopBackground = () => {
