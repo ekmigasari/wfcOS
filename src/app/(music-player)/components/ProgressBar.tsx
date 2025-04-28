@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useAtom } from "jotai";
+import { useState, useEffect } from "react";
+import { useAtom, useSetAtom } from "jotai";
 import {
-  musicPlayerAtom,
+  playerTimeAtom,
   setSeekPositionAtom,
+  updatePlayerInternalsAtom,
 } from "@/application/atoms/musicPlayerAtom";
 
 // Helper to format time (MM:SS)
-const formatTime = (seconds: number) => {
+const formatTime = (seconds: number): string => {
+  if (isNaN(seconds) || !isFinite(seconds)) {
+    return "0:00";
+  }
   const date = new Date(seconds * 1000);
   const hh = date.getUTCHours();
   const mm = date.getUTCMinutes();
@@ -20,25 +24,48 @@ const formatTime = (seconds: number) => {
 };
 
 const ProgressBar = () => {
-  const [playerState] = useAtom(musicPlayerAtom);
-  const [, setSeekPosition] = useAtom(setSeekPositionAtom);
-  const [seeking, setSeeking] = useState(false);
-  const [localPosition, setLocalPosition] = useState(0);
+  const [timeState] = useAtom(playerTimeAtom);
+  const setSeekPosition = useSetAtom(setSeekPositionAtom);
+  const updatePlayerInternals = useSetAtom(updatePlayerInternalsAtom);
 
-  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = parseFloat(e.target.value);
-    setLocalPosition(newTime);
+  const [localSliderValue, setLocalSliderValue] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isDragging) {
+      setLocalSliderValue(timeState.playedSeconds);
+    }
+  }, [timeState.playedSeconds, isDragging]);
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalSliderValue(parseFloat(e.target.value));
   };
 
   const handleSeekMouseDown = () => {
-    setSeeking(true);
+    setIsDragging(true);
+    updatePlayerInternals({ seeking: true });
   };
 
   const handleSeekMouseUp = (e: React.MouseEvent<HTMLInputElement>) => {
-    setSeeking(false);
     const newTime = parseFloat((e.target as HTMLInputElement).value);
     setSeekPosition(newTime);
+    updatePlayerInternals({ seeking: false });
+    setIsDragging(false);
+    setLocalSliderValue(newTime);
   };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLInputElement>) => {
+    const newTime = parseFloat((e.target as HTMLInputElement).value);
+    setSeekPosition(newTime);
+    updatePlayerInternals({ seeking: false });
+    setIsDragging(false);
+    setLocalSliderValue(newTime);
+  };
+
+  const sliderValue = isDragging ? localSliderValue : timeState.playedSeconds;
+  const maxDuration = timeState.duration > 0 ? timeState.duration : 100;
+  const progressPercent = (sliderValue / maxDuration) * 100;
+  const isDisabled = maxDuration <= 0 || !isFinite(maxDuration);
 
   return (
     <div className="mb-2 w-full">
@@ -47,36 +74,27 @@ const ProgressBar = () => {
         <input
           type="range"
           min={0}
-          max={playerState.duration || 100}
+          max={maxDuration}
           step={0.1}
-          value={seeking ? localPosition : playerState.playedSeconds}
-          onChange={handleSeekChange}
+          value={sliderValue}
+          onChange={handleSliderChange}
           onMouseDown={handleSeekMouseDown}
           onMouseUp={handleSeekMouseUp}
           onTouchStart={handleSeekMouseDown}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          onTouchEnd={handleSeekMouseUp as any}
-          disabled={
-            playerState.playlist.length === 0 || playerState.duration === 0
-          }
-          className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+          onTouchEnd={handleTouchEnd}
+          disabled={isDisabled}
+          className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:[&::-webkit-slider-thumb]:bg-muted-foreground"
           style={{
-            background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${
-              ((seeking ? localPosition : playerState.playedSeconds) /
-                (playerState.duration || 100)) *
-              100
-            }%, var(--muted) ${
-              ((seeking ? localPosition : playerState.playedSeconds) /
-                (playerState.duration || 100)) *
-              100
-            }%, var(--muted) 100%)`,
+            background: isDisabled
+              ? `var(--muted)`
+              : `linear-gradient(to right, var(--primary) 0%, var(--primary) ${progressPercent}%, var(--muted) ${progressPercent}%, var(--muted) 100%)`,
           }}
         />
 
         {/* Time Display */}
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{formatTime(playerState.playedSeconds)}</span>
-          <span>{formatTime(playerState.duration)}</span>
+          <span>{formatTime(sliderValue)}</span>
+          <span>{formatTime(timeState.duration)}</span>
         </div>
       </div>
     </div>

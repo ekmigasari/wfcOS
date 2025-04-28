@@ -9,7 +9,7 @@ import {
   TEXT_EDITOR_SETTINGS_KEY,
   loadEditorSettings,
   loadEditorContent,
-} from "../../atoms/textEditorAtom";
+} from "../../application/atoms/textEditorAtom";
 import { Button } from "../../presentation/components/ui/button";
 import { cn } from "@/infrastructure/lib/utils";
 

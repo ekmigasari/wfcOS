@@ -3,7 +3,7 @@ import {
   loadFeatureState,
   saveFeatureState,
 } from "../../infrastructure/utils/storage";
-import { Position, Size } from "../../types"; // Assuming types are defined here
+import { Position, Size } from "@/application/types/window"; // Assuming types are defined here
 
 const FEATURE_KEY = "windows";
 
@@ -18,7 +18,6 @@ export interface WindowState {
   isOpen: boolean; // To track if the window should be rendered
   isMinimized: boolean; // Track if window is minimized to taskbar
   zIndex: number; // To manage stacking order
-  onMinimize?: (isMinimized: boolean) => void; // Optional callback when window is minimized/restored
 }
 
 // Define the shape of the overall window management state
@@ -84,12 +83,6 @@ export const minimizedWindowsAtom = atom(
       .filter((win) => win.isOpen && win.isMinimized)
       .sort((a, b) => a.appId.localeCompare(b.appId)) // Sort by app ID for consistent order
 );
-
-// Atom that notifies when a window's minimize state changes
-export const minimizeChangeAtom = atom<{
-  windowId: string;
-  isMinimized: boolean;
-} | null>(null);
 
 // --- Window Management Action Atoms (Write-only) ---
 
@@ -164,51 +157,37 @@ export const closeWindowAtom = atom(null, (get, set, windowId: string) => {
   // This allows reopening it in the same place later via openWindowAtom
 });
 
-// Atom to minimize a window
-export const minimizeWindowAtom = atom(null, (get, set, windowId: string) => {
-  set(windowRegistryAtom, (prev) => {
-    const windowToMinimize = prev[windowId];
-    if (!windowToMinimize || !windowToMinimize.isOpen) return prev;
+// Atom to explicitly set the minimized state of a window
+export const setWindowMinimizedStateAtom = atom(
+  null,
+  (
+    get,
+    set,
+    { windowId, isMinimized }: { windowId: string; isMinimized: boolean }
+  ) => {
+    set(windowRegistryAtom, (prev) => {
+      const windowState = prev[windowId];
+      // Only proceed if window exists and is open
+      if (!windowState || !windowState.isOpen) return prev;
 
-    // Execute onMinimize callback if defined - this allows apps to react to minimization
-    if (windowToMinimize.onMinimize) {
-      windowToMinimize.onMinimize(true);
-    }
+      // Prevent redundant updates if already in the target state
+      if (windowState.isMinimized === isMinimized) return prev;
 
-    // Emit minimize change event
-    set(minimizeChangeAtom, { windowId, isMinimized: true });
+      // Create the updated window state
+      const updatedWindowState = {
+        ...windowState,
+        isMinimized: isMinimized,
+        // Only bring to front when restoring (isMinimized: false)
+        zIndex: isMinimized ? windowState.zIndex : getNextZIndex(prev),
+      };
 
-    return {
-      ...prev,
-      [windowId]: { ...windowToMinimize, isMinimized: true },
-    };
-  });
-});
-
-// Atom to restore a minimized window
-export const restoreWindowAtom = atom(null, (get, set, windowId: string) => {
-  set(windowRegistryAtom, (prev) => {
-    const windowToRestore = prev[windowId];
-    if (!windowToRestore || !windowToRestore.isOpen) return prev;
-
-    // Execute onMinimize callback if defined - this allows apps to react to restoration
-    if (windowToRestore.onMinimize) {
-      windowToRestore.onMinimize(false);
-    }
-
-    // Emit minimize change event
-    set(minimizeChangeAtom, { windowId, isMinimized: false });
-
-    return {
-      ...prev,
-      [windowId]: {
-        ...windowToRestore,
-        isMinimized: false,
-        zIndex: getNextZIndex(prev), // Bring to front when restored
-      },
-    };
-  });
-});
+      return {
+        ...prev,
+        [windowId]: updatedWindowState,
+      };
+    });
+  }
+);
 
 // Atom to bring a window to the front
 export const focusWindowAtom = atom(null, (get, set, windowId: string) => {

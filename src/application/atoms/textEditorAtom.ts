@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { loadFeatureState } from "../infrastructure/utils/storage";
+import { loadFeatureState } from "../../infrastructure/utils/storage";
 
 // Define keys for storage
 export const TEXT_EDITOR_STORAGE_KEY = "textEditorContent";

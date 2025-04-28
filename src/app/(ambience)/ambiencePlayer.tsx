@@ -11,7 +11,7 @@ import {
   currentSoundAtom,
   isWindowOpenAtom,
   currentTimeAtom,
-} from "../../atoms/ambiencePlayerAtom";
+} from "../../application/atoms/ambiencePlayerAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 
 // Icons

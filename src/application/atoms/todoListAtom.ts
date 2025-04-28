@@ -2,7 +2,7 @@ import { atom } from "jotai";
 import {
   loadFeatureState,
   saveFeatureState,
-} from "../infrastructure/utils/storage";
+} from "../../infrastructure/utils/storage";
 
 const FEATURE_KEY = "todoList";
 

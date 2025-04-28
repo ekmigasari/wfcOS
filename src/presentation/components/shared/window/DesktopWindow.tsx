@@ -6,7 +6,7 @@ import { useWindowManagement } from "../../../../application/hooks/useWindowMana
 import {
   focusWindowAtom,
   updateWindowPositionSizeAtom,
-  minimizeWindowAtom,
+  setWindowMinimizedStateAtom,
 } from "../../../../application/atoms/windowAtoms";
 import { WindowBase } from "./WindowBase";
 
@@ -37,7 +37,6 @@ type DesktopWindowProps = {
   minSize?: { width: number; height: number };
   zIndex: number;
   playSounds?: boolean;
-  onMinimizeStateChange?: (isMinimized: boolean) => void;
 };
 
 export const DesktopWindow = ({
@@ -52,7 +51,6 @@ export const DesktopWindow = ({
   minSize = { width: 150, height: 100 },
   zIndex,
   playSounds = true,
-  onMinimizeStateChange,
 }: DesktopWindowProps) => {
   // Client-side only state to avoid hydration issues
   const [isMounted, setIsMounted] = useState(false);
@@ -60,19 +58,19 @@ export const DesktopWindow = ({
   // Jotai state management
   const focusWindow = useAtom(focusWindowAtom)[1];
   const updateWindowPositionSize = useAtom(updateWindowPositionSizeAtom)[1];
-  const minimizeWindow = useAtom(minimizeWindowAtom)[1];
+  const setWindowMinimizedState = useAtom(setWindowMinimizedStateAtom)[1];
 
   // Handle window focus
   const handleFocus = () => {
     focusWindow(windowId);
   };
 
-  // Handle window minimize
-  const handleMinimize = () => {
-    minimizeWindow(windowId);
+  // Handle window minimize request
+  const handleRequestMinimize = () => {
+    setWindowMinimizedState({ windowId, isMinimized: true });
   };
 
-  // Handle window close
+  // Handle window close request
   const handleClose = () => {
     onClose();
   };
@@ -121,7 +119,7 @@ export const DesktopWindow = ({
       isOpen={isOpen}
       isMinimized={isMinimized}
       onClose={handleClose}
-      onMinimize={handleMinimize}
+      onRequestMinimize={handleRequestMinimize}
       zIndex={zIndex}
       position={position}
       size={size}
@@ -132,7 +130,6 @@ export const DesktopWindow = ({
       showResizeHandles={true}
       titleBarClassName="cursor-move"
       playSounds={playSounds}
-      onMinimizeStateChange={onMinimizeStateChange}
     >
       {children}
     </WindowBase>

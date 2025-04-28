@@ -1,24 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { useAtom } from "jotai";
-import { Check, Pencil, Play, Trash2, X } from "lucide-react";
+import { useAtom, useSetAtom } from "jotai";
+import { Check, Pencil, Play, Pause, Trash2, X } from "lucide-react";
 import {
   musicPlayerAtom,
-  persistMusicPlayerState,
   getYoutubeId,
   addSongAtom,
   removeSongAtom,
   updateSongTitleAtom,
+  playPauseAtom,
+  persistedMusicPlayerAtom,
+  playerTimeAtom,
+  volatileMusicPlayerAtom,
+  type PersistedMusicPlayerState,
+  type VolatileMusicPlayerState,
 } from "@/application/atoms/musicPlayerAtom";
 import { Song } from "@/application/atoms/musicPlayerAtom";
 
 const PlaylistManager = () => {
   const [playerState] = useAtom(musicPlayerAtom);
-  const [, persistState] = useAtom(persistMusicPlayerState);
-  const [, addSong] = useAtom(addSongAtom);
-  const [, removeSong] = useAtom(removeSongAtom);
-  const [, updateSongTitle] = useAtom(updateSongTitleAtom);
+  const addSong = useSetAtom(addSongAtom);
+  const removeSong = useSetAtom(removeSongAtom);
+  const updateSongTitle = useSetAtom(updateSongTitleAtom);
+  const togglePlayPause = useSetAtom(playPauseAtom);
+  const setPersistedState = useSetAtom(persistedMusicPlayerAtom);
+  const setVolatileState = useSetAtom(volatileMusicPlayerAtom);
+  const setPlayerTime = useSetAtom(playerTimeAtom);
 
   // Local state
   const [newSongUrl, setNewSongUrl] = useState("");
@@ -56,20 +64,25 @@ const PlaylistManager = () => {
   };
 
   const handleSelectSong = (index: number) => {
-    // Don't select if editing
     if (editingIndex !== null) return;
 
     if (index !== playerState.currentSongIndex) {
-      persistState({
+      setPersistedState((prev: PersistedMusicPlayerState) => ({
+        ...prev,
         currentSongIndex: index,
-        isPlaying: true,
+      }));
+      setPlayerTime({
         currentTime: 0,
-        currentSong: playerState.playlist[index],
+        playedSeconds: 0,
+        duration: 0,
+        seeking: false,
       });
+      setVolatileState((prev: VolatileMusicPlayerState) => ({
+        ...prev,
+        isPlaying: true,
+      }));
     } else {
-      persistState({
-        isPlaying: !playerState.isPlaying,
-      });
+      togglePlayPause();
     }
   };
 
@@ -134,7 +147,7 @@ const PlaylistManager = () => {
             <ul>
               {playerState.playlist.map((song, index) => (
                 <li
-                  key={index}
+                  key={`${song.id}-${index}`}
                   onClick={() => handleSelectSong(index)}
                   className={`px-3 py-2 cursor-pointer rounded-md hover:bg-muted/80 ${
                     index === playerState.currentSongIndex
@@ -144,11 +157,16 @@ const PlaylistManager = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      {index === playerState.currentSongIndex &&
-                      playerState.isPlaying ? (
-                        <span className="text-primary flex-shrink-0">
-                          <Play className="w-4 h-4" />
-                        </span>
+                      {index === playerState.currentSongIndex ? (
+                        playerState.isPlaying ? (
+                          <span className="text-primary flex-shrink-0">
+                            <Play className="w-4 h-4" />
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground flex-shrink-0">
+                            <Pause className="w-4 h-4" />
+                          </span>
+                        )
                       ) : (
                         <span className="w-4 h-4 flex-shrink-0"></span>
                       )}
@@ -160,6 +178,7 @@ const PlaylistManager = () => {
                             value={editingTitle}
                             onChange={(e) => setEditingTitle(e.target.value)}
                             onKeyDown={handleTitleKeyDown}
+                            onClick={(e) => e.stopPropagation()}
                             className="p-1 bg-input border border-border rounded text-sm w-full"
                             autoFocus
                           />
@@ -186,14 +205,10 @@ const PlaylistManager = () => {
                                 ? "text-primary"
                                 : ""
                             }`}
+                            title={song.title}
                           >
                             {song.title}
                           </span>
-                          {song.seqId && (
-                            <span className="text-xs text-muted-foreground">
-                              #{song.seqId}
-                            </span>
-                          )}
                         </div>
                       )}
                     </div>

@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import ReactPlayer from "react-player/youtube";
 import {
   musicPlayerAtom,
-  persistMusicPlayerState,
+  playPauseAtom,
+  nextSongAtom,
+  setLoadingAtom,
+  updatePlayerInternalsAtom,
+  setPlayerProgressAtom,
 } from "@/application/atoms/musicPlayerAtom";
 
 // Keep a global reference to the YouTube player
@@ -17,8 +21,13 @@ interface VideoDisplayProps {
 }
 
 const VideoDisplay = ({ isVisible }: VideoDisplayProps) => {
-  const [playerState, setPlayerState] = useAtom(musicPlayerAtom);
-  const [, persistState] = useAtom(persistMusicPlayerState);
+  const [playerState] = useAtom(musicPlayerAtom);
+  const setLoading = useSetAtom(setLoadingAtom);
+  const setPlayerProgress = useSetAtom(setPlayerProgressAtom);
+  const updatePlayerInternals = useSetAtom(updatePlayerInternalsAtom);
+  const nextSong = useSetAtom(nextSongAtom);
+  const togglePlayPause = useSetAtom(playPauseAtom);
+
   const playerRef = useRef<ReactPlayer>(null);
 
   // Set up reference to the YouTube player instance when component mounts
@@ -62,7 +71,7 @@ const VideoDisplay = ({ isVisible }: VideoDisplayProps) => {
           // Ensure we persist the state one last time
           if (playerRef.current) {
             const newTime = playerRef.current.getCurrentTime() || 0;
-            persistState({ currentTime: newTime });
+            updatePlayerInternals({ currentTime: newTime });
           }
           globalYoutubePlayer.pauseVideo();
         } catch (e) {
@@ -75,107 +84,60 @@ const VideoDisplay = ({ isVisible }: VideoDisplayProps) => {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [persistState]);
+  }, [updatePlayerInternals]);
 
-  // Sync player state when it's ready
+  // Effect to seek when the currentTime changes due to external action (like ProgressBar)
   useEffect(() => {
-    if (!playerRef.current || !playerState.currentSong) return;
+    if (
+      playerRef.current &&
+      playerState.seeking &&
+      Math.abs(playerRef.current.getCurrentTime() - playerState.currentTime) > 1
+    ) {
+      playerRef.current.seekTo(playerState.currentTime, "seconds");
+    }
+  }, [playerState.currentTime, playerState.seeking]);
 
-    const syncTimer = setTimeout(() => {
-      try {
-        setPlayerState((state) => ({ ...state, isLoading: false }));
-
-        // If we have a saved position, seek to it
-        if (playerState.currentTime > 0) {
-          playerRef.current?.seekTo(playerState.currentTime, "seconds");
-        }
-
-        // Apply volume settings
-        const player = playerRef.current?.getInternalPlayer();
-        if (player && typeof player.setVolume === "function") {
-          player.setVolume(playerState.isMuted ? 0 : playerState.volume * 100);
-        }
-
-        // Update playing state based on saved state
-        setTimeout(() => {
-          const player = playerRef.current?.getInternalPlayer();
-          if (player) {
-            if (playerState.isPlaying) {
-              player.playVideo();
-            } else {
-              player.pauseVideo();
-            }
-          }
-        }, 500);
-      } catch (error) {
-        console.error("Error syncing player state:", error);
-      }
-    }, 1000);
-
-    return () => clearTimeout(syncTimer);
-  }, [
-    playerState.currentSong,
-    playerState.currentTime,
-    persistState,
-    playerState.isPlaying,
-    playerState.isMuted,
-    playerState.volume,
-    setPlayerState,
-  ]);
-
-  // Update playing state when it changes
+  // Effect to control playback state (play/pause)
   useEffect(() => {
     if (!playerRef.current) return;
-
-    try {
-      const player = playerRef.current.getInternalPlayer();
-      if (player) {
+    const player = playerRef.current.getInternalPlayer();
+    if (player) {
+      try {
         if (playerState.isPlaying) {
-          player.playVideo();
+          player.playVideo?.();
         } else {
-          player.pauseVideo();
+          player.pauseVideo?.();
         }
+      } catch (error) {
+        console.error("Error applying play/pause state:", error);
       }
-    } catch (error) {
-      console.error("Error applying play/pause state:", error);
     }
   }, [playerState.isPlaying]);
 
-  // Save current position periodically
+  // Effect to control volume (including mute)
   useEffect(() => {
     if (!playerRef.current) return;
+    const player = playerRef.current.getInternalPlayer();
+    if (player && typeof player.setVolume === "function") {
+      player.setVolume(playerState.volume * 100);
+    }
+  }, [playerState.volume]);
 
-    // Save position function
-    const savePosition = () => {
-      if (playerRef.current && !playerState.seeking && playerState.isPlaying) {
-        const newTime = playerRef.current.getCurrentTime() || 0;
-        if (Math.abs(newTime - playerState.currentTime) > 1) {
-          persistState({
-            currentTime: newTime,
-            playedSeconds: newTime,
-          });
-        }
-      }
-    };
-
-    // Set up interval to save position
-    const interval = setInterval(savePosition, 5000);
-
-    return () => {
-      clearInterval(interval);
-      savePosition(); // Save one last time on unmount
-    };
-  }, [
-    playerState.currentTime,
-    playerState.seeking,
-    playerState.isPlaying,
-    persistState,
-  ]);
+  // Define config separately with explicit type for clarity
+  const playerConfig = {
+    youtube: {
+      playerVars: {
+        controls: 0, // Disable default YouTube controls
+      },
+    },
+  };
 
   return (
     <div
-      className={`player-wrapper ${
-        isVisible ? "h-48 mb-4" : "h-0 overflow-hidden"
+      className={`player-wrapper transition-all duration-300 ease-in-out ${
+        isVisible
+          ? "h-48 mb-4 opacity-100"
+          : "h-0 opacity-0 overflow-hidden pointer-events-none"
       }`}
     >
       {playerState.currentSong && (
@@ -183,81 +145,57 @@ const VideoDisplay = ({ isVisible }: VideoDisplayProps) => {
           ref={playerRef}
           url={playerState.currentSong.url}
           playing={playerState.isPlaying}
-          controls={isVisible}
-          volume={playerState.isMuted ? 0 : playerState.volume}
+          volume={playerState.volume}
+          controls={false} // Use our custom controls
           width="100%"
           height="100%"
           style={{
             borderRadius: "0.375rem",
             overflow: "hidden",
           }}
-          onReady={() => {
-            // Update the global player reference when ready
-            if (playerRef.current) {
-              globalYoutubePlayer = playerRef.current.getInternalPlayer();
-
-              // Set volume when player is ready
-              if (typeof globalYoutubePlayer.setVolume === "function") {
-                globalYoutubePlayer.setVolume(
-                  playerState.isMuted ? 0 : playerState.volume * 100
-                );
-              }
-
-              setPlayerState((state) => ({ ...state, isLoading: false }));
+          onReady={(player) => {
+            setLoading(false);
+            console.log("Player ready");
+            const internalPlayer = player.getInternalPlayer();
+            if (
+              internalPlayer &&
+              typeof internalPlayer.setVolume === "function"
+            ) {
+              internalPlayer.setVolume(playerState.volume * 100);
             }
           }}
+          onStart={() => {
+            setLoading(false);
+            console.log("Player started");
+          }}
+          onPlay={() => {
+            if (!playerState.isPlaying) togglePlayPause();
+            setLoading(false);
+          }}
+          onPause={() => {
+            if (playerState.isPlaying) togglePlayPause();
+          }}
+          onBuffer={() => setLoading(true)}
+          onBufferEnd={() => setLoading(false)}
           onDuration={(duration) => {
-            setPlayerState((state) => ({ ...state, duration }));
+            updatePlayerInternals({ duration });
           }}
-          onProgress={(state) => {
+          onProgress={({ playedSeconds }) => {
+            // Only update progress if the user is not actively seeking
             if (!playerState.seeking) {
-              setPlayerState((prev) => ({
-                ...prev,
-                playedSeconds: state.playedSeconds,
-              }));
+              setPlayerProgress({ playedSeconds, currentTime: playedSeconds });
             }
           }}
-          onError={(e) => {
-            console.error("Player error:", e);
-            setPlayerState((state) => ({ ...state, isLoading: false }));
+          onError={(e, data) => {
+            // Mark unused parameters
+            console.error("Player error:", e, data);
+            setLoading(false);
           }}
           onEnded={() => {
-            if (playerState.playlist.length <= 1) {
-              persistState({ isPlaying: false });
-            } else {
-              const nextIndex =
-                (playerState.currentSongIndex + 1) %
-                playerState.playlist.length;
-              persistState({
-                currentSongIndex: nextIndex,
-                currentTime: 0,
-                currentSong: playerState.playlist[nextIndex],
-              });
-            }
+            console.log("Song ended");
+            nextSong();
           }}
-          config={{
-            playerVars: {
-              rel: 0,
-              showinfo: 0,
-              modestbranding: 1,
-              iv_load_policy: 3,
-              disablekb: 1,
-              fs: 0,
-            },
-            onUnstarted: () => {
-              // Handle case where YouTube API fails to auto-play
-              if (playerState.isPlaying && playerRef.current) {
-                try {
-                  const player = playerRef.current.getInternalPlayer();
-                  if (player && typeof player.playVideo === "function") {
-                    player.playVideo();
-                  }
-                } catch (e) {
-                  console.error("Error playing video:", e);
-                }
-              }
-            },
-          }}
+          config={playerConfig} // Pass the typed config object
         />
       )}
     </div>

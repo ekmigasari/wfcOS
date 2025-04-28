@@ -22,7 +22,7 @@ export type WindowBaseProps = {
   isOpen: boolean;
   isMinimized?: boolean;
   onClose: () => void;
-  onMinimize: () => void;
+  onRequestMinimize: () => void;
   zIndex: number;
   position: { x: number; y: number };
   size: { width: number; height: number };
@@ -39,7 +39,6 @@ export type WindowBaseProps = {
   ) => void;
   showResizeHandles?: boolean;
   playSounds?: boolean;
-  onMinimizeStateChange?: (isMinimized: boolean) => void;
 };
 
 export const WindowBase = ({
@@ -49,7 +48,7 @@ export const WindowBase = ({
   isOpen,
   isMinimized = false,
   onClose,
-  onMinimize,
+  onRequestMinimize,
   zIndex,
   position,
   size,
@@ -63,7 +62,6 @@ export const WindowBase = ({
   handleResizeStart,
   showResizeHandles = false,
   playSounds = true,
-  onMinimizeStateChange,
 }: WindowBaseProps) => {
   // Don't render if not open
   if (!isOpen) {
@@ -79,13 +77,13 @@ export const WindowBase = ({
     onClose();
   };
 
-  // Handle window minimize with sound
-  const handleMinimize = (e: React.MouseEvent) => {
+  // Handle window minimize request with sound
+  const handleRequestMinimize = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (playSounds) {
       playSound("/sounds/minimize.mp3");
     }
-    onMinimize();
+    onRequestMinimize();
   };
 
   // Define resize handles for window
@@ -95,11 +93,6 @@ export const WindowBase = ({
 
   // Skip rendering the visible part if minimized
   if (isMinimized) {
-    // Notify the application of minimize state change via the optional callback
-    if (onMinimizeStateChange) {
-      onMinimizeStateChange(true);
-    }
-
     return (
       <div
         className="absolute opacity-0 pointer-events-none"
@@ -119,9 +112,6 @@ export const WindowBase = ({
         {children}
       </div>
     );
-  } else if (onMinimizeStateChange) {
-    // Notify the application that it's not minimized (visible)
-    onMinimizeStateChange(false);
   }
 
   const resizeHandles: {
@@ -225,7 +215,7 @@ export const WindowBase = ({
         <div className="flex items-center gap-1">
           <button
             className="cursor-pointer bg-yellow-500 text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
-            onClick={handleMinimize}
+            onClick={handleRequestMinimize}
             title="Minimize"
           >
             -

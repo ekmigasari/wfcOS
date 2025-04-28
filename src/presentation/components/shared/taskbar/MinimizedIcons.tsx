@@ -5,7 +5,7 @@ import { useAtom } from "jotai";
 import Image from "next/image";
 import {
   minimizedWindowsAtom,
-  restoreWindowAtom,
+  setWindowMinimizedStateAtom,
 } from "@/application/atoms/windowAtoms";
 import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { playSound } from "@/infrastructure/lib/utils";
@@ -17,7 +17,7 @@ export const MinimizedIcons = () => {
 
   // Get minimized windows from state
   const [minimizedWindows] = useAtom(minimizedWindowsAtom);
-  const restoreWindow = useAtom(restoreWindowAtom)[1];
+  const setWindowMinimizedState = useAtom(setWindowMinimizedStateAtom)[1];
 
   // Use useEffect to mark component as mounted on the client
   useEffect(() => {
@@ -28,8 +28,8 @@ export const MinimizedIcons = () => {
   const handleRestoreWindow = (windowId: string) => {
     playSound("/sounds/click.mp3");
 
-    // Restore the window without disrupting any audio playback
-    restoreWindow(windowId);
+    // Restore the window and bring it to front using the new atom
+    setWindowMinimizedState({ windowId, isMinimized: false });
   };
 
   // Don't render during SSR or if no minimized windows

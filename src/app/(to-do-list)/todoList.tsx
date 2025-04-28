@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAtom } from "jotai";
-import { tasksAtom, TaskItem } from "../../atoms/todoListAtom"; // Adjust path as needed
+import { tasksAtom, TaskItem } from "../../application/atoms/todoListAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 import { ArrowRightIcon } from "lucide-react";
 import { ArrowDownIcon } from "lucide-react";
