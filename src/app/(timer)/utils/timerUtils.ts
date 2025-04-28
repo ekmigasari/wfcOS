@@ -1,4 +1,4 @@
-import { TimerSetting } from "@/atoms/timerAtom";
+import { TimerSetting } from "@/application/atoms/timerAtom";
 
 // Format time as MM:SS
 export const formatTime = (seconds: number): string => {
@@ -21,7 +21,7 @@ export const getDisplayTitle = (
   switch (timerSetting) {
     case "work25":
       return "Work";
-    case "short4":
+    case "short5":
       return "Short Break";
     case "long15":
       return "Long Break";

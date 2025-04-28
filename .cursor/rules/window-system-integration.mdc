@@ -1,0 +1,158 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Window System Integration Guide
+
+This guide explains how to work with the wfcOS windowing system which provides a desktop-like experience with draggable, resizable windows.
+
+## Window Component Architecture
+
+The window system follows a component hierarchy:
+
+- [Window.tsx](mdc:src/presentation/components/shared/window/Window.tsx) - Top-level adaptive component
+  - Handles device detection (mobile vs desktop)
+  - Integrates with the Timer system
+  - Dispatches to platform-specific implementations
+
+- [WindowBase.tsx](mdc:src/presentation/components/shared/window/WindowBase.tsx) - Core window UI
+  - Provides title bar with controls (minimize/close)
+  - Implements content area
+  - Defines resize handles
+
+- [DesktopWindow.tsx](mdc:src/presentation/components/shared/window/DesktopWindow.tsx) - Desktop implementation
+  - Adds dragging behavior
+  - Implements resizing functionality
+  - Handles focus management
+
+- [MobileWindow.tsx](mdc:src/presentation/components/shared/window/MobileWindow.tsx) - Mobile implementation
+  - Optimized for touch interactions
+  - Handles mobile-specific behaviors
+
+## Window State Management
+
+Windows are managed through Jotai atoms defined in [windowAtoms.ts](mdc:src/application/atoms/windowAtoms.ts).
+
+### Key Types
+
+```typescript
+export interface WindowState {
+  id: string;             // Unique window instance ID
+  appId: string;          // App type identifier
+  title: string;          // Window title
+  position: Position;     // {x, y} coordinates
+  size: Size;             // {width, height}
+  minSize?: Size;         // Minimum allowed size
+  isOpen: boolean;        // Whether window is rendered
+  isMinimized: boolean;   // Whether minimized to taskbar
+  zIndex: number;         // Stacking order
+}
+```
+
+### Core Window Actions
+
+- `openWindowAtom` - Creates a new window or brings existing one to front
+- `closeWindowAtom` - Closes a window (can preserve state)
+- `minimizeWindowAtom` - Minimizes window to taskbar
+- `restoreWindowAtom` - Restores minimized window
+- `focusWindowAtom` - Brings window to front
+- `updateWindowPositionSizeAtom` - Updates position/size after drag/resize
+
+## Using the Window System
+
+### Opening a Window
+
+```typescript
+import { useAtom } from "jotai";
+import { openWindowAtom } from "@/application/atoms/windowAtoms";
+
+export const OpenCalcButton = () => {
+  const [, openWindow] = useAtom(openWindowAtom);
+  
+  const handleClick = () => {
+    openWindow({
+      id: `calculator-${Date.now()}`,
+      appId: "calculator",
+      title: "Calculator",
+      initialSize: { width: 400, height: 500 },
+      minSize: { width: 300, height: 400 },
+      children: <Calculator />
+    });
+  };
+  
+  return <button onClick={handleClick}>Open Calculator</button>;
+};
+```
+
+### Implementing Custom Window Behavior
+
+If your app needs special window behaviors:
+
+1. Use the `windowId` prop passed to your component
+
+```typescript
+type CalculatorProps = {
+  windowId: string;
+};
+
+export const Calculator = ({ windowId }: CalculatorProps) => {
+  const [, closeWindow] = useAtom(closeWindowAtom);
+  
+  // Custom close handler with confirmation
+  const handleCustomClose = () => {
+    if (confirm("Close calculator?")) {
+      closeWindow(windowId);
+    }
+  };
+  
+  return (
+    <div>
+      <button onClick={handleCustomClose}>Close with confirmation</button>
+      {/* ... calculator UI ... */}
+    </div>
+  );
+};
+```
+
+2. Integrate with window lifecycle events
+
+```typescript
+export const YourApp = ({ windowId }: { windowId: string }) => {
+  // Set up effects for window lifecycle
+  useEffect(() => {
+    console.log("Window opened:", windowId);
+    
+    return () => {
+      console.log("Window closed:", windowId);
+      // Clean up resources
+    };
+  }, [windowId]);
+  
+  // Your app UI
+  return <div>...</div>;
+};
+```
+
+## Responsive Windows
+
+To make your app work well in both desktop and mobile windows:
+
+1. Use flexible layouts (Flexbox/Grid)
+2. Adapt UI based on window size
+3. Design for minimum viable sizes
+4. Test in both desktop and mobile window variants
+
+## Integration with Taskbar
+
+The taskbar automatically shows buttons for minimized windows. When a user clicks a taskbar button, the `restoreWindowAtom` is called to restore that window.
+
+## Advanced: Custom Window Features
+
+For advanced cases like confirming window close, syncing window state with app state, or custom window behaviors:
+
+1. Pass the `windowId` to your app component
+2. Use window atoms in your component to control window behavior
+3. Create derived atoms for your specific needs
+
+See the Timer app integration in [timerAtom.ts](mdc:src/application/atoms/timerAtom.ts) and [Timer.tsx](mdc:src/app/(timer)/Timer.tsx) for a complete example.

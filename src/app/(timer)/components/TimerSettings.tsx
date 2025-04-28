@@ -7,7 +7,7 @@ import {
   setTimerSettingAtom,
   setCustomDurationAtom,
   setCustomTitleAtom,
-} from "@/atoms/timerAtom";
+} from "@/application/atoms/timerAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 
 interface TimerSettingsProps {
@@ -102,8 +102,8 @@ export const TimerSettings = ({
       description: "Focus time for maximum productivity",
     },
     {
-      value: "short4",
-      label: "Short Break (4min)",
+      value: "short5",
+      label: "Short Break (5min)",
       description: "Quick refreshment between work sessions",
     },
     {

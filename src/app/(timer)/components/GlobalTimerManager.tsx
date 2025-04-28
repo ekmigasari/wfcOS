@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { timerAtom } from "@/atoms/timerAtom";
+import { timerAtom } from "@/application/atoms/timerAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 import { formatTime } from "@/app/(timer)/utils/timerUtils";
 
@@ -10,138 +10,156 @@ import { formatTime } from "@/app/(timer)/utils/timerUtils";
  * GlobalTimerManager
  *
  * A global component that manages timer state regardless of window state.
- * - Continues running when window is minimized
+ * - Uses a Web Worker to continue running when browser tab is inactive
  * - Updates document title to show timer status
  * - Plays sound when timer completes
  * - Resets when timer window is closed
- * - Uses system clock for accurate timing
  */
 export const GlobalTimerManager = () => {
   const [timerState, setTimerState] = useAtom(timerAtom);
   const alarmPlayedRef = useRef(false);
-  const timerStartTimeRef = useRef<number | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const lastUpdateTimeRef = useRef<number | null>(null);
+  const workerRef = useRef<Worker | null>(null);
 
+  // Initialize the worker
   useEffect(() => {
-    // Cleanup function to cancel animation frame
-    const cleanup = () => {
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
+    // Only run in browser environment
+    if (typeof window === "undefined") return;
+
+    // Create the worker
+    const worker = new Worker("/timerWorker.js");
+
+    // Set up message handler from worker
+    worker.onmessage = (e) => {
+      const { type, timeRemaining } = e.data;
+
+      switch (type) {
+        case "tick":
+          // Update time remaining from worker
+          if (timeRemaining !== timerState.timeRemaining) {
+            setTimerState((prev) => ({
+              ...prev,
+              timeRemaining,
+            }));
+          }
+          break;
+
+        case "complete":
+          // Timer finished
+          if (!alarmPlayedRef.current) {
+            alarmPlayedRef.current = true;
+            playSound("/sounds/timeup.mp3");
+
+            setTimerState((prev) => ({
+              ...prev,
+              isRunning: false,
+              // Leave timeRemaining at 0 to ensure "Time is up!" title remains
+              timeRemaining: 0,
+            }));
+
+            // Force the title update
+            if (typeof window !== "undefined") {
+              document.title = `⏰ Time is up!`;
+            }
+          }
+          break;
+
+        case "paused":
+          // Timer paused
+          setTimerState((prev) => ({
+            ...prev,
+            timeRemaining,
+            isRunning: false,
+          }));
+          break;
+
+        case "reset":
+          // Timer reset
+          alarmPlayedRef.current = false;
+          break;
       }
     };
 
-    // Reset the timer start reference when the timer is stopped
-    if (!timerState.isRunning) {
-      timerStartTimeRef.current = null;
-      lastUpdateTimeRef.current = null;
-      cleanup();
+    // Handle timer reset event from outside this component
+    const handleTimerReset = () => {
+      if (workerRef.current) {
+        workerRef.current.postMessage({ command: "reset" });
+      }
+    };
+
+    // Listen for timer reset events
+    window.addEventListener("timer-reset", handleTimerReset);
+
+    // Store worker reference
+    workerRef.current = worker;
+
+    // Cleanup function
+    return () => {
+      worker.terminate();
+      workerRef.current = null;
+      window.removeEventListener("timer-reset", handleTimerReset);
+    };
+  }, [setTimerState, timerState.timeRemaining]);
+
+  // Control the worker based on timer state changes
+  useEffect(() => {
+    // Skip if no worker or no window
+    if (!workerRef.current || typeof window === "undefined") return;
+
+    const worker = workerRef.current;
+
+    // When the timer is not active (closed), terminate and recreate worker
+    if (!timerState.isActive) {
       return;
     }
 
-    // Only run the timer if it's active (window is open or minimized, but not closed)
-    if (
-      timerState.isActive &&
-      timerState.isRunning &&
-      timerState.timeRemaining > 0
-    ) {
-      // If this is the first time the timer is running, set the start time
-      if (timerStartTimeRef.current === null) {
-        timerStartTimeRef.current = Date.now();
-        lastUpdateTimeRef.current = Date.now();
-      }
-
-      // Function to update the timer using requestAnimationFrame for better accuracy
-      const updateTimer = () => {
-        if (!timerState.isRunning || !timerState.isActive) {
-          cleanup();
-          return;
-        }
-
-        const currentTime = Date.now();
-
-        // Only update once per second (1000ms) to ensure we count down in whole seconds
-        if (
-          lastUpdateTimeRef.current &&
-          currentTime - lastUpdateTimeRef.current < 1000
-        ) {
-          animationFrameRef.current = requestAnimationFrame(updateTimer);
-          return;
-        }
-
-        // Calculate seconds elapsed since last update
-        const secondsElapsed = lastUpdateTimeRef.current
-          ? Math.floor((currentTime - lastUpdateTimeRef.current) / 1000)
-          : 0;
-
-        // Only update if at least one second has passed
-        if (secondsElapsed > 0) {
-          // Update the last update time
-          lastUpdateTimeRef.current = currentTime;
-
-          // Calculate new time remaining, ensuring we don't go below 0
-          const newTimeRemaining = Math.max(
-            0,
-            timerState.timeRemaining - secondsElapsed
-          );
-
-          // Only update state if time has changed
-          if (newTimeRemaining !== timerState.timeRemaining) {
-            setTimerState((prev) => ({
-              ...prev,
-              timeRemaining: newTimeRemaining,
-            }));
-
-            // Handle timer completion
-            if (newTimeRemaining <= 0 && !alarmPlayedRef.current) {
-              alarmPlayedRef.current = true;
-              playSound("/sounds/timeup.mp3");
-
-              // Stop the timer
-              setTimerState((prev) => ({
-                ...prev,
-                isRunning: false,
-              }));
-
-              cleanup();
-              return;
-            }
-          }
-        }
-
-        // Continue animation frame loop
-        animationFrameRef.current = requestAnimationFrame(updateTimer);
-      };
-
-      // Start the animation frame loop and clean up any existing one
-      cleanup();
-      animationFrameRef.current = requestAnimationFrame(updateTimer);
+    // Handle timer state changes
+    if (timerState.isRunning && timerState.timeRemaining > 0) {
+      // Start/resume the timer
+      worker.postMessage({
+        command: "start",
+        timeRemaining: timerState.timeRemaining,
+      });
       alarmPlayedRef.current = false;
-    }
-    // Handle timer completion directly if time is already at 0
-    else if (
-      timerState.isActive &&
-      timerState.timeRemaining <= 0 &&
-      !alarmPlayedRef.current
-    ) {
-      alarmPlayedRef.current = true;
-      playSound("/sounds/timeup.mp3");
+    } else if (!timerState.isRunning && timerState.timeRemaining > 0) {
+      // Pause the timer
+      worker.postMessage({ command: "pause" });
+    } else if (timerState.timeRemaining <= 0) {
+      // Timer completed
+      if (!alarmPlayedRef.current) {
+        alarmPlayedRef.current = true;
+        playSound("/sounds/timeup.mp3");
 
-      // Stop the timer
-      setTimerState((prev) => ({
-        ...prev,
-        isRunning: false,
-      }));
-    }
+        setTimerState((prev) => ({
+          ...prev,
+          isRunning: false,
+          // Ensure timeRemaining stays at 0
+          timeRemaining: 0,
+        }));
 
-    // Update document title to show timer status
+        // Force the title update
+        if (typeof window !== "undefined") {
+          document.title = `⏰ Time is up!`;
+        }
+      }
+    }
+  }, [
+    timerState.isRunning,
+    timerState.isActive,
+    timerState.timeRemaining,
+    setTimerState,
+  ]);
+
+  // Update document title to show timer status
+  useEffect(() => {
     if (typeof window !== "undefined") {
       if (timerState.isActive && timerState.isRunning) {
         // Show running timer in title (useful when minimized)
         document.title = `(${formatTime(
           timerState.timeRemaining
         )}) Timer - wfcOS`;
+      } else if (timerState.isActive && timerState.timeRemaining <= 0) {
+        // Show time's up message when timer completes
+        document.title = `⏰ Time is up!`;
       } else if (
         timerState.isActive &&
         !timerState.isRunning &&
@@ -154,15 +172,11 @@ export const GlobalTimerManager = () => {
         document.title = "wfcOS";
       }
     }
-
-    // Cleanup when unmounting or when dependencies change
-    return cleanup;
   }, [
     timerState.isRunning,
     timerState.isActive,
     timerState.isMinimized,
     timerState.timeRemaining,
-    setTimerState,
   ]);
 
   // This component doesn't render any visible UI

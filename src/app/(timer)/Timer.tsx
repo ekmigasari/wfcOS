@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { timerAtom } from "@/atoms/timerAtom";
+import { timerAtom } from "@/application/atoms/timerAtom";
 import TimerDisplay from "./components/TimerDisplay";
 import TimerControls from "./components/TimerControls";
 import TimerSettings from "./components/TimerSettings";
@@ -11,7 +11,7 @@ export const Timer = () => {
   const [timerState] = useAtom(timerAtom);
 
   return (
-    <div className="flex flex-col items-center justify-between text-secondary h-full p-4">
+    <div className="flex flex-col items-center justify-start text-secondary h-full p-4">
       {/* Timer Display Area */}
       <div className="flex flex-col items-center mb-6">
         <TimerDisplay

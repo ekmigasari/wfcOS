@@ -1,6 +1,6 @@
 "use client";
 
-import { TimerSetting } from "@/atoms/timerAtom";
+import { TimerSetting } from "@/application/atoms/timerAtom";
 import { formatTime, getDisplayTitle } from "../utils/timerUtils";
 
 interface TimerDisplayProps {

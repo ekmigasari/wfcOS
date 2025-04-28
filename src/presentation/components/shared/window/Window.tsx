@@ -9,7 +9,7 @@ import { useDeviceDetect } from "@/application/hooks";
 import {
   setTimerWindowIdAtom,
   handleTimerWindowCloseAtom,
-} from "@/atoms/timerAtom";
+} from "@/application/atoms/timerAtom";
 
 /**
  * Window Component

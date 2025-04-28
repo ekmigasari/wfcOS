@@ -1,7 +1,10 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { startPauseTimerAtom, resetTimerAtom } from "@/atoms/timerAtom";
+import {
+  startPauseTimerAtom,
+  resetTimerAtom,
+} from "@/application/atoms/timerAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 
 interface TimerControlsProps {

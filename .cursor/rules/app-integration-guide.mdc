@@ -1,0 +1,191 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# wfcOS App Integration Guide
+
+This guide outlines how to properly integrate applications with the window system and local storage in wfcOS.
+
+## Window System Integration
+
+Applications in wfcOS are displayed in window containers that provide consistent UI and behavior across the system. 
+
+### Core Window Files
+- [Window.tsx](mdc:src/presentation/components/shared/window/Window.tsx) - Main entry point that adapts based on device type
+- [WindowBase.tsx](mdc:src/presentation/components/shared/window/WindowBase.tsx) - Base window UI with resize and control functionality
+- [DesktopWindow.tsx](mdc:src/presentation/components/shared/window/DesktopWindow.tsx) - Desktop-specific window implementation
+- [MobileWindow.tsx](mdc:src/presentation/components/shared/window/MobileWindow.tsx) - Mobile-specific window implementation
+
+### Window State Management
+- [windowAtoms.ts](mdc:src/application/atoms/windowAtoms.ts) - Jotai atoms for window state management
+
+### Implementing a Windowed App
+
+1. Create your app component as a client component:
+```tsx
+"use client";
+
+import { useAtom } from "jotai";
+import { yourAppAtom } from "@/application/atoms/yourAppAtom";
+
+export const YourApp = () => {
+  const [appState] = useAtom(yourAppAtom);
+  
+  return (
+    <div className="flex flex-col items-center justify-between h-full p-4">
+      {/* App contents */}
+    </div>
+  );
+};
+```
+
+2. Register your app in the window system:
+```tsx
+import { useAtom } from "jotai";
+import { openWindowAtom } from "@/application/atoms/windowAtoms";
+
+// In your app launcher or dashboard component
+const openYourApp = () => {
+  const [, openWindow] = useAtom(openWindowAtom);
+  
+  openWindow({
+    id: `yourApp-${Date.now()}`, // Unique ID for this instance
+    appId: "yourApp", // Consistent ID for app type
+    title: "Your App Title",
+    initialSize: { width: 600, height: 400 },
+    minSize: { width: 300, height: 200 }, // Optional
+    children: <YourApp />
+  });
+};
+```
+
+3. Reference the Timer app for a complete example:
+- [Timer.tsx](mdc:src/app/(timer)/Timer.tsx) - Main Timer component
+
+## Local Storage Integration
+
+wfcOS uses Jotai atoms with localStorage persistence for state management.
+
+### Core Storage Files
+- [storage.ts](mdc:src/infrastructure/utils/storage.ts) - Utilities for localStorage persistence
+
+### State Management
+- [JotaiProvider.tsx](mdc:src/providers/JotaiProvider.tsx) - Provider for Jotai state atoms
+- [timerAtom.ts](mdc:src/application/atoms/timerAtom.ts) - Example of feature-specific atoms with persistence
+
+### Implementing Persistent App State
+
+1. Create your app's atom file:
+```typescript
+import { atom } from "jotai";
+import {
+  loadFeatureState,
+  saveFeatureState,
+} from "@/infrastructure/utils/storage";
+
+const FEATURE_KEY = "yourApp"; // Unique storage key
+
+// Define your app's state interface
+export interface YourAppState {
+  // App-specific state properties
+  setting1: string;
+  setting2: number;
+  // ...
+}
+
+// Initialize from localStorage or with defaults
+const initialYourAppState: YourAppState = (() => {
+  const savedState = loadFeatureState<YourAppState>(FEATURE_KEY);
+  
+  // Define default values
+  const defaults: YourAppState = {
+    setting1: "default",
+    setting2: 0,
+    // ...
+  };
+  
+  // Merge saved state with defaults
+  return {
+    ...defaults,
+    ...savedState,
+  };
+})();
+
+// Create base atom
+const baseYourAppAtom = atom<YourAppState>(initialYourAppState);
+
+// Create derived atom with localStorage persistence
+export const yourAppAtom = atom(
+  (get) => get(baseYourAppAtom),
+  (get, set, newState: YourAppState | ((prevState: YourAppState) => YourAppState)) => {
+    const currentState = get(baseYourAppAtom);
+    const updatedState = typeof newState === "function"
+      ? newState(currentState)
+      : newState;
+      
+    // Only update and save if state has changed
+    if (JSON.stringify(currentState) !== JSON.stringify(updatedState)) {
+      set(baseYourAppAtom, updatedState);
+      saveFeatureState(FEATURE_KEY, updatedState);
+    }
+  }
+);
+
+// Create action atoms for specific state updates
+export const updateSetting1Atom = atom(
+  null, // write-only atom
+  (get, set, newValue: string) => {
+    set(yourAppAtom, (prev) => ({
+      ...prev,
+      setting1: newValue,
+    }));
+  }
+);
+```
+
+2. Use your atoms in your app component:
+```tsx
+"use client";
+
+import { useAtom } from "jotai";
+import { yourAppAtom, updateSetting1Atom } from "@/application/atoms/yourAppAtom";
+
+export const YourApp = () => {
+  const [appState] = useAtom(yourAppAtom);
+  const [, updateSetting1] = useAtom(updateSetting1Atom);
+  
+  return (
+    <div className="flex flex-col items-center justify-between h-full p-4">
+      <p>Setting 1: {appState.setting1}</p>
+      <button 
+        onClick={() => updateSetting1("new value")}
+        className="px-4 py-2 bg-primary text-white rounded"
+      >
+        Update Setting
+      </button>
+    </div>
+  );
+};
+```
+
+3. For apps that need global state management that persists even when closed:
+   - Add a global manager component in JotaiProvider similar to GlobalTimerManager
+   - Implement necessary cleanup logic when windows are closed
+
+## Best Practices
+
+1. **State Management**
+   - Keep state as local as possible
+   - Use action atoms for specific updates
+   - Validate state before saving to localStorage
+
+2. **Window Management**
+   - Set appropriate initial and minimum sizes for your app
+   - Design responsive UIs that adapt to window resizing
+   - Clean up resources when window is closed
+
+3. **Performance**
+   - Avoid excessive localStorage operations
+   - Only save state when it actually changes
+   - Use memoization for complex calculations

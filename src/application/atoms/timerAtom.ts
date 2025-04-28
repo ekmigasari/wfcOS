@@ -6,11 +6,11 @@ import {
 
 const FEATURE_KEY = "timer";
 const DEFAULT_WORK_TIME = 25 * 60; // 25 minutes
-const DEFAULT_SHORT_BREAK_TIME = 4 * 60; // 4 minutes
+const DEFAULT_SHORT_BREAK_TIME = 5 * 60; // 5 minutes
 const DEFAULT_LONG_BREAK_TIME = 15 * 60; // 15 minutes
 const DEFAULT_CUSTOM_MINUTES = 10; // Default custom time
 
-export type TimerSetting = "work25" | "short4" | "long15" | "custom";
+export type TimerSetting = "work25" | "short5" | "long15" | "custom";
 
 // Define the shape of the Timer state
 export interface TimerState {
@@ -36,7 +36,7 @@ const getDurationForSetting = (
   switch (setting) {
     case "work25":
       return DEFAULT_WORK_TIME;
-    case "short4":
+    case "short5":
       return DEFAULT_SHORT_BREAK_TIME;
     case "long15":
       return DEFAULT_LONG_BREAK_TIME;
@@ -127,6 +127,16 @@ export const resetTimerAtom = atom(null, (get, set) => {
       prev.timerSetting,
       prev.customDurationMinutes
     );
+
+    // Notify worker about reset if it exists in the window context
+    if (typeof window !== "undefined") {
+      // Use setTimeout to ensure this runs after state update
+      setTimeout(() => {
+        // Dispatch a custom event that GlobalTimerManager can listen for
+        window.dispatchEvent(new CustomEvent("timer-reset"));
+      }, 0);
+    }
+
     return {
       ...prev,
       timeRemaining: newTimeRemaining,
