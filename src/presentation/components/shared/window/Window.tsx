@@ -69,6 +69,9 @@ export const Window = (props: WindowProps) => {
   // Determine if this is a timer window by checking the title
   const isTimerWindow = title.toLowerCase().includes("timer");
 
+  // Determine if this is an ambience window by checking the title
+  const isAmbienceWindow = title.toLowerCase().includes("ambience");
+
   // Handle window open/close for timer persistence
   useEffect(() => {
     if (isOpen && isTimerWindow) {
@@ -97,6 +100,14 @@ export const Window = (props: WindowProps) => {
       focusWindow(windowId);
     }
   }, [isOpen, isMinimized, windowId, focusWindow]);
+
+  // Handle minimization state changes for Ambience window
+  useEffect(() => {
+    // Only run this for Ambience window
+    if (isAmbienceWindow && props.onMinimizeStateChange) {
+      props.onMinimizeStateChange(!!isMinimized);
+    }
+  }, [isMinimized, isAmbienceWindow, props]);
 
   // Custom close handler that integrates with timer
   const handleClose = () => {

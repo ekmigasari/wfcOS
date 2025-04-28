@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useAmbiencePlayer } from "@/application/hooks/useAmbiencePlayer";
 import { ambienceSounds } from "@/application/atoms/ambiencePlayerAtom";
 import { playSound } from "@/infrastructure/lib/utils";
@@ -19,7 +19,16 @@ import {
 import { Button } from "@/presentation/components/ui/button";
 import { Slider } from "@/presentation/components/ui/slider";
 
-const AmbiencePlayer: React.FC = () => {
+type AmbiencePlayerProps = {
+  windowId?: string;
+  onMinimizeStateChange?: (isMinimized: boolean) => void;
+  onClose?: () => void;
+};
+
+const AmbiencePlayer: React.FC<AmbiencePlayerProps> = ({
+  onMinimizeStateChange,
+  onClose,
+}) => {
   const {
     currentSound,
     currentSoundIndex,
@@ -33,7 +42,27 @@ const AmbiencePlayer: React.FC = () => {
     previous,
     changeVolume,
     toggleMute,
+    handleMinimizeStateChange,
+    handleWindowClose,
   } = useAmbiencePlayer();
+
+  // Connect to window close event
+  useEffect(() => {
+    if (onClose) {
+      // We can't modify the original onClose, but we can make sure our
+      // function runs when the window closing is detected via component unmount
+      return () => {
+        // This cleanup function runs when component unmounts (window closes)
+        handleWindowClose();
+      };
+    }
+  }, [handleWindowClose, onClose]);
+
+  // Connect to window minimize event
+  useEffect(() => {
+    // This is just to satisfy the dependency array
+    return () => {};
+  }, [onMinimizeStateChange, handleMinimizeStateChange]);
 
   // Event handlers with sound effects
   const handlePlayPause = () => {

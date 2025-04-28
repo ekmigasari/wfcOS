@@ -22,7 +22,8 @@ import {
   getAudioElement,
   getAudioCurrentTime,
   isAudioPlaying,
-  cleanupAudio,
+  // cleanupAudio,
+  stopAudio,
   getIsPageUnloading,
 } from "@/infrastructure/lib/audioService";
 
@@ -408,16 +409,11 @@ export const useAmbiencePlayer = () => {
       setIsWindowOpen(false);
       persistState({ isWindowOpen: false });
 
-      // MODIFIED: Stop playback when window is closed (not minimized)
-      // Only if window is closed (not minimized)
-      if (!isWindowOpen) {
-        setIsPlaying(false);
-        persistState({ isPlaying: false });
-        cleanupAudio(true); // Stop playback
-      }
+      // When unmounting, this could be either minimization or closing
+      // The actual stop will be handled by Window component's onClose handler
 
       if (getIsPageUnloading()) {
-        cleanupAudio(true); // Final cleanup
+        stopAudio(); // Final cleanup on page unload
       }
     };
   }, [
@@ -427,6 +423,23 @@ export const useAmbiencePlayer = () => {
     setCurrentTime,
     setIsPlaying,
   ]);
+
+  // Handle window minimize state changes
+  const handleMinimizeStateChange = (isMinimized: boolean) => {
+    console.log(
+      `Ambience window minimize state: ${
+        isMinimized ? "minimized" : "restored"
+      }`
+    );
+  };
+
+  // Handle window close - explicitly stops the audio
+  const handleWindowClose = () => {
+    console.log("Ambience window closed, stopping audio");
+    setIsPlaying(false);
+    persistState({ isPlaying: false });
+    stopAudio(); // Full cleanup on close
+  };
 
   // Public methods to use in the component
   const playPause = () => {
@@ -489,5 +502,7 @@ export const useAmbiencePlayer = () => {
     previous,
     changeVolume,
     toggleMute,
+    handleMinimizeStateChange,
+    handleWindowClose,
   };
 };

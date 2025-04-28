@@ -155,5 +155,19 @@ export const cleanupAudio = (shouldPause: boolean = true) => {
   }
 };
 
+// Full stop and cleanup for when window is closed (not just minimized)
+export const stopAudio = () => {
+  if (!globalAudio) return;
+
+  try {
+    safeAudioPause();
+    globalAudio.src = ""; // Releases media resources
+    globalAudio.load(); // Force cleanup
+    console.log("Audio fully stopped and cleaned up");
+  } catch (e) {
+    console.error("Error during audio stop:", e);
+  }
+};
+
 export const getAudioElement = () => globalAudio;
 export const getIsPageUnloading = () => isPageUnloading;
