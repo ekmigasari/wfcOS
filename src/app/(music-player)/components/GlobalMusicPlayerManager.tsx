@@ -22,24 +22,19 @@ export const GlobalMusicPlayerManager = () => {
 
   // Initialize title updates for the music player
   useEffect(() => {
-    // Function to update the document title
     const updateTitle = () => {
       if (typeof window === "undefined") return;
 
       if (playerState.isPlaying && !playerState.isWindowOpen) {
-        // Show currently playing song in title when minimized
         const songTitle = playerState.currentSong?.title || "Music";
         document.title = `▶️ ${songTitle} - wfcOS`;
       } else if (!playerState.isPlaying && !playerState.isWindowOpen) {
-        // Show paused state when minimized
         document.title = `⏸️ Music (Paused) - wfcOS`;
       } else if (!playerState.isWindowOpen) {
-        // Default title when music player is not open
         document.title = "wfcOS";
       }
     };
 
-    // Set up interval to update title (in case of song change)
     updateTitle();
     titleUpdateInterval.current = setInterval(updateTitle, 2000);
 
@@ -52,20 +47,16 @@ export const GlobalMusicPlayerManager = () => {
     playerState.isPlaying,
     playerState.isWindowOpen,
     playerState.currentSong,
-    setPlayerState,
   ]);
 
   // Handle visibility changes
   useEffect(() => {
     const handleVisibilityChange = () => {
-      // If the page becomes hidden (e.g., switched tabs) while player is active
-      if (
-        document.visibilityState === "hidden" &&
-        !playerState.isWindowOpen &&
-        playerState.isPlaying
-      ) {
-        // We do nothing - music should continue playing
-        console.log("Page hidden but music continuing in background");
+      if (document.visibilityState === "hidden" && playerState.isPlaying) {
+        // Keep playing when minimized or tab switched
+        setPlayerState((prev) => ({ ...prev, isWindowOpen: false }));
+      } else if (document.visibilityState === "visible") {
+        setPlayerState((prev) => ({ ...prev, isWindowOpen: true }));
       }
     };
 
@@ -73,16 +64,16 @@ export const GlobalMusicPlayerManager = () => {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [playerState.isWindowOpen, playerState.isPlaying, persistState]);
+  }, [playerState.isPlaying, setPlayerState]);
 
   // Sync with unload events
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Save state before unloading page
       persistState({
         isPlaying: playerState.isPlaying,
         currentTime: playerState.currentTime,
         currentSongIndex: playerState.currentSongIndex,
+        isWindowOpen: playerState.isWindowOpen,
       });
     };
 
@@ -94,6 +85,7 @@ export const GlobalMusicPlayerManager = () => {
     playerState.isPlaying,
     playerState.currentTime,
     playerState.currentSongIndex,
+    playerState.isWindowOpen,
     persistState,
   ]);
 

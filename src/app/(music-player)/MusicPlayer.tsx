@@ -33,11 +33,6 @@ export const MusicPlayer = () => {
                 (loading...)
               </span>
             )}
-            {!playerState.isWindowOpen && playerState.isPlaying && (
-              <span className="text-sm font-normal ml-2 text-primary">
-                (playing in background)
-              </span>
-            )}
           </h2>
 
           {/* Progress Bar */}

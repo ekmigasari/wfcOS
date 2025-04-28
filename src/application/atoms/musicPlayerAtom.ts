@@ -15,7 +15,6 @@ export interface MusicPlayerState {
   playlist: Song[];
   currentSongIndex: number;
   isPlaying: boolean;
-  isWindowOpen: boolean;
   currentTime: number;
   volume: number;
   isLoading: boolean;
@@ -25,6 +24,7 @@ export interface MusicPlayerState {
   seeking: boolean;
   isMuted: boolean;
   currentSong: Song | null;
+  isWindowOpen: boolean;
 }
 
 // Default songs to include in the playlist
@@ -62,7 +62,6 @@ const getInitialState = () => {
     playlist: Song[];
     currentSongIndex: number;
     isPlaying: boolean;
-    isWindowOpen: boolean;
     currentTime: number;
     volume: number;
   }>("musicPlayer");
@@ -74,7 +73,6 @@ const getInitialState = () => {
     playlist,
     currentSongIndex: currentSongIndex < playlist.length ? currentSongIndex : 0,
     isPlaying: stored?.isPlaying ?? false,
-    isWindowOpen: stored?.isWindowOpen ?? false,
     currentTime: stored?.currentTime ?? 0,
     volume: stored?.volume ?? 0.7,
     isLoading: false,
@@ -84,6 +82,7 @@ const getInitialState = () => {
     seeking: false,
     isMuted: false,
     currentSong: playlist.length > 0 ? playlist[currentSongIndex] : null,
+    isWindowOpen: true,
   };
 };
 
@@ -104,7 +103,6 @@ export const persistMusicPlayerState = atom(
       playlist: newState.playlist,
       currentSongIndex: newState.currentSongIndex,
       isPlaying: newState.isPlaying,
-      isWindowOpen: newState.isWindowOpen,
       currentTime: newState.currentTime,
       volume: newState.volume,
     });
