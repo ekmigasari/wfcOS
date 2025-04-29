@@ -50,23 +50,24 @@ export interface VolatileMusicPlayerState {
 // Default songs
 const defaultSongs: Song[] = [
   {
-    url: "https://www.youtube.com/watch?v=lTRiuFIWV54",
-    title: "Lo-fi Study",
-    id: "lTRiuFIWV54",
-    seqId: 1,
-  },
-  {
     url: "https://www.youtube.com/watch?v=Fp5ghKduTK8",
     title: "Ghibli Piano",
     id: "Fp5ghKduTK8",
+    seqId: 1,
+  },
+  {
+    url: "https://www.youtube.com/watch?v=67vdKXlYAZU",
+    title: "Jazzjeans",
+    id: "67vdKXlYAZU",
     seqId: 2,
   },
   {
-    url: "https://www.youtube.com/watch?v=KxJrYKoTeXA",
-    title: "Jazzjeans",
-    id: "KxJrYKoTeXA",
+    url: "https://www.youtube.com/watch?v=lTRiuFIWV54",
+    title: "Lo-fi Study",
+    id: "lTRiuFIWV54",
     seqId: 3,
   },
+
   {
     url: "https://www.youtube.com/watch?v=pfU0QORkRpY",
     title: "FKJ Live",

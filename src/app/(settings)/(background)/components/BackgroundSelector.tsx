@@ -5,13 +5,23 @@ import { playSound } from "@/infrastructure/lib/utils";
 
 // Constants
 const backgrounds = [
-  "/background/bg-1.png",
-  "/background/bg-2.png",
-  "/background/bg-3.png",
-  "/background/bg-4.png",
-  "/background/bg-5.png",
-  "/background/bg-6.png",
-  "/background/bg-7.png",
+  "/background/bg-1.webp",
+  "/background/bg-2.webp",
+  "/background/bg-3.webp",
+  "/background/bg-4.webp",
+  "/background/bg-5.webp",
+  "/background/bg-6.webp",
+  "/background/bg-7.webp",
+  "/background/bg-8.webp",
+  "/background/bg-9.webp",
+  "/background/bg-10.webp",
+  "/background/bg-11.webp",
+  "/background/bg-12.webp",
+  "/background/bg-13.webp",
+  "/background/bg-14.webp",
+  "/background/bg-15.webp",
+  "/background/bg-16.webp",
+  "/background/bg-17.webp",
 ];
 
 // Component for handling background image selection
