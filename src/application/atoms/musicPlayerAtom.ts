@@ -51,7 +51,7 @@ export interface VolatileMusicPlayerState {
 const defaultSongs: Song[] = [
   {
     url: "https://www.youtube.com/watch?v=lTRiuFIWV54",
-    title: "Lo-fi Study Session",
+    title: "Lo-fi Study",
     id: "lTRiuFIWV54",
     seqId: 1,
   },
