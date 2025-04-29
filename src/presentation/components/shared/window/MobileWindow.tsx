@@ -6,7 +6,6 @@ import { WindowBase } from "./WindowBase";
 import {
   focusWindowAtom,
   updateWindowPositionSizeAtom,
-  minimizeWindowAtom,
 } from "../../../../application/atoms/windowAtoms";
 
 /**
@@ -36,7 +35,6 @@ type MobileWindowProps = {
   minSize?: { width: number; height: number };
   zIndex: number;
   playSounds?: boolean;
-  onMinimizeStateChange?: (isMinimized: boolean) => void;
 };
 
 export const MobileWindow = ({
@@ -48,7 +46,6 @@ export const MobileWindow = ({
   onClose,
   zIndex,
   playSounds = true,
-  onMinimizeStateChange,
 }: MobileWindowProps) => {
   // Client-side only state to avoid hydration issues
   const [isMounted, setIsMounted] = useState(false);
@@ -62,16 +59,10 @@ export const MobileWindow = ({
   // Jotai state management
   const focusWindow = useAtom(focusWindowAtom)[1];
   const updateWindowPositionSize = useAtom(updateWindowPositionSizeAtom)[1];
-  const minimizeWindow = useAtom(minimizeWindowAtom)[1];
 
   // Handle window focus
   const handleFocus = () => {
     focusWindow(windowId);
-  };
-
-  // Handle window minimize
-  const handleMinimize = () => {
-    minimizeWindow(windowId);
   };
 
   // Handle window close
@@ -161,7 +152,6 @@ export const MobileWindow = ({
       isOpen={isOpen}
       isMinimized={isMinimized}
       onClose={handleClose}
-      onMinimize={handleMinimize}
       zIndex={zIndex}
       position={mobilePosition}
       size={mobileSize}
@@ -172,7 +162,6 @@ export const MobileWindow = ({
       style={mobileStyle}
       showResizeHandles={false} // Mobile doesn't use resize handles
       playSounds={playSounds}
-      onMinimizeStateChange={onMinimizeStateChange}
     >
       {children}
     </WindowBase>

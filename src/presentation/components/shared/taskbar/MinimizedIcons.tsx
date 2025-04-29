@@ -24,11 +24,12 @@ export const MinimizedIcons = () => {
     setMounted(true);
   }, []);
 
-  // Restore a window when clicked in taskbar
+  // Restore a window when clicked in taskbar - simply toggle isMinimized state
   const handleRestoreWindow = (windowId: string) => {
+    // Optional sound effect
     playSound("/sounds/click.mp3");
 
-    // Restore the window and bring it to front using the new atom
+    // Just update the minimized state boolean in the atom
     setWindowMinimizedState({ windowId, isMinimized: false });
   };
 

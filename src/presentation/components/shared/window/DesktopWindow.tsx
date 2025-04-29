@@ -6,7 +6,6 @@ import { useWindowManagement } from "../../../../application/hooks/useWindowMana
 import {
   focusWindowAtom,
   updateWindowPositionSizeAtom,
-  setWindowMinimizedStateAtom,
 } from "../../../../application/atoms/windowAtoms";
 import { WindowBase } from "./WindowBase";
 
@@ -58,16 +57,10 @@ export const DesktopWindow = ({
   // Jotai state management
   const focusWindow = useAtom(focusWindowAtom)[1];
   const updateWindowPositionSize = useAtom(updateWindowPositionSizeAtom)[1];
-  const setWindowMinimizedState = useAtom(setWindowMinimizedStateAtom)[1];
 
   // Handle window focus
   const handleFocus = () => {
     focusWindow(windowId);
-  };
-
-  // Handle window minimize request
-  const handleRequestMinimize = () => {
-    setWindowMinimizedState({ windowId, isMinimized: true });
   };
 
   // Handle window close request
@@ -119,7 +112,6 @@ export const DesktopWindow = ({
       isOpen={isOpen}
       isMinimized={isMinimized}
       onClose={handleClose}
-      onRequestMinimize={handleRequestMinimize}
       zIndex={zIndex}
       position={position}
       size={size}

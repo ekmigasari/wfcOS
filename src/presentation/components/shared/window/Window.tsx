@@ -32,7 +32,6 @@ import {
  * - Focus management
  * - Automatic focus when opened from icon clicks
  * - Preserves component state when minimized (no remounting)
- * - Supports callbacks for minimization state changes to notify applications
  */
 type WindowProps = {
   windowId: string;
@@ -46,7 +45,6 @@ type WindowProps = {
   minSize?: { width: number; height: number };
   zIndex: number;
   playSounds?: boolean;
-  onMinimizeStateChange?: (isMinimized: boolean) => void; // App notification callback
 };
 
 export const Window = (props: WindowProps) => {
@@ -68,9 +66,6 @@ export const Window = (props: WindowProps) => {
 
   // Determine if this is a timer window by checking the title
   const isTimerWindow = title.toLowerCase().includes("timer");
-
-  // Determine if this is an ambience window by checking the title
-  const isAmbienceWindow = title.toLowerCase().includes("ambience");
 
   // Handle window open/close for timer persistence
   useEffect(() => {
@@ -101,14 +96,6 @@ export const Window = (props: WindowProps) => {
     }
   }, [isOpen, isMinimized, windowId, focusWindow]);
 
-  // Handle minimization state changes for Ambience window
-  useEffect(() => {
-    // Only run this for Ambience window
-    if (isAmbienceWindow && props.onMinimizeStateChange) {
-      props.onMinimizeStateChange(!!isMinimized);
-    }
-  }, [isMinimized, isAmbienceWindow, props]);
-
   // Custom close handler that integrates with timer
   const handleClose = () => {
     if (isTimerWindow) {
@@ -133,7 +120,6 @@ export const Window = (props: WindowProps) => {
       title={title}
       onClose={handleClose}
       playSounds={playSounds}
-      onMinimizeStateChange={props.onMinimizeStateChange}
       {...restProps}
     />
   ) : (
@@ -144,7 +130,6 @@ export const Window = (props: WindowProps) => {
       title={title}
       onClose={handleClose}
       playSounds={playSounds}
-      onMinimizeStateChange={props.onMinimizeStateChange}
       {...restProps}
     />
   );

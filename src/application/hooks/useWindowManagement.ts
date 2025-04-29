@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Position, Size } from "../../types";
-import { playSound } from "../../infrastructure/lib/utils";
+import { Position, Size } from "@/application/types/window";
+import { playSound } from "@/infrastructure/lib/utils";
 
 // Define possible resize directions
 export type ResizeDirection =

@@ -3,6 +3,8 @@
 import React from "react";
 import { cn, playSound } from "../../../../infrastructure/lib/utils";
 import { ResizeDirection } from "../../../../application/hooks/useWindowManagement";
+import { useAtom } from "jotai";
+import { setWindowMinimizedStateAtom } from "../../../../application/atoms/windowAtoms";
 
 /**
  * WindowBase Component
@@ -22,7 +24,6 @@ export type WindowBaseProps = {
   isOpen: boolean;
   isMinimized?: boolean;
   onClose: () => void;
-  onRequestMinimize: () => void;
   zIndex: number;
   position: { x: number; y: number };
   size: { width: number; height: number };
@@ -42,13 +43,12 @@ export type WindowBaseProps = {
 };
 
 export const WindowBase = ({
-  // windowId not used in base component but kept in type for consistency
+  windowId,
   title,
   children,
   isOpen,
   isMinimized = false,
   onClose,
-  onRequestMinimize,
   zIndex,
   position,
   size,
@@ -63,6 +63,9 @@ export const WindowBase = ({
   showResizeHandles = false,
   playSounds = true,
 }: WindowBaseProps) => {
+  // Jotai atom for minimizing windows
+  const [, setWindowMinimizedState] = useAtom(setWindowMinimizedStateAtom);
+
   // Don't render if not open
   if (!isOpen) {
     return null;
@@ -78,12 +81,12 @@ export const WindowBase = ({
   };
 
   // Handle window minimize request with sound
-  const handleRequestMinimize = (e: React.MouseEvent) => {
+  const handleMinimize = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (playSounds) {
       playSound("/sounds/minimize.mp3");
     }
-    onRequestMinimize();
+    setWindowMinimizedState({ windowId, isMinimized: true });
   };
 
   // Define resize handles for window
@@ -215,7 +218,7 @@ export const WindowBase = ({
         <div className="flex items-center gap-1">
           <button
             className="cursor-pointer bg-yellow-500 text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
-            onClick={handleRequestMinimize}
+            onClick={handleMinimize}
             title="Minimize"
           >
             -

@@ -173,12 +173,11 @@ export const setWindowMinimizedStateAtom = atom(
       // Prevent redundant updates if already in the target state
       if (windowState.isMinimized === isMinimized) return prev;
 
-      // Create the updated window state
+      // Create the updated window state with only the isMinimized change
       const updatedWindowState = {
         ...windowState,
         isMinimized: isMinimized,
-        // Only bring to front when restoring (isMinimized: false)
-        zIndex: isMinimized ? windowState.zIndex : getNextZIndex(prev),
+        // No zIndex changes - WindowBase will only show/hide based on isMinimized
       };
 
       return {
