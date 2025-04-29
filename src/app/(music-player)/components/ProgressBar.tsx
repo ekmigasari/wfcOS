@@ -7,6 +7,7 @@ import {
   setSeekPositionAtom,
   updatePlayerInternalsAtom,
 } from "@/application/atoms/musicPlayerAtom";
+import { Slider } from "@/presentation/components/ui/slider";
 
 // Helper to format time (MM:SS)
 const formatTime = (seconds: number): string => {
@@ -27,7 +28,7 @@ const ProgressBar = () => {
   const [timeState] = useAtom(playerTimeAtom);
   const setSeekPosition = useSetAtom(setSeekPositionAtom);
   const updatePlayerInternals = useSetAtom(updatePlayerInternalsAtom);
-  const progressBarRef = useRef<HTMLDivElement>(null);
+  const sliderContainerRef = useRef<HTMLDivElement>(null);
 
   const [localSliderValue, setLocalSliderValue] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -38,45 +39,40 @@ const ProgressBar = () => {
     }
   }, [timeState.playedSeconds, isDragging]);
 
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalSliderValue(parseFloat(e.target.value));
+  const handleSliderChange = (values: number[]) => {
+    const newValue = values[0];
+    setLocalSliderValue(newValue);
+
+    if (!isDragging) {
+      setIsDragging(true);
+      updatePlayerInternals({ seeking: true });
+    }
   };
 
-  const handleSeekMouseDown = () => {
-    setIsDragging(true);
-    updatePlayerInternals({ seeking: true });
-  };
-
-  const handleSeekMouseUp = (e: React.MouseEvent<HTMLInputElement>) => {
-    const newTime = parseFloat((e.target as HTMLInputElement).value);
-    setSeekPosition(newTime);
+  const handleSliderCommit = (values: number[]) => {
+    const newValue = values[0];
+    setSeekPosition(newValue);
     updatePlayerInternals({ seeking: false });
     setIsDragging(false);
-    setLocalSliderValue(newTime);
   };
 
-  const handleTouchEnd = (e: React.TouchEvent<HTMLInputElement>) => {
-    const newTime = parseFloat((e.target as HTMLInputElement).value);
-    setSeekPosition(newTime);
-    updatePlayerInternals({ seeking: false });
-    setIsDragging(false);
-    setLocalSliderValue(newTime);
-  };
-
-  // Handle direct click on progress bar
+  // Handle direct click on progress bar container
   const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isDisabled || !progressBarRef.current) return;
+    if (isDisabled || !sliderContainerRef.current) return;
 
-    const rect = progressBarRef.current.getBoundingClientRect();
+    const rect = sliderContainerRef.current.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const percentClicked = clickX / rect.width;
     const newTime = percentClicked * maxDuration;
 
+    // Update slider value
     setLocalSliderValue(newTime);
-    setSeekPosition(newTime);
-    updatePlayerInternals({ seeking: true });
 
-    // Small delay to ensure the seeking state is updated properly
+    // Seek to position
+    setSeekPosition(newTime);
+
+    // Handle seeking state
+    updatePlayerInternals({ seeking: true });
     setTimeout(() => {
       updatePlayerInternals({ seeking: false });
     }, 50);
@@ -84,38 +80,29 @@ const ProgressBar = () => {
 
   const sliderValue = isDragging ? localSliderValue : timeState.playedSeconds;
   const maxDuration = timeState.duration > 0 ? timeState.duration : 100;
-  const progressPercent = (sliderValue / maxDuration) * 100;
   const isDisabled = maxDuration <= 0 || !isFinite(maxDuration);
 
   return (
     <div className="mb-2 w-full">
       <div className="flex flex-col space-y-1 w-full">
-        {/* Progress Bar Container */}
+        {/* Progress Slider Container with click handler */}
         <div
-          ref={progressBarRef}
-          className="relative w-full h-2 bg-muted rounded-full cursor-pointer"
+          ref={sliderContainerRef}
+          className="relative w-full h-5 cursor-pointer flex items-center"
           onClick={handleProgressBarClick}
-          style={{
-            background: isDisabled
-              ? `var(--muted)`
-              : `linear-gradient(to right, var(--primary) 0%, var(--primary) ${progressPercent}%, var(--muted) ${progressPercent}%, var(--muted) 100%)`,
-          }}
         >
-          {/* Slider Input (invisible but functional) */}
-          <input
-            type="range"
+          <Slider
+            value={[sliderValue]}
             min={0}
             max={maxDuration}
             step={0.1}
-            value={sliderValue}
-            onChange={handleSliderChange}
-            onMouseDown={handleSeekMouseDown}
-            onMouseUp={handleSeekMouseUp}
-            onTouchStart={handleSeekMouseDown}
-            onTouchEnd={handleTouchEnd}
+            onValueChange={handleSliderChange}
+            onValueCommit={handleSliderCommit}
             disabled={isDisabled}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+            className="w-full absolute z-10 pointer-events-none"
           />
+          {/* Invisible overlay to capture clicks */}
+          <div className="absolute inset-0 z-20"></div>
         </div>
 
         {/* Time Display */}
