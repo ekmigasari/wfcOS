@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { cn, playSound } from "../../../../infrastructure/lib/utils";
 import { ResizeDirection } from "../../../../application/hooks/useWindowManagement";
 import { useAtom } from "jotai";
@@ -42,6 +42,24 @@ export type WindowBaseProps = {
   playSounds?: boolean;
 };
 
+// Memoized content component to prevent re-rendering when window state changes
+const MemoizedContent = React.memo(
+  ({
+    children,
+    contentClassName,
+  }: {
+    children: React.ReactNode;
+    contentClassName: string;
+  }) => (
+    <div
+      className={cn("p-4 flex-grow overflow-auto bg-card", contentClassName)}
+    >
+      {children}
+    </div>
+  )
+);
+MemoizedContent.displayName = "MemoizedContent";
+
 export const WindowBase = ({
   windowId,
   title,
@@ -66,6 +84,80 @@ export const WindowBase = ({
   // Jotai atom for minimizing windows
   const [, setWindowMinimizedState] = useAtom(setWindowMinimizedStateAtom);
 
+  // Define resize handles for window
+  const handleBaseClass = "absolute z-[1001] select-none";
+  const cornerHandleClass = `${handleBaseClass} w-5 h-5`;
+  const edgeHandleClass = handleBaseClass;
+
+  // Define resize handles with useMemo (before any early returns)
+  const resizeHandles = useMemo(
+    () => [
+      // Corners
+      {
+        className: cn(cornerHandleClass, "bottom-[-3px] right-[-3px]"),
+        direction: "bottom-right" as ResizeDirection,
+        style: {
+          cursor: "nwse-resize",
+          backgroundColor: "rgba(255, 255, 255, 0.05)",
+          borderRight: "1px solid rgba(255, 255, 255, 0.1)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+        },
+      },
+      {
+        className: cn(cornerHandleClass, "bottom-[-3px] left-[-3px]"),
+        direction: "bottom-left" as ResizeDirection,
+        style: {
+          cursor: "nesw-resize",
+          backgroundColor: "rgba(255, 255, 255, 0.05)",
+          borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+        },
+      },
+      {
+        className: cn(cornerHandleClass, "top-[-3px] right-[-3px]"),
+        direction: "top-right" as ResizeDirection,
+        style: {
+          cursor: "nesw-resize",
+          backgroundColor: "rgba(255, 255, 255, 0.05)",
+          borderRight: "1px solid rgba(255, 255, 255, 0.1)",
+          borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+        },
+      },
+      {
+        className: cn(cornerHandleClass, "top-[-3px] left-[-3px]"),
+        direction: "top-left" as ResizeDirection,
+        style: {
+          cursor: "nwse-resize",
+          backgroundColor: "rgba(255, 255, 255, 0.05)",
+          borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
+          borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+        },
+      },
+      // Edges
+      {
+        className: cn(edgeHandleClass, "top-5 bottom-5 right-[-3px] w-[6px]"),
+        direction: "right" as ResizeDirection,
+        style: { cursor: "ew-resize" },
+      },
+      {
+        className: cn(edgeHandleClass, "top-5 bottom-5 left-[-3px] w-[6px]"),
+        direction: "left" as ResizeDirection,
+        style: { cursor: "ew-resize" },
+      },
+      {
+        className: cn(edgeHandleClass, "left-5 right-5 bottom-[-3px] h-[6px]"),
+        direction: "bottom" as ResizeDirection,
+        style: { cursor: "ns-resize" },
+      },
+      {
+        className: cn(edgeHandleClass, "left-5 right-5 top-[-3px] h-[6px]"),
+        direction: "top" as ResizeDirection,
+        style: { cursor: "ns-resize" },
+      },
+    ],
+    [cornerHandleClass, edgeHandleClass]
+  );
+
   // Don't render if not open
   if (!isOpen) {
     return null;
@@ -89,174 +181,77 @@ export const WindowBase = ({
     setWindowMinimizedState({ windowId, isMinimized: true });
   };
 
-  // Define resize handles for window
-  const handleBaseClass = "absolute z-[1001] select-none";
-  const cornerHandleClass = `${handleBaseClass} w-5 h-5`;
-  const edgeHandleClass = handleBaseClass;
-
-  const resizeHandles: {
-    className: string;
-    direction: ResizeDirection;
-    style?: React.CSSProperties;
-  }[] = [
-    // Corners
-    {
-      className: cn(cornerHandleClass, "bottom-[-3px] right-[-3px]"),
-      direction: "bottom-right",
-      style: {
-        cursor: "nwse-resize",
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
-        borderRight: "1px solid rgba(255, 255, 255, 0.1)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-      },
-    },
-    {
-      className: cn(cornerHandleClass, "bottom-[-3px] left-[-3px]"),
-      direction: "bottom-left",
-      style: {
-        cursor: "nesw-resize",
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
-        borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-      },
-    },
-    {
-      className: cn(cornerHandleClass, "top-[-3px] right-[-3px]"),
-      direction: "top-right",
-      style: {
-        cursor: "nesw-resize",
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
-        borderRight: "1px solid rgba(255, 255, 255, 0.1)",
-        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-      },
-    },
-    {
-      className: cn(cornerHandleClass, "top-[-3px] left-[-3px]"),
-      direction: "top-left",
-      style: {
-        cursor: "nwse-resize",
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
-        borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
-        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-      },
-    },
-    // Edges
-    {
-      className: cn(edgeHandleClass, "top-5 bottom-5 right-[-3px] w-[6px]"),
-      direction: "right",
-      style: { cursor: "ew-resize" },
-    },
-    {
-      className: cn(edgeHandleClass, "top-5 bottom-5 left-[-3px] w-[6px]"),
-      direction: "left",
-      style: { cursor: "ew-resize" },
-    },
-    {
-      className: cn(edgeHandleClass, "left-5 right-5 bottom-[-3px] h-[6px]"),
-      direction: "bottom",
-      style: { cursor: "ns-resize" },
-    },
-    {
-      className: cn(edgeHandleClass, "left-5 right-5 top-[-3px] h-[6px]"),
-      direction: "top",
-      style: { cursor: "ns-resize" },
-    },
-  ];
-
+  // Main outer container - always present regardless of minimized state
   return (
-    <>
-      {/* Always render children for audio continuation, but hidden when minimized */}
-      {isMinimized && (
-        <div
-          className="absolute opacity-0 pointer-events-none"
-          style={{
-            position: "fixed",
-            left: "-9999px",
-            top: 0,
-            width: 0,
-            height: 0,
-            zIndex: -1,
-          }}
-        >
-          {children}
-        </div>
+    <div
+      className={cn(
+        "absolute bg-background border border-secondary rounded-lg shadow-xl flex flex-col overflow-hidden",
+        className,
+        isMinimized && "opacity-0 pointer-events-none"
       )}
-
-      {/* Only render window UI when not minimized */}
-      {!isMinimized && (
-        <div
-          className={cn(
-            "absolute bg-background border border-secondary rounded-lg shadow-xl flex flex-col overflow-hidden",
-            className
-          )}
-          style={{
-            top: `${position.y}px`,
-            left: `${position.x}px`,
-            width: `${size.width}px`,
-            height: `${size.height}px`,
-            minWidth: minSize?.width ? `${minSize.width}px` : "150px",
-            minHeight: minSize?.height ? `${minSize.height}px` : "100px",
-            zIndex,
-            ...style,
-          }}
-          onMouseDown={onFocus}
-        >
-          {/* Title Bar */}
-          <div
-            className={cn(
-              "bg-primary px-3 py-2 border-b border-secondary flex justify-between items-center select-none h-10 rounded-t-md shadow-md",
-              titleBarClassName
-            )}
-            onMouseDown={onTitleBarMouseDown}
+      style={{
+        top: isMinimized ? "-9999px" : `${position.y}px`,
+        left: isMinimized ? "-9999px" : `${position.x}px`,
+        width: `${size.width}px`,
+        height: `${size.height}px`,
+        minWidth: minSize?.width ? `${minSize.width}px` : "150px",
+        minHeight: minSize?.height ? `${minSize.height}px` : "100px",
+        zIndex: isMinimized ? -1 : zIndex,
+        position: isMinimized ? "fixed" : "absolute",
+        ...style,
+      }}
+      onMouseDown={!isMinimized ? onFocus : undefined}
+    >
+      {/* Title Bar */}
+      <div
+        className={cn(
+          "bg-primary px-3 py-2 border-b border-secondary flex justify-between items-center select-none h-10 rounded-t-md shadow-md",
+          titleBarClassName
+        )}
+        onMouseDown={!isMinimized ? onTitleBarMouseDown : undefined}
+      >
+        <span className="overflow-hidden text-ellipsis whitespace-nowrap text-white">
+          {title}
+        </span>
+        <div className="flex items-center gap-1">
+          <button
+            className="cursor-pointer bg-yellow-500 text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
+            onClick={handleMinimize}
+            title="Minimize"
           >
-            <span className="overflow-hidden text-ellipsis whitespace-nowrap text-white">
-              {title}
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                className="cursor-pointer bg-yellow-500 text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
-                onClick={handleMinimize}
-                title="Minimize"
-              >
-                -
-              </button>
-              <button
-                className="cursor-pointer bg-destructive text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
-                onClick={handleClose}
-                title="Close"
-              >
-                X
-              </button>
-            </div>
-          </div>
-
-          {/* Content Area */}
-          <div
-            className={cn(
-              "p-4 flex-grow overflow-auto bg-card",
-              contentClassName
-            )}
+            -
+          </button>
+          <button
+            className="cursor-pointer bg-destructive text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
+            onClick={handleClose}
+            title="Close"
           >
-            {children}
-          </div>
-
-          {/* Resize Handles */}
-          {showResizeHandles &&
-            handleResizeStart &&
-            resizeHandles.map((handle) => (
-              <div
-                key={handle.direction}
-                className={handle.className}
-                style={handle.style}
-                data-resize-handle="true"
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  handleResizeStart(e, handle.direction);
-                }}
-              />
-            ))}
+            X
+          </button>
         </div>
-      )}
-    </>
+      </div>
+
+      {/* Memoized Content Area */}
+      <MemoizedContent contentClassName={contentClassName}>
+        {children}
+      </MemoizedContent>
+
+      {/* Resize Handles */}
+      {showResizeHandles && handleResizeStart
+        ? !isMinimized &&
+          resizeHandles.map((handle) => (
+            <div
+              key={handle.direction}
+              className={handle.className}
+              style={handle.style}
+              data-resize-handle="true"
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                handleResizeStart(e, handle.direction);
+              }}
+            />
+          ))
+        : null}
+    </div>
   );
 };
