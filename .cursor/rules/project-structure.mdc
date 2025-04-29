@@ -1,0 +1,46 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Structure
+
+This Next.js application follows a structured organization:
+
+## Directory Organization
+
+- `src/app/`: Contains Next.js App Router pages and layouts
+  - Each page route has its own directory with `page.tsx`, `layout.tsx`, etc.
+  - Page-specific components go in `app/[page]/components/`
+
+- `src/presentation/components/`: Reusable UI components
+  - `components/ui/`: Shadcn components
+  - `components/layout/`: Layout components like `window.tsx`
+  - `components/apps/`: Application feature components
+
+- `src/application/atoms/`: State management with Jotai atoms
+  - Each atom or related group of atoms should be in separate files
+
+- `src/application/hooks/`: Custom React hooks
+  - Named according to their functionality (e.g., `useWindowSize.ts`)
+
+- `src/infrastructure/utils/`: Utility functions
+  - Including `storage.ts` for local storage operations
+
+- `src/infrastructure/config/`: Configuration files
+  - Contains `appRegistry.ts` for app/feature registration
+
+- `src/application/types/`: TypeScript type definitions
+  - Shared types and interfaces used across the application
+
+- `src/presentation/styles/`: Global styles and Tailwind configuration
+  - Includes `globals.css` for application-wide styles
+
+- `src/infrastructure/lib/`: Shared libraries and integrations
+  - External service integrations and wrappers
+
+  ### Key Files
+- `/src/infrastructure/config/appRegistry.ts`: Registry for all apps and features
+- `/src/infrastructure/utils/storage.ts`: Helpers for local storage persistence
+- `/src/presentation/components/layout/window.tsx`: Reusable window layout for apps
+- `/src/presentation/styles/globals.css`: Global styling

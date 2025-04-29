@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Workflow
+
+## Environment
+- Framework: Next.js v.15 with App Router
+- UI: Tailwind CSS v4
+- Component Library: Shadcn
+- Language: TypeScript
+- State Management: Jotai
+- Package Manager: Bun
+- Linter: ESLint v.8
+- React: v.19
+
+## Package Management
+- Install packages: `bun add [package-name]`
+- Install dev dependencies: `bun add -D [package-name]`
+- Update packages: `bun update [package-name]`
+- Remove packages: `bun remove [package-name]`
+- Add Shadcn components: `bunx shadcn@latest add [component-name]`
+
+## Scripts
+- `bun dev`: Start development server
+- `bun build`: Build for production
+- `bun start`: Start production server
+- `bun lint`: Run linter with auto-fix
+
+## Code Quality
+- ESLint enforces code style and best practices
+- Husky runs pre-commit hooks
+- Commitlint ensures commit message consistency

@@ -1,0 +1,62 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Product Roadmap
+
+This document outlines the planned development roadmap for the wfcOS platform, serving as a checkpoint and to-do list for implementation. Features are organized by priority and development phase.
+
+## Current Sprint (REFACTOR V2)
+These features should be prioritized for immediate implementation:
+
+- [x] Restructure the Project, to make it easy to maintenance and scaling
+- [x] Apps Icons
+- [x] Make Window Desktop and Mobile in different components
+- [x] Main Menu
+- [x] Window resizer
+- [x] Window Hyration, page refresh, running app
+- [x] Fix Timer
+- [x] Background
+- [ ] Music
+- [ ] to-do list
+- [ ] Notepad
+
+## Near-Term Roadmap
+These features are planned for the next development cycle:
+
+- [ ] Add Change log
+- [ ] Add About section/page
+- [ ] Add Login and Cloud Storage
+
+## Future Roadmap
+These features are planned for future implementation:
+
+- [ ] Add global mute
+- [ ] Add mute only to click
+- [ ] Add sound typing functionality to Notepad
+- [ ] Information board
+- [ ] Bookmark functionality
+- [ ] Add logging functionality to Pomodoro timer
+- [ ] Chat application/system
+
+
+## Guidelines for Feature Implementation
+
+### Feature Prioritization
+- Focus on completing Current Sprint items before starting Near-Term Roadmap
+- Document any blockers or dependencies that affect implementation
+- Update this roadmap as features are completed or priorities change
+
+### Implementation Standards
+- Follow all existing coding standards and architectural guidelines
+- Create appropriate tests for each new feature
+- Update documentation when adding new functionality
+- Ensure all new features maintain compatibility with existing system
+
+### Feature Completion Checklist
+- Implementation meets all functional requirements
+- Code passes all lint and test requirements
+- Documentation is updated
+- Feature is reviewed and approved
+- User feedback is collected when applicable
