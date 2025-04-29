@@ -2,7 +2,7 @@ import { atom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 
 // Default background path
-const DEFAULT_BACKGROUND = "/background/bg-2.png";
+const DEFAULT_BACKGROUND = "/background/bg-2.webp";
 const DEFAULT_FIT = "fill";
 const DEFAULT_SETTINGS: BackgroundSettings = {
   url: DEFAULT_BACKGROUND,
