@@ -24,9 +24,7 @@ export const MusicPlayer = () => {
           <h2 className="text-xl font-bold mb-2 truncate">
             {playerState.currentSong?.title || "No song selected"}
             {playerState.currentSong && "seqId" in playerState.currentSong && (
-              <span className="text-sm font-normal ml-2 text-muted-foreground">
-                #{playerState.currentSong.seqId}
-              </span>
+              <span className="text-sm font-normal ml-2 text-muted-foreground"></span>
             )}
             {playerState.isLoading && (
               <span className="text-sm font-normal ml-2 text-amber-500">

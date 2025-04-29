@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useAtom, useSetAtom } from "jotai";
-import ReactPlayer from "react-player/youtube";
+import ReactPlayer, { YouTubeConfig } from "react-player/youtube";
 import {
   musicPlayerAtom,
   playPauseAtom,
@@ -130,7 +130,7 @@ const VideoDisplay = ({ isVisible }: VideoDisplayProps) => {
         controls: 0, // Disable default YouTube controls
       },
     },
-  };
+  } as YouTubeConfig;
 
   return (
     <div

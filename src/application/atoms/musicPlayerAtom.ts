@@ -53,26 +53,31 @@ const defaultSongs: Song[] = [
     url: "https://www.youtube.com/watch?v=lTRiuFIWV54",
     title: "Lo-fi Study Session",
     id: "lTRiuFIWV54",
+    seqId: 1,
   },
   {
     url: "https://www.youtube.com/watch?v=Fp5ghKduTK8",
     title: "Ghibli Piano",
     id: "Fp5ghKduTK8",
+    seqId: 2,
   },
   {
     url: "https://www.youtube.com/watch?v=KxJrYKoTeXA",
     title: "Jazzjeans",
     id: "KxJrYKoTeXA",
+    seqId: 3,
   },
   {
     url: "https://www.youtube.com/watch?v=pfU0QORkRpY",
     title: "FKJ Live",
     id: "pfU0QORkRpY",
+    seqId: 4,
   },
   {
     url: "https://www.youtube.com/watch?v=ot5UsNymqgQ",
     title: "Cozy Room",
     id: "ot5UsNymqgQ",
+    seqId: 5,
   },
 ];
 
@@ -476,3 +481,98 @@ export const handleVisibilityChangeAtom = atom(
 export const setLoadingAtom = atom(null, (get, set, isLoading: boolean) => {
   set(volatileMusicPlayerAtom, (prev) => ({ ...prev, isLoading }));
 });
+
+// Atom to reorder songs in the playlist via drag and drop
+export const reorderPlaylistAtom = atom(
+  null,
+  (get, set, { from, to }: { from: number; to: number }) => {
+    const persistedState = get(persistedMusicPlayerAtom);
+    if (
+      from < 0 ||
+      from >= persistedState.playlist.length ||
+      to < 0 ||
+      to >= persistedState.playlist.length ||
+      from === to
+    ) {
+      return;
+    }
+
+    const newPlaylist = [...persistedState.playlist];
+    const [movedItem] = newPlaylist.splice(from, 1);
+    newPlaylist.splice(to, 0, movedItem);
+
+    // Adjust currentSongIndex if needed
+    let newIndex = persistedState.currentSongIndex;
+    if (from === persistedState.currentSongIndex) {
+      // If we're moving the current song, update the index to its new position
+      newIndex = to;
+    } else if (
+      from < persistedState.currentSongIndex &&
+      to >= persistedState.currentSongIndex
+    ) {
+      // If moving an item from before to after the current song
+      newIndex--;
+    } else if (
+      from > persistedState.currentSongIndex &&
+      to <= persistedState.currentSongIndex
+    ) {
+      // If moving an item from after to before the current song
+      newIndex++;
+    }
+
+    set(persistedMusicPlayerAtom, (prev) => ({
+      ...prev,
+      playlist: newPlaylist,
+      currentSongIndex: newIndex,
+    }));
+  }
+);
+
+// Atom to sort the playlist by different criteria
+export const sortPlaylistAtom = atom(
+  null,
+  (
+    get,
+    set,
+    {
+      sortBy,
+      direction,
+    }: { sortBy: "title" | "dateAdded" | "reset"; direction: "asc" | "desc" }
+  ) => {
+    const persistedState = get(persistedMusicPlayerAtom);
+    const currentSong =
+      persistedState.playlist[persistedState.currentSongIndex];
+
+    let newPlaylist = [...persistedState.playlist];
+
+    if (sortBy === "title") {
+      newPlaylist.sort((a, b) => {
+        const comparison = a.title.localeCompare(b.title);
+        return direction === "asc" ? comparison : -comparison;
+      });
+    } else if (sortBy === "dateAdded") {
+      // Sort by seqId (timestamp) if available
+      newPlaylist.sort((a, b) => {
+        if (a.seqId && b.seqId) {
+          const comparison = a.seqId - b.seqId;
+          return direction === "asc" ? comparison : -comparison;
+        }
+        return 0;
+      });
+    } else if (sortBy === "reset") {
+      // Reset to default songs order
+      newPlaylist = [...defaultSongs];
+    }
+
+    // Find the new index of the current song
+    const newIndex = newPlaylist.findIndex(
+      (song) => song.id === currentSong.id
+    );
+
+    set(persistedMusicPlayerAtom, (prev) => ({
+      ...prev,
+      playlist: newPlaylist,
+      currentSongIndex: newIndex >= 0 ? newIndex : 0,
+    }));
+  }
+);

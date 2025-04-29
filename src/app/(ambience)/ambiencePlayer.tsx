@@ -108,7 +108,7 @@ const AmbiencePlayer: React.FC<AmbiencePlayerProps> = () => {
     } else if (!isPlaying && !audio.paused) {
       audio.pause();
     }
-  }, [isPlaying, persistState]);
+  }, [isPlaying, persistState, setIsPlaying]);
 
   // Set up audio event listeners
   useEffect(() => {
@@ -160,7 +160,7 @@ const AmbiencePlayer: React.FC<AmbiencePlayerProps> = () => {
       audio.removeEventListener("pause", handlePause);
       audio.removeEventListener("error", handleError);
     };
-  }, [isPlaying, persistState]);
+  }, [isPlaying, persistState, setIsPlaying]);
 
   // Handle playback toggle
   const handlePlayPause = () => {
