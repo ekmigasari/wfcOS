@@ -4,8 +4,8 @@ import { Timer } from "@/app/(timer)/Timer";
 import { BackgroundChanger } from "@/app/(settings)/(background)/background";
 import { MusicPlayer } from "@/app/(music-player)/MusicPlayer";
 import TodoList from "@/app/(to-do-list)/todoList";
-import TextEditor from "@/app/(notepad)/textEditor";
 import AmbiencePlayer from "@/app/(ambience)/ambiencePlayer";
+import Notepad from "@/app/(notepad)/Notepad";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -34,13 +34,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 320, height: 400 },
     component: TodoList,
   },
-  notepad: {
-    name: "Notepad",
-    src: "/icons/notepad.png",
-    defaultSize: { width: 400, height: 600 },
-    minSize: { width: 320, height: 400 },
-    component: TextEditor,
-  },
+
   ambience: {
     name: "Ambience",
     src: "/icons/ambience.png",
@@ -54,6 +48,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 320, height: 400 },
     component: MusicPlayer,
+  },
+  notepad: {
+    name: "Notepad",
+    src: "/icons/notepad.png",
+    defaultSize: { width: 400, height: 600 },
+    minSize: { width: 320, height: 400 },
+    component: Notepad,
   },
   settings: {
     name: "Settings",

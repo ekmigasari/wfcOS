@@ -2,29 +2,29 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useAtom } from "jotai";
 import { saveFeatureState } from "../../infrastructure/utils/storage";
 import {
-  textEditorContentAtom,
-  textEditorSettingsAtom,
+  notepadContentAtom,
+  notepadSettingsAtom,
   EditorSettings,
-  TEXT_EDITOR_STORAGE_KEY,
-  TEXT_EDITOR_SETTINGS_KEY,
+  NOTEPAD_STORAGE_KEY,
+  NOTEPAD_SETTINGS_KEY,
   loadEditorSettings,
   loadEditorContent,
-} from "../../application/atoms/textEditorAtom";
+} from "@/application/atoms/notepadAtom";
 import { Button } from "../../presentation/components/ui/button";
 import { cn } from "@/infrastructure/lib/utils";
 
-interface TextEditorProps {
+interface NotepadProps {
   initialContent?: string;
   editorId?: string;
 }
 
-const TextEditor: React.FC<TextEditorProps> = ({
+const Notepad: React.FC<NotepadProps> = ({
   initialContent = "",
   editorId = "default",
 }) => {
   // Use global state with atoms
-  const [content, setContent] = useAtom(textEditorContentAtom);
-  const [editorSettings, setEditorSettings] = useAtom(textEditorSettingsAtom);
+  const [content, setContent] = useAtom(notepadContentAtom);
+  const [editorSettings, setEditorSettings] = useAtom(notepadSettingsAtom);
 
   // Status message state
   const [statusMessage, setStatusMessage] = useState<string>("");
@@ -83,7 +83,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
     // Set up new timer if auto-save is enabled
     if (editorSettings.autoSaveInterval > 0) {
       autoSaveTimerRef.current = setInterval(() => {
-        saveFeatureState(`${TEXT_EDITOR_STORAGE_KEY}_${editorId}`, content);
+        saveFeatureState(`${NOTEPAD_STORAGE_KEY}_${editorId}`, content);
         // Optional: show a subtle indicator that content was saved
         showStatusMessage("Content auto-saved");
       }, editorSettings.autoSaveInterval * 1000);
@@ -183,10 +183,10 @@ const TextEditor: React.FC<TextEditorProps> = ({
   // Store editorId in a data attribute for potential future use
   useEffect(() => {
     // Could use editorId for instance-specific storage in the future
-    console.log(`Text Editor instance ${editorId} mounted`);
+    console.log(`Notepad instance ${editorId} mounted`);
 
     return () => {
-      console.log(`Text Editor instance ${editorId} unmounted`);
+      console.log(`Notepad instance ${editorId} unmounted`);
     };
   }, [editorId]);
 
@@ -194,7 +194,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
   useEffect(() => {
     if (initialLoadDone) {
       // Only save after initial load to prevent overwriting
-      saveFeatureState(`${TEXT_EDITOR_STORAGE_KEY}_${editorId}`, content);
+      saveFeatureState(`${NOTEPAD_STORAGE_KEY}_${editorId}`, content);
     }
   }, [content, editorId, initialLoadDone]);
 
@@ -202,10 +202,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
   useEffect(() => {
     if (initialLoadDone) {
       // Only save after initial load to prevent overwriting
-      saveFeatureState(
-        `${TEXT_EDITOR_SETTINGS_KEY}_${editorId}`,
-        editorSettings
-      );
+      saveFeatureState(`${NOTEPAD_SETTINGS_KEY}_${editorId}`, editorSettings);
     }
   }, [editorSettings, editorId, initialLoadDone]);
 
@@ -495,4 +492,4 @@ const TextEditor: React.FC<TextEditorProps> = ({
   );
 };
 
-export default TextEditor;
+export default Notepad;
