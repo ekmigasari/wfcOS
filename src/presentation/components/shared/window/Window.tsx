@@ -73,21 +73,14 @@ export const Window = (props: WindowProps) => {
       // When timer window opens, associate it with the timer
       setTimerWindowId(windowId);
     }
+  }, [isOpen, windowId, isTimerWindow, setTimerWindowId]);
 
-    // Cleanup function for when window closes or component unmounts
-    return () => {
-      if (isTimerWindow && !isOpen) {
-        // Reset timer when timer window is closed
-        handleTimerWindowClose();
-      }
-    };
-  }, [
-    isOpen,
-    windowId,
-    isTimerWindow,
-    setTimerWindowId,
-    handleTimerWindowClose,
-  ]);
+  // Handle timer cleanup when window is closed
+  useEffect(() => {
+    if (!isOpen && isTimerWindow) {
+      handleTimerWindowClose();
+    }
+  }, [isOpen, isTimerWindow, handleTimerWindowClose]);
 
   // Auto-focus the window when it's opened or restored from minimization
   useEffect(() => {
@@ -95,17 +88,6 @@ export const Window = (props: WindowProps) => {
       focusWindow(windowId);
     }
   }, [isOpen, isMinimized, windowId, focusWindow]);
-
-  // Custom close handler that integrates with timer
-  const handleClose = () => {
-    if (isTimerWindow) {
-      // Handle timer cleanup when window is closed
-      handleTimerWindowClose();
-    }
-
-    // Call the original onClose handler
-    onClose();
-  };
 
   // If window is not open, don't render anything
   if (!isOpen) return null;
@@ -118,7 +100,7 @@ export const Window = (props: WindowProps) => {
       isOpen={isOpen}
       isMinimized={isMinimized}
       title={title}
-      onClose={handleClose}
+      onClose={onClose}
       playSounds={playSounds}
       {...restProps}
     />
@@ -128,7 +110,7 @@ export const Window = (props: WindowProps) => {
       isOpen={isOpen}
       isMinimized={isMinimized}
       title={title}
-      onClose={handleClose}
+      onClose={onClose}
       playSounds={playSounds}
       {...restProps}
     />

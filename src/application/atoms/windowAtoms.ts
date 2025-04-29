@@ -72,7 +72,7 @@ export const windowRegistryAtom = atom(
 export const openWindowsAtom = atom(
   (get) =>
     Object.values(get(windowRegistryAtom))
-      .filter((win) => win.isOpen) // Include all open windows, even if minimized
+      .filter((win) => win.isOpen) // Only check if the window is open
       .sort((a, b) => a.zIndex - b.zIndex) // Render lower zIndex first (behind)
 );
 
@@ -80,7 +80,7 @@ export const openWindowsAtom = atom(
 export const minimizedWindowsAtom = atom(
   (get) =>
     Object.values(get(windowRegistryAtom))
-      .filter((win) => win.isOpen && win.isMinimized)
+      .filter((win) => win.isMinimized)
       .sort((a, b) => a.appId.localeCompare(b.appId)) // Sort by app ID for consistent order
 );
 
@@ -167,8 +167,8 @@ export const setWindowMinimizedStateAtom = atom(
   ) => {
     set(windowRegistryAtom, (prev) => {
       const windowState = prev[windowId];
-      // Only proceed if window exists and is open
-      if (!windowState || !windowState.isOpen) return prev;
+      // Only proceed if window exists
+      if (!windowState) return prev;
 
       // Prevent redundant updates if already in the target state
       if (windowState.isMinimized === isMinimized) return prev;
@@ -177,7 +177,7 @@ export const setWindowMinimizedStateAtom = atom(
       const updatedWindowState = {
         ...windowState,
         isMinimized: isMinimized,
-        // No zIndex changes - WindowBase will only show/hide based on isMinimized
+        // No zIndex changes here
       };
 
       return {
@@ -192,8 +192,7 @@ export const setWindowMinimizedStateAtom = atom(
 export const focusWindowAtom = atom(null, (get, set, windowId: string) => {
   set(windowRegistryAtom, (prev) => {
     const windowToFocus = prev[windowId];
-    if (!windowToFocus || !windowToFocus.isOpen || windowToFocus.isMinimized)
-      return prev; // Don't focus closed/minimized/non-existent windows
+    if (!windowToFocus || !windowToFocus.isOpen) return prev; // Don't focus closed windows
 
     const maxZIndex = getNextZIndex(prev) - 1; // Get current max zIndex
 
