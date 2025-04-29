@@ -71,16 +71,12 @@ const getInitialState = () => {
     currentSoundIndex: number;
     isPlaying: boolean;
     volume: number;
-    isWindowOpen: boolean;
-    currentTime: number;
   }>("ambiencePlayer");
 
   return {
     currentSoundIndex: stored?.currentSoundIndex ?? 0,
     isPlaying: stored?.isPlaying ?? false,
     volume: stored?.volume ?? 0.7,
-    isWindowOpen: stored?.isWindowOpen ?? false,
-    currentTime: stored?.currentTime ?? 0,
   };
 };
 
@@ -90,8 +86,6 @@ export const currentSoundIndexAtom = atom<number>(
 );
 export const isPlayingAtom = atom<boolean>(getInitialState().isPlaying);
 export const volumeAtom = atom<number>(getInitialState().volume);
-export const isWindowOpenAtom = atom<boolean>(getInitialState().isWindowOpen);
-export const currentTimeAtom = atom<number>(getInitialState().currentTime);
 
 // Derived atom to get the current sound
 export const currentSoundAtom = atom((get) => {
@@ -105,8 +99,6 @@ export const persistAmbiencePlayerState = atom(
     currentSoundIndex: get(currentSoundIndexAtom),
     isPlaying: get(isPlayingAtom),
     volume: get(volumeAtom),
-    isWindowOpen: get(isWindowOpenAtom),
-    currentTime: get(currentTimeAtom),
   }),
   (
     _get,
@@ -115,8 +107,6 @@ export const persistAmbiencePlayerState = atom(
       currentSoundIndex?: number;
       isPlaying?: boolean;
       volume?: number;
-      isWindowOpen?: boolean;
-      currentTime?: number;
     }
   ) => {
     if (newState.currentSoundIndex !== undefined) {
@@ -127,12 +117,6 @@ export const persistAmbiencePlayerState = atom(
     }
     if (newState.volume !== undefined) {
       set(volumeAtom, newState.volume);
-    }
-    if (newState.isWindowOpen !== undefined) {
-      set(isWindowOpenAtom, newState.isWindowOpen);
-    }
-    if (newState.currentTime !== undefined) {
-      set(currentTimeAtom, newState.currentTime);
     }
 
     // Save to local storage
@@ -147,14 +131,6 @@ export const persistAmbiencePlayerState = atom(
           : _get(isPlayingAtom),
       volume:
         newState.volume !== undefined ? newState.volume : _get(volumeAtom),
-      isWindowOpen:
-        newState.isWindowOpen !== undefined
-          ? newState.isWindowOpen
-          : _get(isWindowOpenAtom),
-      currentTime:
-        newState.currentTime !== undefined
-          ? newState.currentTime
-          : _get(currentTimeAtom),
     };
 
     saveFeatureState("ambiencePlayer", currentState);

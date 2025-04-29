@@ -1,8 +1,15 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useAmbiencePlayer } from "@/application/hooks/useAmbiencePlayer";
-import { ambienceSounds } from "@/application/atoms/ambiencePlayerAtom";
+import React, { useEffect, useRef, useState } from "react";
+import { useAtom } from "jotai";
+import {
+  ambienceSounds,
+  currentSoundAtom,
+  currentSoundIndexAtom,
+  isPlayingAtom,
+  persistAmbiencePlayerState,
+  volumeAtom,
+} from "@/application/atoms/ambiencePlayerAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 
 // Icons
@@ -21,74 +28,203 @@ import { Slider } from "@/presentation/components/ui/slider";
 
 type AmbiencePlayerProps = {
   windowId?: string;
-  onMinimizeStateChange?: (isMinimized: boolean) => void;
-  onClose?: () => void;
 };
 
-const AmbiencePlayer: React.FC<AmbiencePlayerProps> = ({
-  onMinimizeStateChange,
-  onClose,
-}) => {
-  const {
-    currentSound,
-    currentSoundIndex,
-    isPlaying,
-    volume,
-    isMuted,
-    isLoading,
-    isWindowOpen,
-    playPause,
-    next,
-    previous,
-    changeVolume,
-    toggleMute,
-    handleMinimizeStateChange,
-    handleWindowClose,
-  } = useAmbiencePlayer();
+const AmbiencePlayer: React.FC<AmbiencePlayerProps> = () => {
+  // Global state using Jotai atoms
+  const [currentSoundIndex, setCurrentSoundIndex] = useAtom(
+    currentSoundIndexAtom
+  );
+  const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
+  const [volume, setVolume] = useAtom(volumeAtom);
+  const [currentSound] = useAtom(currentSoundAtom);
+  const [, persistState] = useAtom(persistAmbiencePlayerState);
 
-  // Connect to window close event
+  // Local state
+  const [isMuted, setIsMuted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [prevVolume, setPrevVolume] = useState(volume);
+
+  // Refs
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const ignoreEventsRef = useRef(false);
+
+  // Initialize audio element
   useEffect(() => {
-    if (onClose) {
-      // We can't modify the original onClose, but we can make sure our
-      // function runs when the window closing is detected via component unmount
-      return () => {
-        // This cleanup function runs when component unmounts (window closes)
-        handleWindowClose();
-      };
+    // Create audio element if it doesn't exist
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.loop = true;
     }
-  }, [handleWindowClose, onClose]);
 
-  // Connect to window minimize event
+    // Clean up on unmount - this ensures audio stops when window closes
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+
+        // Update atom state
+        setIsPlaying(false);
+        persistState({ isPlaying: false });
+      }
+    };
+  }, [persistState, setIsPlaying]);
+
+  // Handle source and volume changes
   useEffect(() => {
-    // This is just to satisfy the dependency array
-    return () => {};
-  }, [onMinimizeStateChange, handleMinimizeStateChange]);
+    if (!audioRef.current || !currentSound) return;
 
-  // Event handlers with sound effects
+    const audio = audioRef.current;
+
+    // Set source if needed
+    if (!audio.src.endsWith(currentSound.source)) {
+      setIsLoading(true);
+      audio.src = currentSound.source;
+    }
+
+    // Set volume
+    audio.volume = isMuted ? 0 : volume;
+  }, [currentSound, volume, isMuted]);
+
+  // Handle play/pause state
+  useEffect(() => {
+    if (!audioRef.current || ignoreEventsRef.current) return;
+
+    const audio = audioRef.current;
+
+    const playAudio = async () => {
+      try {
+        await audio.play();
+      } catch (error) {
+        console.error("Error playing audio:", error);
+        setIsPlaying(false);
+        persistState({ isPlaying: false });
+      }
+    };
+
+    if (isPlaying && (audio.paused || audio.ended)) {
+      playAudio();
+    } else if (!isPlaying && !audio.paused) {
+      audio.pause();
+    }
+  }, [isPlaying, persistState]);
+
+  // Set up audio event listeners
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    const audio = audioRef.current;
+
+    const handleCanPlay = () => {
+      setIsLoading(false);
+    };
+
+    const handlePlay = () => {
+      if (!isPlaying && !ignoreEventsRef.current) {
+        ignoreEventsRef.current = true;
+        setIsPlaying(true);
+        persistState({ isPlaying: true });
+        setTimeout(() => {
+          ignoreEventsRef.current = false;
+        }, 100);
+      }
+    };
+
+    const handlePause = () => {
+      if (isPlaying && !ignoreEventsRef.current) {
+        ignoreEventsRef.current = true;
+        setIsPlaying(false);
+        persistState({ isPlaying: false });
+        setTimeout(() => {
+          ignoreEventsRef.current = false;
+        }, 100);
+      }
+    };
+
+    const handleError = (e: Event) => {
+      console.error("Audio error:", e);
+      setIsLoading(false);
+      setIsPlaying(false);
+      persistState({ isPlaying: false });
+    };
+
+    audio.addEventListener("canplay", handleCanPlay);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("error", handleError);
+
+    return () => {
+      audio.removeEventListener("canplay", handleCanPlay);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("error", handleError);
+    };
+  }, [isPlaying, persistState]);
+
+  // Handle playback toggle
   const handlePlayPause = () => {
     playSound("/sounds/click.mp3");
-    playPause();
+    setIsPlaying(!isPlaying);
+    persistState({ isPlaying: !isPlaying });
   };
 
+  // Skip to next track
   const handleNext = () => {
     if (ambienceSounds.length <= 1 || isLoading) return;
     playSound("/sounds/click.mp3");
-    next();
+
+    const newIndex = (currentSoundIndex + 1) % ambienceSounds.length;
+    setCurrentSoundIndex(newIndex);
+    persistState({ currentSoundIndex: newIndex });
   };
 
+  // Skip to previous track
   const handlePrevious = () => {
     if (ambienceSounds.length <= 1 || isLoading) return;
     playSound("/sounds/click.mp3");
-    previous();
+
+    const newIndex =
+      (currentSoundIndex - 1 + ambienceSounds.length) % ambienceSounds.length;
+    setCurrentSoundIndex(newIndex);
+    persistState({ currentSoundIndex: newIndex });
   };
 
+  // Change volume
   const handleVolumeChange = (value: number[]) => {
-    changeVolume(value);
+    const newVolume = value[0];
+    setVolume(newVolume);
+    setIsMuted(newVolume === 0);
+    persistState({ volume: newVolume });
+
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
   };
 
+  // Toggle mute
   const handleToggleMute = () => {
     playSound("/sounds/click.mp3");
-    toggleMute();
+
+    if (isMuted) {
+      // Unmute
+      const newVolume = prevVolume > 0 ? prevVolume : 0.5;
+      setIsMuted(false);
+      setVolume(newVolume);
+      persistState({ volume: newVolume });
+
+      if (audioRef.current) {
+        audioRef.current.volume = newVolume;
+      }
+    } else {
+      // Mute
+      setPrevVolume(volume);
+      setIsMuted(true);
+
+      if (audioRef.current) {
+        audioRef.current.volume = 0;
+      }
+    }
   };
 
   return (
@@ -100,7 +236,6 @@ const AmbiencePlayer: React.FC<AmbiencePlayerProps> = ({
           </h3>
           <p className="text-sm text-muted-foreground">
             {isLoading ? "Loading..." : isPlaying ? "Playing" : "Paused"}
-            {!isWindowOpen && isPlaying && " in background"}
           </p>
           <p className="text-sm text-muted-foreground">
             <span>Sound {currentSoundIndex + 1}</span>

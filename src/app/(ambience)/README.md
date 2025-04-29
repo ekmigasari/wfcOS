@@ -1,40 +1,28 @@
 # Ambience Player
 
-The Ambience Player is a background audio player that provides ambient soundscapes to enhance the user experience.
+The Ambience Player is a simple audio player that provides ambient soundscapes to enhance the user experience.
 
 ## Architecture
 
-The player has been refactored into several components:
+The player now uses a simplified architecture:
 
-1. **Audio Service** (`src/infrastructure/lib/audioService.ts`):
+1. **Atoms** (`src/application/atoms/ambiencePlayerAtom.ts`):
 
-   - Manages the global audio element
-   - Handles audio operations safely with a queue
-   - Provides utility functions for audio control
+   - Defines available sounds
+   - Manages persistent state with Jotai
+   - Handles storage in localStorage
 
-2. **Custom Hook** (`src/application/hooks/useAmbiencePlayer.ts`):
-
-   - Manages player state and behavior logic
-   - Handles audio lifecycle
-   - Provides a clean API for components
-
-3. **UI Component** (`src/app/(ambience)/ambiencePlayer.tsx`):
-   - Renders the player interface
-   - Uses the custom hook for all logic
-   - Focuses solely on UI concerns
+2. **UI Component** (`src/app/(ambience)/ambiencePlayer.tsx`):
+   - Contains all audio handling logic directly
+   - No separate audio service or hooks
+   - Direct management of the audio element
 
 ## Behavior
 
-- **Window Close**: When the player window is closed, audio playback stops completely.
-- **Window Minimize**: When the player window is minimized but not closed, audio continues to play in the background.
-- **Page Unload**: Audio stops when the page unloads (navigation away or closing browser).
-
-## State Management
-
-State is managed through Jotai atoms in `src/application/atoms/ambiencePlayerAtom.ts`:
-
-- Player state is persisted to local storage
-- State is restored when the player is reopened
+- **Window Open**: Audio plays only when the window is open (showing UI)
+- **Window Minimize**: Window minimization has no effect on audio playback
+- **Window Close**: Audio stops completely when the window is closed
+- **State Persistence**: Volume and selected sound are remembered between sessions
 
 ## Usage
 
