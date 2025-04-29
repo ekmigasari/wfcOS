@@ -15,6 +15,7 @@ import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { useAtom } from "jotai";
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
 import { ResetDialog } from "./ResetDialog";
+import { ChangelogWindow, CHANGELOG_WINDOW_ID } from "./ChangelogWindow";
 
 export const TaskbarMenu = () => {
   const openWindow = useAtom(openWindowAtom)[1];
@@ -48,6 +49,19 @@ export const TaskbarMenu = () => {
   const openResetDialog = () => {
     playSound("/sounds/click.mp3");
     setResetDialogOpen(true);
+  };
+
+  // Function to open changelog window
+  const openChangelogWindow = () => {
+    playSound("/sounds/open.mp3");
+
+    openWindow({
+      id: CHANGELOG_WINDOW_ID,
+      appId: "changelog", // Custom appId that's not in the registry
+      title: "Changelog",
+      minSize: { width: 300, height: 200 },
+      initialSize: { width: 500, height: 400 },
+    });
   };
 
   return (
@@ -88,7 +102,11 @@ export const TaskbarMenu = () => {
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem disabled>
-            WFC OS<MenubarShortcut>v 1.0</MenubarShortcut>
+            WFC OS<MenubarShortcut>v 2.0</MenubarShortcut>
+          </MenubarItem>
+          <MenubarSeparator />
+          <MenubarItem inset onSelect={openChangelogWindow}>
+            Changelog<MenubarShortcut>history</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
           <MenubarItem
@@ -108,6 +126,9 @@ export const TaskbarMenu = () => {
 
       {/* Reset Dialog */}
       <ResetDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen} />
+
+      {/* Changelog Window */}
+      <ChangelogWindow />
     </>
   );
 };

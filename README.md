@@ -6,24 +6,23 @@ Built with a cutting-edge stack including Next.js 15, React 19, and Tailwind CSS
 
 ## 🛠️ Tech Stack
 
-- **Framework:** [Next.js](https://nextjs.org/) v15.2.4
-- **UI Library:** [React](https://reactjs.org/) v19.1.0
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) v4.1.4
-- **Linting:** [ESLint](https://eslint.org/) v9.24.0
-- **Git Hooks:** [Husky](https://typicode.github.io/husky/) v9.1.7
-- **Commit Linting:** [Commitlint](https://commitlint.js.org/) v19.8.0
-- **Containerization:** [Docker](https://www.docker.com/)
-- **Language:** [TypeScript](https://www.typescriptlang.org/) v5.8.3
-- **Package Manager:** [Bun](https://bun.sh/) v1.x
-- **UI Components:** [Radix UI](https://www.radix-ui.com/) v1.1.7, [shadcn/ui](https://ui.shadcn.com/)
-- **Icons:** [Lucide React](https://lucide.dev/) v0.488.0
+- **Framework:** [Next.js](https://nextjs.org/) v15 with App Router
+- **UI Library:** [React](https://reactjs.org/) v19
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) v4
+- **State Management:** [Jotai](https://jotai.org/) (Atom-based state management)
+- **Component Library:** [Shadcn/UI](https://ui.shadcn.com/) with [Radix UI](https://www.radix-ui.com/)
+- **Linting:** [ESLint](https://eslint.org/) v8
+- **Git Hooks:** [Husky](https://typicode.github.io/husky/)
+- **Commit Linting:** [Commitlint](https://commitlint.js.org/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Package Manager:** [Bun](https://bun.sh/)
+- **Icons:** [Lucide React](https://lucide.dev/)
 
 ## 📁 Folder Structure
 
 ```
 .
 ├── .husky/                 # Husky git hooks configuration
-│   └── pre-commit          # Pre-commit hook script
 │
 ├── .next/                  # Next.js build output (generated)
 │
@@ -34,28 +33,32 @@ Built with a cutting-edge stack including Next.js 15, React 19, and Tailwind CSS
 │
 ├── src/                    # Source code
 │   ├── app/                # Next.js App Router
+│   │   ├── [page]/         # Route-specific directories
+│   │   │   ├── page.tsx    # Page component
+│   │   │   ├── layout.tsx  # Page-specific layout
+│   │   │   └── components/ # Page-specific components
 │   │   ├── layout.tsx      # Root layout component
-│   │   ├── page.tsx        # Home page component
-│   │   └── favicon.ico     # Site favicon
+│   │   └── page.tsx        # Home page component
 │   │
-│   ├── components/         # React components
-│   │   ├── apps.tsx        # Main application component
-│   │   ├── clock.tsx       # Clock component
-│   │   ├── apps/           # Application-specific components
-│   │   ├── layout/         # Layout components
-│   │   └── ui/             # Reusable UI components
+│   ├── presentation/       # UI Layer
+│   │   ├── components/     # React components
+│   │   │   ├── ui/         # Shadcn components
+│   │   │   ├── layout/     # Layout components like window.tsx
+│   │   │   └── apps/       # Application feature components
+│   │   └── styles/         # Global styles and Tailwind configuration
+│   │       └── globals.css # Global styles
 │   │
-│   ├── config/             # Configuration files
+│   ├── application/        # Application Layer
+│   │   ├── atoms/          # Jotai atoms for state management
+│   │   ├── hooks/          # Custom React hooks
+│   │   └── types/          # TypeScript type definitions
 │   │
-│   ├── hooks/              # Custom React hooks
-│   │
-│   ├── lib/                # Utility libraries
-│   │
-│   ├── styles/             # Global styles
-│   │
-│   ├── types/              # TypeScript type definitions
-│   │
-│   └── utils/              # Helper functions and utilities
+│   └── infrastructure/     # Infrastructure Layer
+│       ├── config/         # Configuration files
+│       │   └── appRegistry.ts # Registry for all apps and features
+│       ├── utils/          # Helper functions and utilities
+│       │   └── storage.ts  # Helpers for local storage persistence
+│       └── lib/            # Shared libraries and integrations
 │
 ├── .dockerignore           # Files to ignore in Docker build
 ├── .eslintrc.json          # ESLint configuration (specific rules)
@@ -142,6 +145,49 @@ bun run lint
    docker-compose up -d
    ```
 
+## 📦 Package Management
+
+- Install packages: `bun add [package-name]`
+- Install dev dependencies: `bun add -D [package-name]`
+- Add Shadcn components: `bunx shadcn@latest add [component-name]`
+
+## 🧩 Architecture
+
+The project follows a clean architecture approach with three main layers:
+
+1. **Presentation Layer**:
+
+   - Components, UI elements, and styles
+   - Located in `/src/presentation/`
+
+2. **Application Layer**:
+
+   - Business logic, state management with Jotai atoms, hooks
+   - Located in `/src/application/`
+
+3. **Infrastructure Layer**:
+   - Configuration, utilities, and external services integration
+   - Located in `/src/infrastructure/`
+
+### Key Components
+
+- **Component Structure**:
+  - Server Components (default) vs Client Components (with "use client" directive)
+  - Component organization follows high cohesion, low coupling principles
+- **State Management**:
+
+  - Uses Jotai for global state with atom-based architecture
+  - Local state when appropriate
+
+- **Window System**:
+
+  - All applications use the reusable window component at `/src/presentation/components/layout/window.tsx`
+
+- **App Registry**:
+  - Applications are registered in `/src/infrastructure/config/appRegistry.ts`
+
+> **Note**: For detailed code organization and component guidelines, check the cursor rules in the Cursor Folder. These rules provide comprehensive guidance on naming conventions, component structure, and development best practices.
+
 ## 📝 Development Guidelines
 
 ### Commit Message Format
@@ -191,3 +237,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Shadcn](https://ui.shadcn.com/) - For UI components
 - [Radix UI](https://www.radix-ui.com/) - For accessible UI components
 - [Bun](https://bun.sh/) - For fast JavaScript runtime and package management
+- [Jotai](https://jotai.org/) - For state management
