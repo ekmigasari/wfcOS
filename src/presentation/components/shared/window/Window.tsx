@@ -8,6 +8,7 @@ import {
   closeWindowAtom,
   focusWindowAtom,
 } from "@/application/atoms/windowAtoms";
+import { addAppCleanupRequestAtom } from "@/application/atoms/appLifecycleAtoms";
 import { WindowBase } from "./WindowBase";
 import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { playSound } from "@/infrastructure/lib/utils";
@@ -32,13 +33,15 @@ export const Window = () => {
   const [openWindows] = useAtom(openWindowsAtom);
   const closeWindow = useAtom(closeWindowAtom)[1];
   const focusWindow = useAtom(focusWindowAtom)[1];
+  const addCleanupRequest = useAtom(addAppCleanupRequestAtom)[1];
 
   // Handle client-side mounting
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const handleCloseWindow = (windowId: string) => {
+  const handleCloseWindow = (windowId: string, appId: string) => {
+    addCleanupRequest({ windowId, appId });
     playSound("/sounds/close.mp3", CLOSE_SOUND);
     closeWindow(windowId);
   };
@@ -95,7 +98,7 @@ export const Window = () => {
             appId={window.appId}
             isOpen={true}
             isMinimized={window.isMinimized}
-            onClose={() => handleCloseWindow(window.id)}
+            onClose={() => handleCloseWindow(window.id, window.appId)}
             onFocus={() => handleFocusWindow(window.id)}
             position={window.position}
             size={window.size}

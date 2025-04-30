@@ -6,7 +6,12 @@ import {
   currentSoundAtom,
   isPlayingAtom,
   volumeAtom,
+  ambiencePlayerActions,
 } from "@/application/atoms/ambiencePlayerAtom";
+import { consumeAppCleanupRequestsAtom } from "@/application/atoms/appLifecycleAtoms";
+
+// Define the appId for this manager - MUST match appRegistry.ts key
+const AMBIENCE_APP_ID = "ambience";
 
 /**
  * GlobalAmbienceManager
@@ -21,6 +26,8 @@ export const GlobalAmbienceManager: React.FC = () => {
   const [currentSound] = useAtom(currentSoundAtom);
   const [isPlaying] = useAtom(isPlayingAtom);
   const [volume] = useAtom(volumeAtom);
+  const dispatchAction = useAtom(ambiencePlayerActions)[1];
+  const consumeCleanupRequests = useAtom(consumeAppCleanupRequestsAtom)[1];
 
   // Audio reference
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -45,6 +52,24 @@ export const GlobalAmbienceManager: React.FC = () => {
       }
     };
   }, []);
+
+  // Effect to handle application cleanup requests
+  useEffect(() => {
+    const cleanupRequests = consumeCleanupRequests(AMBIENCE_APP_ID);
+    if (cleanupRequests.length > 0) {
+      console.log(
+        `[GlobalAmbienceManager] Received cleanup request for window(s): ${cleanupRequests
+          .map((r) => r.windowId)
+          .join(", ")}`
+      );
+      // Dispatch pause action when its window is closed
+      dispatchAction({ type: "pause" });
+      if (audioRef.current) {
+        audioRef.current.pause(); // Ensure audio element is paused immediately
+        audioRef.current.src = ""; // Clear source
+      }
+    }
+  }, [consumeCleanupRequests, dispatchAction]);
 
   // Handle source changes
   useEffect(() => {

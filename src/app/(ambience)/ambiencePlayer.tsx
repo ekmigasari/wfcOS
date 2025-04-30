@@ -9,7 +9,6 @@ import {
   ambiencePlayerActions,
 } from "@/application/atoms/ambiencePlayerAtom";
 import { AmbiencePlayerUI } from "./ambiencePlayerUI";
-import { useWindowState } from "@/presentation/components/shared/window/WindowProvider";
 import { playSound } from "@/infrastructure/lib/utils";
 
 /**
@@ -19,8 +18,7 @@ import { playSound } from "@/infrastructure/lib/utils";
  * The actual audio playback is managed by the GlobalAmbienceManager.
  */
 export const AmbiencePlayer: React.FC = () => {
-  // Window integration
-  const { isOpen } = useWindowState();
+
 
   // Player state
   const [currentSound] = useAtom(currentSoundAtom);
@@ -30,16 +28,6 @@ export const AmbiencePlayer: React.FC = () => {
 
   // Track previous volume for mute toggle
   const previousVolumeRef = useRef<number>(volume);
-  const windowClosedRef = useRef<boolean>(false);
-
-  // Handle window closing - pause on close
-  React.useEffect(() => {
-    if (!isOpen && isPlaying) {
-      // Window was closed while playing
-      windowClosedRef.current = true;
-      dispatchAction({ type: "pause" });
-    }
-  }, [isOpen, isPlaying, dispatchAction]);
 
   // Player control handlers
   const handlePlayPause = () => {

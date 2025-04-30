@@ -15,6 +15,9 @@ import {
   handleTimerMinimize,
 } from "@/application/atoms/timerAtom";
 
+// Import ambience lifecycle handlers from hooks
+import { ambienceLifecycle } from "@/app/(ambience)/ambienceLifecycle";
+
 // Simplified Jotai Set type for callbacks
 type JotaiSet = Parameters<Parameters<typeof SetAtom>[1]>[1];
 
@@ -60,6 +63,9 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 375, height: 190 },
     minSize: { width: 375, height: 190 },
     component: AmbiencePlayer,
+    // Register ambience lifecycle handlers
+    onClose: ambienceLifecycle.handleClose,
+    onMinimize: ambienceLifecycle.handleMinimize,
   },
   musicPlayer: {
     name: "Music Player",

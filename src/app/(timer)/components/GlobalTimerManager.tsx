@@ -2,9 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { timerAtom } from "@/application/atoms/timerAtom";
+import { timerAtom, initialTimerState } from "@/application/atoms/timerAtom";
+import { consumeAppCleanupRequestsAtom } from "@/application/atoms/appLifecycleAtoms";
 import { playSound } from "@/infrastructure/lib/utils";
 import { formatTime } from "@/app/(timer)/utils/timerUtils";
+
+// Define the appId for this manager
+const TIMER_APP_ID = "timer";
 
 /**
  * GlobalTimerManager
@@ -17,6 +21,7 @@ import { formatTime } from "@/app/(timer)/utils/timerUtils";
  */
 export const GlobalTimerManager = () => {
   const [timerState, setTimerState] = useAtom(timerAtom);
+  const consumeCleanupRequests = useAtom(consumeAppCleanupRequestsAtom)[1];
   const alarmPlayedRef = useRef(false);
   const workerRef = useRef<Worker | null>(null);
 
@@ -99,6 +104,39 @@ export const GlobalTimerManager = () => {
       window.removeEventListener("timer-reset", handleTimerReset);
     };
   }, [setTimerState, timerState.timeRemaining]);
+
+  // Effect to handle application cleanup requests
+  useEffect(() => {
+    const cleanupRequests = consumeCleanupRequests(TIMER_APP_ID);
+    const relevantRequest = cleanupRequests.find(
+      (req) => req.windowId === timerState.windowId
+    );
+
+    if (relevantRequest) {
+      console.log(
+        `[GlobalTimerManager] Received cleanup request for window: ${relevantRequest.windowId}`
+      );
+
+      // Reset the timer state fully
+      setTimerState(initialTimerState);
+      alarmPlayedRef.current = false;
+
+      // Tell the worker to reset
+      if (workerRef.current) {
+        workerRef.current.postMessage({ command: "reset" });
+      }
+
+      // Reset document title immediately
+      if (typeof window !== "undefined") {
+        document.title = "wfcOS";
+      }
+    }
+  }, [
+    consumeCleanupRequests,
+    timerState.windowId,
+    setTimerState,
+    workerRef.current,
+  ]);
 
   // Control the worker based on timer state changes
   useEffect(() => {
