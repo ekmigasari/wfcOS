@@ -65,13 +65,16 @@ export const ambienceSounds: AmbienceSound[] = [
   },
 ];
 
+// Type for player state
+export interface AmbiencePlayerState {
+  currentSoundIndex: number;
+  isPlaying: boolean;
+  volume: number;
+}
+
 // Get stored state or use defaults
-const getInitialState = () => {
-  const stored = loadFeatureState<{
-    currentSoundIndex: number;
-    isPlaying: boolean;
-    volume: number;
-  }>("ambiencePlayer");
+const getInitialState = (): AmbiencePlayerState => {
+  const stored = loadFeatureState<AmbiencePlayerState>("ambiencePlayer");
 
   return {
     currentSoundIndex: stored?.currentSoundIndex ?? 0,
@@ -80,7 +83,7 @@ const getInitialState = () => {
   };
 };
 
-// Create atoms
+// Primary state atoms
 export const currentSoundIndexAtom = atom<number>(
   getInitialState().currentSoundIndex
 );
@@ -93,46 +96,66 @@ export const currentSoundAtom = atom((get) => {
   return ambienceSounds[currentIndex];
 });
 
-// Persist state when it changes
-export const persistAmbiencePlayerState = atom(
-  (get) => ({
-    currentSoundIndex: get(currentSoundIndexAtom),
-    isPlaying: get(isPlayingAtom),
-    volume: get(volumeAtom),
-  }),
+// Player control actions
+export const ambiencePlayerActions = atom(
+  null,
   (
-    _get,
+    get,
     set,
-    newState: {
-      currentSoundIndex?: number;
-      isPlaying?: boolean;
-      volume?: number;
+    action: {
+      type:
+        | "play"
+        | "pause"
+        | "toggle"
+        | "next"
+        | "previous"
+        | "setVolume"
+        | "setSoundIndex";
+      payload?: number;
     }
   ) => {
-    if (newState.currentSoundIndex !== undefined) {
-      set(currentSoundIndexAtom, newState.currentSoundIndex);
-    }
-    if (newState.isPlaying !== undefined) {
-      set(isPlayingAtom, newState.isPlaying);
-    }
-    if (newState.volume !== undefined) {
-      set(volumeAtom, newState.volume);
+    const currentIndex = get(currentSoundIndexAtom);
+    const soundsCount = ambienceSounds.length;
+
+    switch (action.type) {
+      case "play":
+        set(isPlayingAtom, true);
+        break;
+      case "pause":
+        set(isPlayingAtom, false);
+        break;
+      case "toggle":
+        set(isPlayingAtom, !get(isPlayingAtom));
+        break;
+      case "next":
+        set(currentSoundIndexAtom, (currentIndex + 1) % soundsCount);
+        break;
+      case "previous":
+        set(
+          currentSoundIndexAtom,
+          (currentIndex - 1 + soundsCount) % soundsCount
+        );
+        break;
+      case "setVolume":
+        if (action.payload !== undefined) {
+          set(volumeAtom, action.payload);
+        }
+        break;
+      case "setSoundIndex":
+        if (action.payload !== undefined) {
+          set(
+            currentSoundIndexAtom,
+            Math.max(0, Math.min(action.payload, soundsCount - 1))
+          );
+        }
+        break;
     }
 
-    // Save to local storage
-    const currentState = {
-      currentSoundIndex:
-        newState.currentSoundIndex !== undefined
-          ? newState.currentSoundIndex
-          : _get(currentSoundIndexAtom),
-      isPlaying:
-        newState.isPlaying !== undefined
-          ? newState.isPlaying
-          : _get(isPlayingAtom),
-      volume:
-        newState.volume !== undefined ? newState.volume : _get(volumeAtom),
-    };
-
-    saveFeatureState("ambiencePlayer", currentState);
+    // Save to storage
+    saveFeatureState("ambiencePlayer", {
+      currentSoundIndex: get(currentSoundIndexAtom),
+      isPlaying: get(isPlayingAtom),
+      volume: get(volumeAtom),
+    });
   }
 );
