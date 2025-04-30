@@ -1,15 +1,18 @@
 "use client";
 
-import React, { createContext, useContext, useMemo } from "react";
+import React, { createContext, useContext } from "react";
 
-type WindowState = {
-  isMinimized: boolean;
+interface WindowState {
   isOpen: boolean;
+  isMinimized: boolean;
   onClose: () => void;
-};
+}
 
 const WindowContext = createContext<WindowState | null>(null);
 
+/**
+ * Hook to access window state from child components
+ */
 export const useWindowState = () => {
   const context = useContext(WindowContext);
   if (!context) {
@@ -18,28 +21,18 @@ export const useWindowState = () => {
   return context;
 };
 
+/**
+ * Provider component that passes window state to child components
+ */
 export const WindowProvider = ({
   children,
-  isMinimized,
   isOpen,
+  isMinimized,
   onClose,
-}: {
-  children: React.ReactNode;
-  isMinimized: boolean;
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
-  // Memoize the context value to prevent unnecessary re-renders
-  const contextValue = useMemo(() => {
-    return { isMinimized, isOpen, onClose };
-  }, [isMinimized, isOpen, onClose]);
-
-  // Memoize children to maintain their identity
-  const memoizedChildren = useMemo(() => children, [children]);
-
+}: WindowState & { children: React.ReactNode }) => {
   return (
-    <WindowContext.Provider value={contextValue}>
-      {memoizedChildren}
+    <WindowContext.Provider value={{ isOpen, isMinimized, onClose }}>
+      {children}
     </WindowContext.Provider>
   );
 };

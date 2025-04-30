@@ -4,21 +4,14 @@ import { useState } from "react";
 import { useAtom } from "jotai";
 import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { AppIcon } from "./AppIcon";
-import { Window } from "../../shared/window/Window";
 import { playSound } from "@/infrastructure/lib/utils";
-import {
-  openWindowsAtom,
-  openWindowAtom,
-  closeWindowAtom,
-} from "@/application/atoms/windowAtoms";
+import { openWindowAtom } from "@/application/atoms/windowAtoms";
 
 export const DesktopIcons = () => {
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
 
   // Window state management
-  const [openWindows] = useAtom(openWindowsAtom);
   const openWindow = useAtom(openWindowAtom)[1];
-  const closeWindow = useAtom(closeWindowAtom)[1];
 
   // Convert appRegistry to an array for mapping (if it's an object)
   const apps = Object.entries(appRegistry).map(([id, config]) => ({
@@ -30,24 +23,21 @@ export const DesktopIcons = () => {
     const appConfig = appRegistry[appId];
     if (!appConfig) return;
 
-    playSound("/sounds/open.mp3");
-
     const windowInstanceId = `${appId}-instance`;
 
+    playSound("/sounds/open.mp3");
+
+    // Call openWindow atom - it handles existing/new/minimized logic internally
     openWindow({
       id: windowInstanceId,
       appId: appId,
       title: appConfig.name,
       minSize: appConfig.minSize,
       initialSize: appConfig.defaultSize,
+      // initialPosition is handled by the atom if not provided
     });
 
-    setSelectedAppId(appId);
-  };
-
-  const handleCloseWindow = (windowId: string) => {
-    playSound("/sounds/close.mp3");
-    closeWindow(windowId);
+    setSelectedAppId(appId); // Select the icon
   };
 
   return (
@@ -77,31 +67,6 @@ export const DesktopIcons = () => {
           </div>
         ))}
       </div>
-
-      {/* Render Windows */}
-      {openWindows.map((window) => {
-        const appConfig = appRegistry[window.appId];
-        if (!appConfig) return null;
-
-        const AppComponent = appConfig.component;
-
-        return (
-          <Window
-            key={window.id}
-            windowId={window.id}
-            title={window.title}
-            isOpen={true}
-            isMinimized={window.isMinimized}
-            onClose={() => handleCloseWindow(window.id)}
-            initialSize={window.size}
-            initialPosition={window.position}
-            minSize={window.minSize}
-            zIndex={window.zIndex}
-          >
-            {AppComponent && <AppComponent />}
-          </Window>
-        );
-      })}
     </>
   );
 };

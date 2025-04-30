@@ -1,146 +1,112 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { DesktopWindow } from "./DesktopWindow";
-import { MobileWindow } from "./MobileWindow";
 import { useAtom } from "jotai";
-import { focusWindowAtom } from "@/application/atoms/windowAtoms";
-import { useDeviceDetect } from "@/application/hooks";
-import { WindowProvider } from "./WindowProvider";
+import {
+  openWindowsAtom,
+  closeWindowAtom,
+  focusWindowAtom,
+} from "@/application/atoms/windowAtoms";
+import { WindowBase } from "./WindowBase";
+import { appRegistry } from "@/infrastructure/config/appRegistry";
+import { playSound } from "@/infrastructure/lib/utils";
+
+// Sound type constants
+const CLOSE_SOUND = "window-close";
 
 /**
  * Window Component
  *
- * The main window entry point that adaptively renders either a mobile-optimized
- * or desktop-optimized window based on the device type.
- *
- * Key features:
- * - Uses React Portal to isolate window rendering from the main component tree
- * - Provides WindowProvider context to communicate window state to app components
- * - Prevents unnecessary re-renders of child components
- * - Preserves component state when minimized (no remounting)
- * - Supports responsive design based on device type
+ * The main window container that renders all windows in the system using portals.
+ * This component is responsible for:
+ * - Rendering all open windows from the windowAtoms state
+ * - Creating the portal container if it doesn't exist
+ * - Handling window closing with sound effects
  */
-type WindowProps = {
-  windowId: string;
-  appId: string;
-  title: string;
-  children: React.ReactNode;
-  isOpen: boolean;
-  isMinimized?: boolean;
-  onClose: () => void;
-  initialSize: { width: number; height: number };
-  initialPosition: { x: number; y: number };
-  minSize?: { width: number; height: number };
-  zIndex: number;
-  playSounds?: boolean;
-};
-
-export const Window = (props: WindowProps) => {
-  const {
-    windowId,
-    appId,
-    isOpen,
-    isMinimized = false,
-    onClose,
-    title,
-    children,
-    playSounds = true,
-    ...restProps
-  } = props;
-
+export const Window = () => {
   // Client-side only state to avoid hydration issues
   const [isMounted, setIsMounted] = useState(false);
 
+  // Window state management
+  const [openWindows] = useAtom(openWindowsAtom);
+  const closeWindow = useAtom(closeWindowAtom)[1];
   const focusWindow = useAtom(focusWindowAtom)[1];
-
-  // Use the hook for device detection
-  const { isMobileOrTablet } = useDeviceDetect();
-
-  // Auto-focus the window when it's opened or restored from minimization
-  useEffect(() => {
-    if (isOpen && !isMinimized) {
-      focusWindow(windowId);
-    }
-  }, [isOpen, isMinimized, windowId, focusWindow]);
 
   // Handle client-side mounting
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Strongly memoize children to prevent rerenders when window state changes
-  // This is critical for components like media players
-  const memoizedChildren = useMemo(() => {
-    // We only memoize the children based on their reference
-    return (
-      <WindowProvider
-        isOpen={isOpen}
-        isMinimized={isMinimized}
-        onClose={onClose}
-      >
-        {children}
-      </WindowProvider>
-    );
-  }, [children, isOpen, isMinimized, onClose]);
+  const handleCloseWindow = (windowId: string) => {
+    playSound("/sounds/close.mp3", CLOSE_SOUND);
+    closeWindow(windowId);
+  };
 
-  // Memoize the window UI separately from its content
-  const windowUI = useMemo(() => {
-    // Render the appropriate window component based on device type
-    return (
-      <div style={{ pointerEvents: "auto" }}>
-        {isMobileOrTablet ? (
-          <MobileWindow
-            windowId={windowId}
-            appId={appId}
-            isOpen={isOpen}
-            isMinimized={isMinimized}
-            title={title}
-            onClose={onClose}
-            playSounds={playSounds}
-            {...restProps}
+  const handleFocusWindow = (windowId: string) => {
+    focusWindow(windowId);
+  };
+
+  if (!isMounted) return null;
+
+  // Create portal container if it doesn't exist
+  let portalContainer = document.getElementById("window-portal-container");
+  if (!portalContainer && typeof document !== "undefined") {
+    portalContainer = document.createElement("div");
+    portalContainer.id = "window-portal-container";
+    portalContainer.className = "fixed inset-0 z-[100]";
+    portalContainer.style.pointerEvents = "none";
+    portalContainer.setAttribute("aria-hidden", "true");
+    document.body.appendChild(portalContainer);
+  }
+
+  // If still no portal container, render nothing
+  if (!portalContainer) return null;
+
+  // Render all windows through the portal
+  return createPortal(
+    <>
+      {openWindows.map((window) => {
+        // Skip invalid window data
+        if (!window || !window.appId) {
+          console.error("Window data is incomplete:", window);
+          return null;
+        }
+
+        // Find app configuration
+        const appConfig = appRegistry[window.appId];
+        if (!appConfig) {
+          console.error(`App config not found for appId: ${window.appId}`);
+          return null;
+        }
+
+        // Get app component
+        const AppComponent = appConfig.component;
+        if (!AppComponent) {
+          console.error(`Component not found for appId: ${window.appId}`);
+          return null;
+        }
+
+        return (
+          <WindowBase
+            key={window.id}
+            windowId={window.id}
+            title={window.title}
+            appId={window.appId}
+            isOpen={true}
+            isMinimized={window.isMinimized}
+            onClose={() => handleCloseWindow(window.id)}
+            onFocus={() => handleFocusWindow(window.id)}
+            position={window.position}
+            size={window.size}
+            minSize={window.minSize}
+            zIndex={window.zIndex}
           >
-            {memoizedChildren}
-          </MobileWindow>
-        ) : (
-          <DesktopWindow
-            windowId={windowId}
-            appId={appId}
-            isOpen={isOpen}
-            isMinimized={isMinimized}
-            title={title}
-            onClose={onClose}
-            playSounds={playSounds}
-            {...restProps}
-          >
-            {memoizedChildren}
-          </DesktopWindow>
-        )}
-      </div>
-    );
-  }, [
-    windowId,
-    appId,
-    isOpen,
-    isMinimized,
-    title,
-    onClose,
-    playSounds,
-    restProps,
-    isMobileOrTablet,
-    memoizedChildren,
-  ]);
-
-  // Return null if not mounted yet or the window is not open
-  if (!isMounted || !isOpen) return null;
-
-  // Find the portal container
-  const portalContainer = document.getElementById("window-portal-container");
-
-  // If the portal container doesn't exist, render without the portal
-  if (!portalContainer) return windowUI;
-
-  // Render the window through a portal to isolate it from the main component tree
-  return createPortal(windowUI, portalContainer);
+            <AppComponent />
+          </WindowBase>
+        );
+      })}
+    </>,
+    portalContainer
+  );
 };

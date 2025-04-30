@@ -16,12 +16,10 @@ export const Taskbar = () => {
   return (
     <>
       {/* Main menubar with logo, menu and clock */}
-      <Menubar className="bg-primary border-secondary border-2 text-white z-[1500] relative justify-between">
+      <Menubar className="bg-primary border-secondary border-2 text-white relative justify-between">
         <TaskbarMenu />
         {/* Minimized icons display */}
-        {hasMinimizedWindows && (
-          <MinimizedIcons />
-        )}
+        {hasMinimizedWindows && <MinimizedIcons />}
         <TaskbarClock />
       </Menubar>
     </>

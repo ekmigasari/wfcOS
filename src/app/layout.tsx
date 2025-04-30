@@ -3,7 +3,6 @@ import { Itim } from "next/font/google";
 import "@/presentation/styles/globals.css";
 import JotaiProvider from "@/providers/JotaiProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { WindowPortalContainer } from "@/presentation/components/shared/window/WindowPortalContainer";
 
 const font = Itim({ weight: "400", subsets: ["latin"] });
 
@@ -29,11 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={font.className}>
-        <JotaiProvider>
-          {children}
-          {/* Portal container for window isolation */}
-          <WindowPortalContainer />
-        </JotaiProvider>
+        <JotaiProvider>{children}</JotaiProvider>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>
