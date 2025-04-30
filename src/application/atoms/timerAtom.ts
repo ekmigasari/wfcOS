@@ -1,4 +1,4 @@
-import { atom } from "jotai";
+import { atom, WritableAtom } from "jotai";
 import {
   loadFeatureState,
   saveFeatureState,
@@ -60,7 +60,7 @@ const initialTimerState: TimerState = (() => {
     customTitle: "Custom Timer",
     windowId: null,
     isMinimized: false,
-    isActive: false,
+    isActive: false, // Ensure timer starts inactive
   };
 
   // Merge saved state with defaults, ensuring new fields have defaults
@@ -68,6 +68,8 @@ const initialTimerState: TimerState = (() => {
     ...defaults,
     ...savedState,
     isRunning: false, // Crucial: ensure timer isn't running on load regardless of saved state
+    isActive: false, // Ensure timer is inactive on load
+    windowId: null, // Ensure no window association on load
   };
 
   // Set initial timeRemaining based on merged settings
@@ -76,6 +78,7 @@ const initialTimerState: TimerState = (() => {
     mergedState.customDurationMinutes
   );
 
+  // Correct initial state should not have an active window ID or be active
   return {
     ...mergedState,
     timeRemaining: initialTime,
@@ -100,7 +103,10 @@ export const timerAtom = atom(
         : newState;
 
     // Only update base atom and save if the state has actually changed
-    if (JSON.stringify(currentState) !== JSON.stringify(updatedState)) {
+    // Add null check for stringify
+    if (
+      JSON.stringify(currentState ?? {}) !== JSON.stringify(updatedState ?? {})
+    ) {
       set(baseTimerAtom, updatedState);
       saveFeatureState(FEATURE_KEY, updatedState);
     }
@@ -210,44 +216,89 @@ export const setCustomTitleAtom = atom(null, (get, set, newTitle: string) => {
   }));
 });
 
-// Set window ID for the timer
-export const setTimerWindowIdAtom = atom(
-  null,
-  (get, set, windowId: string | null) => {
-    set(timerAtom, (prev) => ({
-      ...prev,
-      windowId,
-      isActive: windowId !== null,
-    }));
-  }
-);
+// --- Window Lifecycle Callbacks ---
 
-// Handle window minimize/restore
-export const setTimerWindowMinimizedAtom = atom(
-  null,
-  (get, set, isMinimized: boolean) => {
-    set(timerAtom, (prev) => ({
-      ...prev,
-      isMinimized,
-      // Keep the timer active even when minimized
-    }));
-  }
-);
+// Type definition for the Jotai set function, simplified for this context
+type JotaiSet = <Value, Result>(
+  atom: WritableAtom<Value, [Value | ((prev: Value) => Value)], Result>,
+  update: Value | ((prev: Value) => Value)
+) => Result;
 
-// Handle window close - reset timer and clear window association
-export const handleTimerWindowCloseAtom = atom(null, (get, set) => {
+/**
+ * Callback executed when a Timer window is opened.
+ * Associates the windowId with the timer state.
+ */
+export const handleTimerOpen = (set: JotaiSet, windowId: string) => {
   set(timerAtom, (prev) => {
+    // Check if a timer window is already active to prevent conflicts (optional)
+    if (prev.isActive && prev.windowId && prev.windowId !== windowId) {
+      console.warn(
+        `Timer is already active in window ${prev.windowId}. Cannot open another.`
+      );
+      return prev; // Or handle differently, e.g., allow multiple timers
+    }
+    return {
+      ...prev,
+      windowId: windowId,
+      isActive: true,
+      isMinimized: false, // Ensure it's not minimized on open
+    };
+  });
+};
+
+/**
+ * Callback executed when a Timer window is closed.
+ * Resets the timer, stops it, and disassociates the windowId.
+ */
+export const handleTimerClose = (set: JotaiSet, windowId: string) => {
+  set(timerAtom, (prev) => {
+    // Only act if the closing window is the currently active timer window
+    if (prev.windowId !== windowId) {
+      return prev;
+    }
+
     const newTimeRemaining = getDurationForSetting(
       prev.timerSetting,
       prev.customDurationMinutes
     );
+
+    // Dispatch reset event to ensure the worker stops/resets
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("timer-reset"));
+    }
+
     return {
       ...prev,
       timeRemaining: newTimeRemaining,
       isRunning: false,
       windowId: null,
       isMinimized: false,
-      isActive: false,
+      isActive: false, // Mark timer as inactive
     };
   });
-});
+};
+
+/**
+ * Callback executed when a Timer window is minimized or restored.
+ * Updates the isMinimized state.
+ */
+export const handleTimerMinimize = (
+  set: JotaiSet,
+  windowId: string,
+  isMinimized: boolean
+) => {
+  set(timerAtom, (prev) => {
+    // Only update if the window ID matches the active timer
+    if (prev.windowId !== windowId) {
+      return prev;
+    }
+    // Avoid redundant updates
+    if (prev.isMinimized === isMinimized) {
+      return prev;
+    }
+    return {
+      ...prev,
+      isMinimized: isMinimized,
+    };
+  });
+};

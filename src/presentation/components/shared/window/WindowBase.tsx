@@ -19,6 +19,7 @@ import { setWindowMinimizedStateAtom } from "../../../../application/atoms/windo
  */
 export type WindowBaseProps = {
   windowId: string;
+  appId: string;
   title: string;
   children: React.ReactNode;
   isOpen: boolean;
@@ -42,7 +43,7 @@ export type WindowBaseProps = {
   playSounds?: boolean;
 };
 
-// Memoized content component to prevent re-rendering when window state changes
+// Enhance the memoized content component to prevent re-rendering when window state changes
 const MemoizedContent = React.memo(
   ({
     children,
@@ -50,18 +51,37 @@ const MemoizedContent = React.memo(
   }: {
     children: React.ReactNode;
     contentClassName: string;
-  }) => (
-    <div
-      className={cn("p-4 flex-grow overflow-auto bg-card", contentClassName)}
-    >
-      {children}
-    </div>
-  )
+  }) => {
+    console.log("MemoizedContent render");
+
+    // Force stable reference for children to prevent unnecessary re-renders
+    const stableChildren = React.useMemo(() => children, [children]);
+
+    return (
+      <div
+        className={cn("p-4 flex-grow overflow-auto bg-card", contentClassName)}
+      >
+        {stableChildren}
+      </div>
+    );
+  },
+  // Custom comparator function that is extremely strict to prevent re-renders
+  (prevProps, nextProps) => {
+    // Deep compare the children reference - critical for components like media players
+    // Only re-render if the actual children reference changes - not just due to parent re-renders
+    const childrenEqual = prevProps.children === nextProps.children;
+    const classNameEqual =
+      prevProps.contentClassName === nextProps.contentClassName;
+
+    return childrenEqual && classNameEqual;
+  }
 );
 MemoizedContent.displayName = "MemoizedContent";
 
 export const WindowBase = ({
   windowId,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  appId,
   title,
   children,
   isOpen,
@@ -198,6 +218,7 @@ export const WindowBase = ({
         minHeight: minSize?.height ? `${minSize.height}px` : "100px",
         zIndex: isMinimized ? -1 : zIndex,
         position: isMinimized ? "fixed" : "absolute",
+        pointerEvents: isMinimized ? "none" : "auto",
         ...style,
       }}
       onMouseDown={!isMinimized ? onFocus : undefined}

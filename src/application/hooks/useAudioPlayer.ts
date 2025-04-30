@@ -225,26 +225,11 @@ export const useAudioPlayer = () => {
     audio.addEventListener("pause", handlePause);
     audio.addEventListener("error", handleError);
 
-    // Handle visibility change - don't auto-resume on visibility change
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        // When the document becomes hidden, just note the state
-        // Don't try to auto-resume on becoming visible again
-        if (!audio.paused) {
-          audio.pause();
-          // Keep isPlaying true in state if it was playing
-        }
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
       audio.removeEventListener("canplay", handleCanPlay);
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
       audio.removeEventListener("error", handleError);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [isPlaying, persistState, setIsPlaying, hasMounted]);
 

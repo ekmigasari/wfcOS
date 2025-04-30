@@ -25,6 +25,7 @@ import {
  */
 type MobileWindowProps = {
   windowId: string;
+  appId: string;
   title: string;
   children: React.ReactNode;
   isOpen: boolean;
@@ -39,6 +40,7 @@ type MobileWindowProps = {
 
 export const MobileWindow = ({
   windowId,
+  appId,
   title,
   children,
   isOpen,
@@ -148,6 +150,7 @@ export const MobileWindow = ({
   return (
     <WindowBase
       windowId={windowId}
+      appId={appId}
       title={title}
       isOpen={isOpen}
       isMinimized={isMinimized}

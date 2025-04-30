@@ -26,6 +26,7 @@ import { WindowBase } from "./WindowBase";
  */
 type DesktopWindowProps = {
   windowId: string;
+  appId: string;
   title: string;
   children: React.ReactNode;
   isOpen: boolean;
@@ -40,6 +41,7 @@ type DesktopWindowProps = {
 
 export const DesktopWindow = ({
   windowId,
+  appId,
   title,
   children,
   isOpen,
@@ -108,6 +110,7 @@ export const DesktopWindow = ({
   return (
     <WindowBase
       windowId={windowId}
+      appId={appId}
       title={title}
       isOpen={isOpen}
       isMinimized={isMinimized}

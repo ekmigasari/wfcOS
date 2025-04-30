@@ -29,7 +29,7 @@ export const Timer = () => {
         customTitle={timerState.customTitle}
       />
 
-      {/* Show minimized state indicator */}
+      {/* Show minimized state indicator based on atom state */}
       {timerState.isMinimized && (
         <div className="text-xs mt-2 text-green-500">
           Timer will continue running when window is minimized

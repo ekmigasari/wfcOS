@@ -107,8 +107,10 @@ export const GlobalTimerManager = () => {
 
     const worker = workerRef.current;
 
-    // When the timer is not active (closed), terminate and recreate worker
-    if (!timerState.isActive) {
+    // When timer window is closed, terminate the worker
+    if (!timerState.isActive || !timerState.windowId) {
+      // Pause the worker before potentially cleaning up
+      worker.postMessage({ command: "pause" });
       return;
     }
 
@@ -145,6 +147,7 @@ export const GlobalTimerManager = () => {
   }, [
     timerState.isRunning,
     timerState.isActive,
+    timerState.windowId,
     timerState.timeRemaining,
     setTimerState,
   ]);

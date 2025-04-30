@@ -1,11 +1,22 @@
 import { Size } from "@/application/types/window";
 import React from "react";
+import type { SetAtom } from "jotai"; // Import SetAtom type
 import { Timer } from "@/app/(timer)/Timer";
 import { BackgroundChanger } from "@/app/(settings)/(background)/background";
 import { MusicPlayer } from "@/app/(music-player)/MusicPlayer";
 import TodoList from "@/app/(to-do-list)/todoList";
-import AmbiencePlayer from "@/app/(ambience)/ambiencePlayer";
+import { AmbiencePlayer } from "@/app/(ambience)/ambiencePlayer";
 import Notepad from "@/app/(notepad)/Notepad";
+
+// Import timer lifecycle handlers
+import {
+  handleTimerOpen,
+  handleTimerClose,
+  handleTimerMinimize,
+} from "@/application/atoms/timerAtom";
+
+// Simplified Jotai Set type for callbacks
+type JotaiSet = Parameters<Parameters<typeof SetAtom>[1]>[1];
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -14,6 +25,10 @@ interface AppRegistryEntry {
   minSize?: Size;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: React.ComponentType<any>;
+  // Optional lifecycle callbacks
+  onOpen?: (set: JotaiSet, windowId: string) => void;
+  onClose?: (set: JotaiSet, windowId: string) => void;
+  onMinimize?: (set: JotaiSet, windowId: string, isMinimized: boolean) => void;
 }
 
 export const appRegistry: Record<string, AppRegistryEntry> = {
@@ -25,6 +40,10 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 250, height: 300 },
     component: Timer,
+    // Register timer lifecycle handlers
+    onOpen: handleTimerOpen,
+    onClose: handleTimerClose,
+    onMinimize: handleTimerMinimize,
   },
 
   todoList: {
