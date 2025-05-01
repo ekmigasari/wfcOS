@@ -7,20 +7,6 @@ import TodoList from "@/app/(to-do-list)/todoList";
 import { AmbiencePlayer } from "@/app/(ambience)/ambiencePlayer";
 import Notepad from "@/app/(notepad)/Notepad";
 
-// Import timer lifecycle handlers
-import {
-  handleTimerOpen,
-  handleTimerClose,
-  handleTimerMinimize,
-  // Import JotaiSet type
-  JotaiSet,
-} from "@/application/atoms/timerAtom";
-
-// Import ambience lifecycle handlers from hooks
-import { ambienceLifecycle } from "@/application/hooks";
-
-// No need to redefine, just use the imported type
-
 interface AppRegistryEntry {
   name: string; // The display name of the app
   src: string; // Path to the app icon
@@ -28,10 +14,6 @@ interface AppRegistryEntry {
   minSize?: Size;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: React.ComponentType<any>;
-  // Optional lifecycle callbacks
-  onOpen?: (set: JotaiSet, windowId: string) => void;
-  onClose?: (set: JotaiSet, windowId: string) => void;
-  onMinimize?: (set: JotaiSet, windowId: string, isMinimized: boolean) => void;
 }
 
 export const appRegistry: Record<string, AppRegistryEntry> = {
@@ -43,10 +25,6 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 250, height: 300 },
     component: Timer,
-    // Register timer lifecycle handlers
-    onOpen: handleTimerOpen,
-    onClose: handleTimerClose,
-    onMinimize: handleTimerMinimize,
   },
 
   todoList: {
@@ -63,9 +41,6 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 375, height: 190 },
     minSize: { width: 375, height: 190 },
     component: AmbiencePlayer,
-    // Register ambience lifecycle handlers
-    onClose: ambienceLifecycle.handleClose,
-    onMinimize: ambienceLifecycle.handleMinimize,
   },
   musicPlayer: {
     name: "Music Player",

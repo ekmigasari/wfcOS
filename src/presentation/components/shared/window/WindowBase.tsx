@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 import {
   updateWindowPositionSizeAtom,
@@ -10,7 +10,6 @@ import {
 import { Position, Size } from "@/application/types/window";
 import { WindowUI } from "./WindowUI";
 import { useDeviceDetect } from "@/application/hooks";
-import { WindowProvider } from "./WindowProvider";
 import { playSound, stopSound } from "@/infrastructure/lib/utils";
 
 // Sound type constants
@@ -76,20 +75,6 @@ export const WindowBase = ({
   const currentResizeHandleRef = useRef<string | null>(null);
   const initialSizeRef = useRef<Size>({ width: 0, height: 0 });
   const initialPositionRef = useRef<Position>({ x: 0, y: 0 });
-
-  // Memoize children with WindowProvider to prevent unnecessary rerenders
-  const memoizedChildren = useMemo(
-    () => (
-      <WindowProvider
-        isOpen={isOpen}
-        isMinimized={isMinimized}
-        onClose={onClose}
-      >
-        {children}
-      </WindowProvider>
-    ),
-    [children, isOpen, isMinimized, onClose]
-  );
 
   // Auto-focus when window opens or is restored
   useEffect(() => {
@@ -284,64 +269,52 @@ export const WindowBase = ({
 
   // Handle window focus
   const handleFocus = () => {
-    // Only attempt to focus if not already the top window
+    // Only focus if open and not minimized
     if (isOpen && !isMinimized) {
       focusWindow(windowId);
-      onFocus();
-
-      // Prevent redundant focus calls in a short time period
-      const now = Date.now();
-      if (!windowRef.current || !windowRef.current.dataset.lastFocused) {
-        if (windowRef.current) {
-          windowRef.current.dataset.lastFocused = now.toString();
-        }
-      }
     }
+    // Also call the original onFocus passed from parent if needed
+    onFocus(); // Keep this? User might expect it.
   };
 
   // Handle window minimize
   const handleMinimize = () => {
+    if (!isOpen) return; // Can't minimize a closed window
     if (playSounds) {
       playSound("/sounds/minimize.mp3", MINIMIZE_SOUND);
     }
     setWindowMinimizedState({ windowId, isMinimized: true });
   };
 
-  // If window is minimized, render with hidden styles but don't unmount
-  if (isMinimized) {
-    return (
-      <div
-        style={{
-          position: "fixed",
-          left: "-9999px",
-          opacity: 0,
-          pointerEvents: "none",
-          zIndex: -1,
-          visibility: "hidden",
-        }}
-      >
-        {memoizedChildren}
-      </div>
-    );
+  // Early return if the window should not be rendered at all
+  if (!isOpen) {
+    return null;
   }
 
+  // Apply hidden style if minimized, otherwise null
+  const minimizedStyle = isMinimized ? { display: "none" } : {};
+
   return (
-    <WindowUI
-      ref={windowRef}
-      windowId={windowId}
-      appId={appId}
-      title={title}
-      position={position}
-      size={size}
-      zIndex={zIndex}
-      isMobile={isMobileOrTablet}
-      onTitleBarMouseDown={handleDragStart}
-      onMinimize={handleMinimize}
-      onClose={onClose}
-      onFocus={handleFocus}
-      onResizeStart={handleResizeStart}
-    >
-      {memoizedChildren}
-    </WindowUI>
+    // Use the minimized style
+    <div style={minimizedStyle}>
+      <WindowUI
+        ref={windowRef}
+        windowId={windowId}
+        appId={appId}
+        title={title}
+        position={position}
+        size={size}
+        zIndex={zIndex}
+        isMobile={isMobileOrTablet}
+        onTitleBarMouseDown={handleDragStart}
+        onMinimize={handleMinimize}
+        onClose={onClose} // Pass original onClose
+        onFocus={handleFocus}
+        onResizeStart={handleResizeStart}
+      >
+        {/* Render children directly, WindowProvider is removed */}
+        {children}
+      </WindowUI>
+    </div>
   );
 };

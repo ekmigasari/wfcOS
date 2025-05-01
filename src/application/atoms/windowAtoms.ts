@@ -4,7 +4,6 @@ import {
   saveFeatureState,
 } from "../../infrastructure/utils/storage";
 import { Position, Size } from "@/application/types/window"; // Assuming types are defined here
-import { appRegistry } from "@/infrastructure/config/appRegistry"; // Import appRegistry
 
 const FEATURE_KEY = "windows";
 
@@ -151,21 +150,8 @@ export const openWindowAtom = atom(
       }));
     }
 
-    // Call the onOpen lifecycle hook if registered
-    const appConfig = appRegistry[windowConfig.appId];
-    if (appConfig?.onOpen) {
-      // Pass the Jotai set function to the callback
-      appConfig.onOpen(set, windowIdToUpdate);
-    }
-
-    // Also call onMinimize(false) to ensure state consistency on open/restore
-    if (appConfig?.onMinimize) {
-      appConfig.onMinimize(set, windowIdToUpdate, false);
-    }
-
     // Bring the window to front (redundant if new, necessary if existing)
-    // We already set the zIndex above, so maybe focusWindow call isn't strictly needed here?
-    // Let's keep the zIndex setting logic consolidated within openWindowAtom for now.
+    // We already set the zIndex above.
   }
 );
 
@@ -179,14 +165,7 @@ export const closeWindowAtom = atom(null, (get, set, windowId: string) => {
     return; // Window doesn't exist
   }
 
-  // Call the onClose lifecycle hook *before* updating the state
-  const appConfig = appRegistry[windowToClose.appId];
-  if (appConfig?.onClose) {
-    // Pass the Jotai set function to the callback
-    appConfig.onClose(set, windowId);
-  }
-
-  // Now update the state to mark the window as closed
+  // Update the state to mark the window as closed
   set(windowRegistryAtom, (prev) => {
     const newState = { ...prev };
     if (newState[windowId]) {
@@ -228,22 +207,12 @@ export const setWindowMinimizedStateAtom = atom(
         // focusWindow handles bringing to front on restore.
       };
 
-      // Call the onMinimize lifecycle hook BEFORE updating the state in registry
-      // to allow app logic to potentially influence the final state or react to the change
-      const appConfig = appRegistry[windowState.appId];
-      if (appConfig?.onMinimize) {
-        // Pass the Jotai set function and the new minimized state
-        appConfig.onMinimize(set, windowId, isMinimized);
-      }
-
       // Return the updated registry state
       return {
         ...prev,
         [windowId]: updatedWindowState,
       };
     });
-
-    // Removed the misplaced onMinimize call from here, moved inside the set callback
   }
 );
 

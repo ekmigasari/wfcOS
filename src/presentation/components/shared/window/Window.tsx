@@ -4,11 +4,10 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtom } from "jotai";
 import {
-  openWindowsAtom,
+  windowRegistryAtom,
   closeWindowAtom,
   focusWindowAtom,
 } from "@/application/atoms/windowAtoms";
-import { addAppCleanupRequestAtom } from "@/application/atoms/appLifecycleAtoms";
 import { WindowBase } from "./WindowBase";
 import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { playSound } from "@/infrastructure/lib/utils";
@@ -21,7 +20,7 @@ const CLOSE_SOUND = "window-close";
  *
  * The main window container that renders all windows in the system using portals.
  * This component is responsible for:
- * - Rendering all open windows from the windowAtoms state
+ * - Rendering all managed windows from the windowRegistryAtom state
  * - Creating the portal container if it doesn't exist
  * - Handling window closing with sound effects
  */
@@ -30,18 +29,16 @@ export const Window = () => {
   const [isMounted, setIsMounted] = useState(false);
 
   // Window state management
-  const [openWindows] = useAtom(openWindowsAtom);
+  const [windowRegistry] = useAtom(windowRegistryAtom);
   const closeWindow = useAtom(closeWindowAtom)[1];
   const focusWindow = useAtom(focusWindowAtom)[1];
-  const addCleanupRequest = useAtom(addAppCleanupRequestAtom)[1];
 
   // Handle client-side mounting
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const handleCloseWindow = (windowId: string, appId: string) => {
-    addCleanupRequest({ windowId, appId });
+  const handleCloseWindow = (windowId: string) => {
     playSound("/sounds/close.mp3", CLOSE_SOUND);
     closeWindow(windowId);
   };
@@ -66,10 +63,13 @@ export const Window = () => {
   // If still no portal container, render nothing
   if (!portalContainer) return null;
 
+  // Get windows array
+  const allWindows = Object.values(windowRegistry);
+
   // Render all windows through the portal
   return createPortal(
     <>
-      {openWindows.map((window) => {
+      {allWindows.map((window) => {
         // Skip invalid window data
         if (!window || !window.appId) {
           console.error("Window data is incomplete:", window);
@@ -96,9 +96,9 @@ export const Window = () => {
             windowId={window.id}
             title={window.title}
             appId={window.appId}
-            isOpen={true}
+            isOpen={window.isOpen}
             isMinimized={window.isMinimized}
-            onClose={() => handleCloseWindow(window.id, window.appId)}
+            onClose={() => handleCloseWindow(window.id)}
             onFocus={() => handleFocusWindow(window.id)}
             position={window.position}
             size={window.size}
