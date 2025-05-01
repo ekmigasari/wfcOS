@@ -39,7 +39,7 @@ export const MinimizedIcons = () => {
   }
 
   return (
-    <div className="minimized-icons flex gap-1">
+    <div className="minimized-icons flex gap-1 overflow-auto">
       {minimizedWindows.map((window) => {
         // Get app info from registry for the icon
         const appInfo = appRegistry[window.appId];
