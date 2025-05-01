@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 import { timerAtom } from "@/application/atoms/timerAtom";
-import { playSound } from "@/infrastructure/lib/utils";
 import { formatTime, getDisplayTitle } from "./utils/timerUtils";
 
 /**
@@ -43,8 +42,11 @@ export const TimerManager = () => {
           break;
 
         case "complete":
-          // Timer completed
-          playSound("/sounds/timeup.mp3", "timer-complete");
+          // Timer completed - play sound directly using Audio API
+          const audio = new Audio("/sounds/timeup.mp3");
+          audio.play().catch((error) => {
+            console.error("Error playing timer completion sound:", error);
+          });
 
           // Show completion message in browser title
           document.title = "Time is up!";
