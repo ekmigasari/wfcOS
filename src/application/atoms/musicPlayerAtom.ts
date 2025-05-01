@@ -26,7 +26,7 @@ export interface MusicPlayerState {
   showVideo: boolean;
   isMuted: boolean;
   currentSong: Song | null;
-  isWindowOpen: boolean; // Keep window state persisted maybe? Or handle differently? Let's persist for now.
+  isWindowOpen: boolean; // Tracks if the window is open or closed
   documentTitle: string; // This is derived, not persisted
 }
 

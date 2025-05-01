@@ -1,118 +1,115 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { DesktopWindow } from "./DesktopWindow";
-import { MobileWindow } from "./MobileWindow";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useAtom } from "jotai";
-import { focusWindowAtom } from "@/application/atoms/windowAtoms";
-import { useDeviceDetect } from "@/application/hooks";
 import {
-  setTimerWindowIdAtom,
-  handleTimerWindowCloseAtom,
-} from "@/application/atoms/timerAtom";
+  windowRegistryAtom,
+  closeWindowAtom,
+  focusWindowAtom,
+} from "@/application/atoms/windowAtoms";
+import { WindowBase } from "./WindowBase";
+import { appRegistry } from "@/infrastructure/config/appRegistry";
+import { playSound } from "@/infrastructure/lib/utils";
+
+// Sound type constants
+const CLOSE_SOUND = "window-close";
 
 /**
  * Window Component
  *
- * The main window entry point that adaptively renders either a mobile-optimized
- * or desktop-optimized window based on the device type.
- *
- * This component follows the strategy pattern by delegating to specialized
- * implementations (DesktopWindow or MobileWindow) based on the device context,
- * promoting better code organization and separation of concerns.
- *
- * Each specialized implementation shares common base UI elements from WindowBase
- * but implements its own device-specific behaviors and optimizations.
- *
- * Features:
- * - Responsive design based on device type (auto-detected)
- * - Window dragging (desktop only)
- * - Window resizing (desktop only)
- * - Window minimization (both desktop and mobile)
- * - Focus management
- * - Automatic focus when opened from icon clicks
- * - Preserves component state when minimized (no remounting)
+ * The main window container that renders all windows in the system using portals.
+ * This component is responsible for:
+ * - Rendering all managed windows from the windowRegistryAtom state
+ * - Creating the portal container if it doesn't exist
+ * - Handling window closing with sound effects
  */
-type WindowProps = {
-  windowId: string;
-  title: string;
-  children: React.ReactNode;
-  isOpen: boolean;
-  isMinimized?: boolean;
-  onClose: () => void;
-  initialSize: { width: number; height: number };
-  initialPosition: { x: number; y: number };
-  minSize?: { width: number; height: number };
-  zIndex: number;
-  playSounds?: boolean;
-};
+export const Window = () => {
+  // Client-side only state to avoid hydration issues
+  const [isMounted, setIsMounted] = useState(false);
 
-export const Window = (props: WindowProps) => {
-  const {
-    windowId,
-    isOpen,
-    isMinimized,
-    onClose,
-    title,
-    playSounds = true,
-    ...restProps
-  } = props;
+  // Window state management
+  const [windowRegistry] = useAtom(windowRegistryAtom);
+  const closeWindow = useAtom(closeWindowAtom)[1];
   const focusWindow = useAtom(focusWindowAtom)[1];
-  const setTimerWindowId = useAtom(setTimerWindowIdAtom)[1];
-  const handleTimerWindowClose = useAtom(handleTimerWindowCloseAtom)[1];
 
-  // Use the new hook instead of requiring isMobileOrTablet as a prop
-  const { isMobileOrTablet } = useDeviceDetect();
-
-  // Determine if this is a timer window by checking the title
-  const isTimerWindow = title.toLowerCase().includes("timer");
-
-  // Handle window open/close for timer persistence
+  // Handle client-side mounting
   useEffect(() => {
-    if (isOpen && isTimerWindow) {
-      // When timer window opens, associate it with the timer
-      setTimerWindowId(windowId);
-    }
-  }, [isOpen, windowId, isTimerWindow, setTimerWindowId]);
+    setIsMounted(true);
+  }, []);
 
-  // Handle timer cleanup when window is closed
-  useEffect(() => {
-    if (!isOpen && isTimerWindow) {
-      handleTimerWindowClose();
-    }
-  }, [isOpen, isTimerWindow, handleTimerWindowClose]);
+  const handleCloseWindow = (windowId: string) => {
+    playSound("/sounds/close.mp3", CLOSE_SOUND);
+    closeWindow(windowId);
+  };
 
-  // Auto-focus the window when it's opened or restored from minimization
-  useEffect(() => {
-    if (isOpen && !isMinimized) {
-      focusWindow(windowId);
-    }
-  }, [isOpen, isMinimized, windowId, focusWindow]);
+  const handleFocusWindow = (windowId: string) => {
+    focusWindow(windowId);
+  };
 
-  // If window is not open, don't render anything
-  if (!isOpen) return null;
+  if (!isMounted) return null;
 
-  // Render the appropriate window component based on device type
-  // Note: We always render the component even when minimized to preserve state
-  return isMobileOrTablet ? (
-    <MobileWindow
-      windowId={windowId}
-      isOpen={isOpen}
-      isMinimized={isMinimized}
-      title={title}
-      onClose={onClose}
-      playSounds={playSounds}
-      {...restProps}
-    />
-  ) : (
-    <DesktopWindow
-      windowId={windowId}
-      isOpen={isOpen}
-      isMinimized={isMinimized}
-      title={title}
-      onClose={onClose}
-      playSounds={playSounds}
-      {...restProps}
-    />
+  // Create portal container if it doesn't exist
+  let portalContainer = document.getElementById("window-portal-container");
+  if (!portalContainer && typeof document !== "undefined") {
+    portalContainer = document.createElement("div");
+    portalContainer.id = "window-portal-container";
+    portalContainer.className = "fixed inset-0 z-[100]";
+    portalContainer.style.pointerEvents = "none";
+    portalContainer.setAttribute("aria-hidden", "true");
+    document.body.appendChild(portalContainer);
+  }
+
+  // If still no portal container, render nothing
+  if (!portalContainer) return null;
+
+  // Get windows array
+  const allWindows = Object.values(windowRegistry);
+
+  // Render all windows through the portal
+  return createPortal(
+    <>
+      {allWindows.map((window) => {
+        // Skip invalid window data
+        if (!window || !window.appId) {
+          console.error("Window data is incomplete:", window);
+          return null;
+        }
+
+        // Find app configuration
+        const appConfig = appRegistry[window.appId];
+        if (!appConfig) {
+          console.error(`App config not found for appId: ${window.appId}`);
+          return null;
+        }
+
+        // Get app component
+        const AppComponent = appConfig.component;
+        if (!AppComponent) {
+          console.error(`Component not found for appId: ${window.appId}`);
+          return null;
+        }
+
+        return (
+          <WindowBase
+            key={window.id}
+            windowId={window.id}
+            title={window.title}
+            appId={window.appId}
+            isOpen={window.isOpen}
+            isMinimized={window.isMinimized}
+            onClose={() => handleCloseWindow(window.id)}
+            onFocus={() => handleFocusWindow(window.id)}
+            position={window.position}
+            size={window.size}
+            minSize={window.minSize}
+            zIndex={window.zIndex}
+          >
+            <AppComponent />
+          </WindowBase>
+        );
+      })}
+    </>,
+    portalContainer
   );
 };

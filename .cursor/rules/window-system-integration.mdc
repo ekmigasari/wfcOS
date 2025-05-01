@@ -1,42 +1,44 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+
 # Window System Integration Guide
 
 This guide explains how to work with the wfcOS windowing system which provides a desktop-like experience with draggable, resizable windows.
 
 ## Window Component Architecture
 
-The window system follows a component hierarchy:
+The window system follows a streamlined component hierarchy:
 
-- [Window.tsx](mdc:src/presentation/components/shared/window/Window.tsx) - Top-level adaptive component
-  - Handles device detection (mobile vs desktop)
-  - Integrates with the Timer system
-  - Dispatches to platform-specific implementations
+- [Window.tsx](mdc:src/presentation/components/shared/window/Window.tsx) - Main container component
+  - Creates the portal container dynamically
+  - Renders all open windows from `windowAtoms` state
+  - Handles window closing and focusing
 
-- [WindowBase.tsx](mdc:src/presentation/components/shared/window/WindowBase.tsx) - Core window UI
-  - Provides title bar with controls (minimize/close)
-  - Implements content area
-  - Defines resize handles
+- [WindowBase.tsx](mdc:src/presentation/components/shared/window/WindowBase.tsx) - Core window logic
+  - Implements unified interaction logic for all devices
+  - Handles dragging, resizing, focusing, and minimize operations
+  - Manages window state transitions (using Jotai atoms)
+  - Coordinates sound effects using the sound management system
 
-- [DesktopWindow.tsx](mdc:src/presentation/components/shared/window/DesktopWindow.tsx) - Desktop implementation
-  - Adds dragging behavior
-  - Implements resizing functionality
-  - Handles focus management
+- [WindowUI.tsx](mdc:src/presentation/components/shared/window/WindowUI.tsx) - Pure UI component
+  - Renders window visuals (title bar, controls, content area, resize handles)
+  - Heavily memoized to prevent unnecessary re-renders
+  - Adapts layout for mobile vs desktop (hides resize handles on mobile)
+  - Handles clicks on controls (minimize, close) by calling props (which first focus, then perform the action)
 
-- [MobileWindow.tsx](mdc:src/presentation/components/shared/window/MobileWindow.tsx) - Mobile implementation
-  - Optimized for touch interactions
-  - Handles mobile-specific behaviors
-
-## Window State Management
+- [WindowProvider.tsx](mdc:src/presentation/components/shared/window/WindowProvider.tsx) - Context provider
+  - Passes window state (`isOpen`, `isMinimized`, `onClose`) to child components
+  - Allows app components to react to the window's statate Management
 
 Windows are managed through Jotai atoms defined in [windowAtoms.ts](mdc:src/application/atoms/windowAtoms.ts).
 
 ### Key Types
 
 ```typescript
+// Defined in windowAtoms.ts
 export interface WindowState {
   id: string;             // Unique window instance ID
   appId: string;          // App type identifier
@@ -48,133 +50,168 @@ export interface WindowState {
   isMinimized: boolean;   // Whether minimized to taskbar
   zIndex: number;         // Stacking order
 }
+
+// Defined in WindowBase.tsx
+export interface WindowBaseProps {
+  windowId: string;
+  appId: string;
+  title: string;
+  children: React.ReactNode;
+  isOpen: boolean;
+  isMinimized?: boolean;
+  onClose: () => void;
+  onFocus: () => void; // Callback triggered on focus attempts
+  position: Position;
+  size: Size;
+  minSize?: Size;
+  zI playSounds?: boolean;
+}
 ```
 
-### Core Window Actions
+### Core Window Actions (Jotai Atoms)
 
-- `openWindowAtom` - Creates a new window or brings existing one to front
-- `closeWindowAtom` - Closes a window (can preserve state)
-- `minimizeWindowAtom` - Minimizes window to taskbar
-- `restoreWindowAtom` - Restores minimized window
-- `focusWindowAtom` - Brings window to front
+- `openWindowAtom` - Creaor brings existing one to front
+- `closeWindowAtom` - Closes a window (sets `isOpen` to `false`)
+- `setWindowMinimizedStateAtom` - Sets the `isMinimized` state of a window
+- `focusWindowAtom` - Brings window to front by updating its `zIndex`
 - `updateWindowPositionSizeAtom` - Updates position/size after drag/resize
 
 ## Minimized Window Behavior
 
 When a window is minimized:
 
-1. The window remains in the DOM but is hidden from view using CSS properties:
-   - `position: fixed`
-   - `left: -9999px`
-   - `opacity: 0`
-   - `pointer-events: none`
-   - `zIndex: -1`
-   - `visibility: hidden`
-
-2. The window's content continues running (audio playback, timers, etc.)
-   - We use `display: none` is avoided to prevent interrupting audio playback
-   - This enables background processes to continue functioning
-
-3. The window appears in the taskbar via [MinimizedIcons.tsx](mdc:src/presentation/components/shared/taskbar/MinimizedIcons.tsx)
-   - Clicking a taskbar icon restores the window using `restoreWindowAtom`
-   - Restored windows are brought to the front with a new highest z-index
-
-4. State is tracked in the window registry via the `isMinimized` flag
+1. The `isMinimized` flag in `windowAtoms` is set to `true`.
+2. `WindowBase` renders a minimal hidden `div` instead of `WindowUI`.
+   - Uses CSS: `position: fixed`, `left: -9999px`, `opacity: 0`, `pointerEvents: none`, `zIndex: -1`, `visibility: hidden`
+   - This keeps the `memoizedChildren` mounted and running (e.g., audio, timers).
+3. The window appears in the taskbar via [MinimizedIcons.tsx](mdc:src/presentation/components/shared/taskbar/MinimizedIcons.tsx).
+   - Clicking a taskbar icon restores the window using `setWindowMinimizedStateAtom({ windowId, isMinimized: false })`.
+   - Restored windows are brought to the front automatically by the `useEffect` in `WindowBase` calling `focusWindowAtom`.
 
 ## Using the Window System
 
 ### Opening a Window
 
 ```typescript
+// From any component, e.g., an icon click handler
 import { useAtom } from "jotai";
-import { openWindowAtom } from "@/application/atoms/windowAtoms";
+import { openWindowAtom } from "@/applindowAtoms";
+import { MyApp } from "@/components/apps/MyApp"; // Your app component
 
-export const OpenCalcButton = () => {
+export const OpenMyAppButton = () => {
   const [, openWindow] = useAtom(openWindowAtom);
-  
+
   const handleClick = () => {
     openWindow({
-      id: `calculator-${Date.now()}`,
-      appId: "calculator",
-      title: "Calculator",
-      initialSize: { width: 400, height: 500 },
-      minSize: { width: 300, height: 400 },
-      children: <Calculator />
+      // Required properties for a new window instance
+      id: `myApp-${Date.now()}`, // Must be unique per instance
+      appId: "myApp",             // Matchgistry
+      title: "My Application",
+      initialSize: { width: 500,0 },
+      // Optional properties
+      minSize: { width: 250, height: 150 },
+      // in{ x: 100, y: 100 } // Defaults to random-ish position
     });
   };
-  
-  return <button onClick={handleClick}>Open Calculator</button>;
+
+  return <button onClick={Open My App</button>;
 };
 ```
+*Note: The actual app />` in this example) is retrieved from the `appRegistry` within the `Window` component ahildren` to `WindowBase`.*
 
 ### Implementing Custom Window Behavior
 
-If your app needs special window behaviors:
+If your appecial window behaviors:
 
-1. Use the `windowId` prop passed to your component
+1. **Use the `WindowProvider` context** in your app component:
 
 ```typescript
-type CalculatorProps = {
-  windowId: string;
-};
+// In your app component, e.g., src/presentation/components/apps/MyApp.tsx
+import { useWindowState } from "@/presentation/components/shared/window/WindowProvider";
 
-export const Calculator = ({ windowId }: CalculatorProps) => {
-  const [, closeWindow] = useAtom(closeWindowAtom);
-  
-  // Custom close handler with confirmation
+export const MyApp = () => {
+  // Access state provided by WindowBase through context
+  const { isOpen, isMinimized, onClose } = useWindowState();
+
+  // Example: Custom close handler with confirmation
   const handleCustomClose = () => {
-    if (confirm("Close calculator?")) {
-      closeWindow(windowId);
+    if (confirm("Save changes before closing?")) {
+      // Perform save logic...
+      onClose(); // Call the provided onClose function to trigger window closing
     }
   };
-  
+
   return (
     <div>
-      <button onClick={handleCustomClose}>Close with confirmation</button>
-      {/* ... calculator UI ... */}
+      {/* Use the custom handler */}
+      <button onClick={handleCustomClose}>Close App</button>
+      <p>Window State: {isOpen ? 'Open' : 'Closed'}, {isMinimized ? 'Minimized' : 'Visible'}</p>
+      {/* ... rest of your app content ... */}
     </div>
   );
 };
 ```
 
-2. Integrate with window lifecycle events
+2. **Register app lifecycle hooks** in `appRegistry`:
 
 ```typescript
-export const YourApp = ({ windowId }: { windowId: string }) => {
-  // Set up effects for window lifecycle
-  useEffect(() => {
-    console.log("Window opened:", windowId);
-    
-    return () => {
-      console.log("Window closed:", windowId);
-      // Clean up resources
-    };
-  }, [windowId]);
-  
-  // Your app UI
-  return <div>...</div>;
+// In src/infrastructure/config/appRegistry.ts
+import { MyApp } from "@/presentation/components/apps/MyApp";
+import { AppConfig } from "@/application/types/app"; // Assuming this type definition exists
+
+export const appRegistry: Record<string, AppConfig> = {
+  "myApp": {
+    name: "My App",
+    icon: "/icons/myapp.svg", // Example icon path
+    component: MyApp, // Reference to your app component
+    // Optional lifecycle hooks (receive Jotai's 'set' function and windowId)
+    onOpen: (set, windowId) => {
+      console.log("MyApp window opened:", windowId);
+      // Example: set(someGlobalAtom, true);
+    },
+    onClose: (set, windowId) => {
+      console.log("MyApp window closed:", windowId);
+      // Example: Clean up app-specific state in Jotai
+      // set(myAppSpecificAtom, defaultState);
+    },
+    onMinimize: (set, windowId, isMinimized) => {
+      console.log("MyApp window minimize state changed:", windowId, isMinimized);
+      // Example: Pause/resume background tasks based on minimize state
+      // set(myAppTimerAtom, (prev) => ({ ...prev, isPaused: isMinimized }));
+    }
+  },
+  // ... other registered apps
 };
 ```
 
-## Responsive Windows
+## Sound Effects
 
-To make your app work well in both desktop and mobile windows:
+The window system includes sound effects for various interactions:
 
-1. Use flexible layouts (Flexbox/Grid)
-2. Adapt UI based on window size
-3. Design for minimum viable sizes
-4. Test in both desktop and mobile window variants
+- **Drag Start/End**: Managed in `handleDragStart` / `handleDragEnd` in `WindowBase.tsx`.
+- **Resize Start/End**: Managed in `handleResizeStart` / `handleResizeEnd` in `WindowBase.tsx`.
+- **Minimizing**: Managed in `handleMinimize` in `WindowBase.tsx`.
+- **Closing**: Managed in `handleCloseWindow` in `Window.tsx`.
 
-## Integration with Taskbar
+Sound playback uses the sound management system in [utils.ts](mdc:src/infrastructure/lib/utils.ts) (`playSound`, `stopSound`), ensuring sounds stop immediately when actions end and handling potential playback errors. Sounds are identified by type (e.g., `DRAG_SOUND`, `RESIZE_SOUND`).
 
-The taskbar automatically shows buttons for minimized windows. When a user clicks a taskbar button, the `restoreWindowAtom` is called to restore that window.
+## Responsive Design
 
-## Advanced: Custom Window Features
+The window system is responsive by default:
 
-For advanced cases like confirming window close, syncing window state with app state, or custom window behaviors:
+- **Desktop**: Full dragging and resizing capabilities via mouse interactions handled in `WindowBase.tsx`. Resize handles are visible.
+- **Mobile**:
+  - Dragging is constrained within screen bounds (`handleDragMove` in `WindowBase.tsx`).
+  - Resizing is disabled (resize handles are hidden in `WindowUI.tsx` when `isMobile` is true).
+- Automatic device detection uses the `useDeviceDetect` hook within `WindowBase.tsx`.
 
-1. Pass the `windowId` to your app component
-2. Use window atoms in your component to control window behavior
-3. Create derived atoms for your specific needs
+## Portal-Based Rendering
 
-See the Timer app integration in [timerAtom.ts](mdc:src/application/atoms/timerAtom.ts) and [Timer.tsx](mdc:src/app/(timer)/Timer.tsx) for a complete example.
+Window rendering uses React's `createPortal` for isolation:
+
+1. The `Window` component dynamically creates a `div` with `id="window-portal-container"` and appends it to `document.body` if it doesn't exist.
+2. All `WindowBase` components (representing individual windows) are rendered into this shared portal container using `createPortal`.
+3. This isolates windows from the main React component tree's layout and styling.
+4. Windows naturally stack based on their `zIndex` property managed by `focusWindowAtom`.
+
+See [Window.tsx](mdc:src/presentation/components/shared/window/Window.tsx) for the implementation details.

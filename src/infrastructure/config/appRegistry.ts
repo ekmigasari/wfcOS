@@ -4,8 +4,9 @@ import { Timer } from "@/app/(timer)/Timer";
 import { BackgroundChanger } from "@/app/(settings)/(background)/background";
 import { MusicPlayer } from "@/app/(music-player)/MusicPlayer";
 import TodoList from "@/app/(to-do-list)/todoList";
-import AmbiencePlayer from "@/app/(ambience)/ambiencePlayer";
+import { AmbiencePlayer } from "@/app/(ambience)/ambiencePlayer";
 import Notepad from "@/app/(notepad)/Notepad";
+import { ChangelogWindow } from "@/presentation/components/shared/taskbar/ChangelogWindow";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -14,6 +15,7 @@ interface AppRegistryEntry {
   minSize?: Size;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: React.ComponentType<any>;
+  hidden?: boolean; // Flag to hide app from desktop icons
 }
 
 export const appRegistry: Record<string, AppRegistryEntry> = {
@@ -62,6 +64,14 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 250, height: 300 },
     component: BackgroundChanger,
+  },
+  changelog: {
+    name: "Changelog",
+    src: "/icons/info.png",
+    defaultSize: { width: 500, height: 400 },
+    minSize: { width: 300, height: 200 },
+    component: ChangelogWindow,
+    hidden: true, // Hide from desktop icons
   },
 };
 

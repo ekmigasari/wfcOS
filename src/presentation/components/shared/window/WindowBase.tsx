@@ -1,257 +1,320 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { cn, playSound } from "../../../../infrastructure/lib/utils";
-import { ResizeDirection } from "../../../../application/hooks/useWindowManagement";
+import React, { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { setWindowMinimizedStateAtom } from "../../../../application/atoms/windowAtoms";
+import {
+  updateWindowPositionSizeAtom,
+  focusWindowAtom,
+  setWindowMinimizedStateAtom,
+} from "@/application/atoms/windowAtoms";
+import { Position, Size } from "@/application/types/window";
+import { WindowUI } from "./WindowUI";
+import { useDeviceDetect } from "@/application/hooks";
+import { playSound, stopSound } from "@/infrastructure/lib/utils";
 
-/**
- * WindowBase Component
- *
- * A base component for window UI that provides the foundation for both desktop and mobile window implementations.
- * This component handles the basic window structure with title bar and content area,
- * with support for common window operations including resizing.
- *
- * The component accepts common window properties like position, size, and styling options,
- * while providing extension points for specialized behaviors like dragging and resizing.
- *
- */
-export type WindowBaseProps = {
+// Sound type constants
+const DRAG_SOUND = "window-drag";
+const RESIZE_SOUND = "window-resize";
+const MINIMIZE_SOUND = "window-minimize";
+
+export interface WindowBaseProps {
   windowId: string;
+  appId: string;
   title: string;
   children: React.ReactNode;
   isOpen: boolean;
   isMinimized?: boolean;
   onClose: () => void;
-  zIndex: number;
-  position: { x: number; y: number };
-  size: { width: number; height: number };
   onFocus: () => void;
-  className?: string;
-  titleBarClassName?: string;
-  contentClassName?: string;
-  style?: React.CSSProperties;
-  onTitleBarMouseDown?: (event: React.MouseEvent<Element, MouseEvent>) => void;
-  minSize?: { width: number; height: number };
-  handleResizeStart?: (
-    e: React.MouseEvent<HTMLDivElement>,
-    direction: ResizeDirection
-  ) => void;
-  showResizeHandles?: boolean;
+  position: Position;
+  size: Size;
+  minSize?: Size;
+  zIndex: number;
   playSounds?: boolean;
-};
+}
 
-// Memoized content component to prevent re-rendering when window state changes
-const MemoizedContent = React.memo(
-  ({
-    children,
-    contentClassName,
-  }: {
-    children: React.ReactNode;
-    contentClassName: string;
-  }) => (
-    <div
-      className={cn("p-4 flex-grow overflow-auto bg-card", contentClassName)}
-    >
-      {children}
-    </div>
-  )
-);
-MemoizedContent.displayName = "MemoizedContent";
-
+/**
+ * WindowBase Component
+ *
+ * A unified window implementation that works responsively for both desktop and mobile.
+ * Handles all window interactions:
+ * - Dragging/moving
+ * - Resizing
+ * - Minimizing
+ * - Closing
+ * - Focus management
+ */
 export const WindowBase = ({
   windowId,
+  appId,
   title,
   children,
   isOpen,
   isMinimized = false,
   onClose,
-  zIndex,
+  onFocus,
   position,
   size,
-  onFocus,
-  className = "",
-  titleBarClassName = "",
-  contentClassName = "",
-  style = {},
-  onTitleBarMouseDown,
-  minSize = { width: 150, height: 100 },
-  handleResizeStart,
-  showResizeHandles = false,
+  minSize = { width: 200, height: 150 },
+  zIndex,
   playSounds = true,
 }: WindowBaseProps) => {
-  // Jotai atom for minimizing windows
+  // Device detection for responsive behavior
+  const { isMobileOrTablet } = useDeviceDetect();
+
+  // Window state management atoms
+  const updateWindowPositionSize = useAtom(updateWindowPositionSizeAtom)[1];
+  const focusWindow = useAtom(focusWindowAtom)[1];
   const [, setWindowMinimizedState] = useAtom(setWindowMinimizedStateAtom);
 
-  // Define resize handles for window
-  const handleBaseClass = "absolute z-[1001] select-none";
-  const cornerHandleClass = `${handleBaseClass} w-5 h-5`;
-  const edgeHandleClass = handleBaseClass;
+  // Refs for window dragging and resizing
+  const windowRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const isResizingRef = useRef(false);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const currentResizeHandleRef = useRef<string | null>(null);
+  const initialSizeRef = useRef<Size>({ width: 0, height: 0 });
+  const initialPositionRef = useRef<Position>({ x: 0, y: 0 });
 
-  // Define resize handles with useMemo (before any early returns)
-  const resizeHandles = useMemo(
-    () => [
-      // Corners
-      {
-        className: cn(cornerHandleClass, "bottom-[-3px] right-[-3px]"),
-        direction: "bottom-right" as ResizeDirection,
-        style: {
-          cursor: "nwse-resize",
-          backgroundColor: "rgba(255, 255, 255, 0.05)",
-          borderRight: "1px solid rgba(255, 255, 255, 0.1)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-        },
-      },
-      {
-        className: cn(cornerHandleClass, "bottom-[-3px] left-[-3px]"),
-        direction: "bottom-left" as ResizeDirection,
-        style: {
-          cursor: "nesw-resize",
-          backgroundColor: "rgba(255, 255, 255, 0.05)",
-          borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-        },
-      },
-      {
-        className: cn(cornerHandleClass, "top-[-3px] right-[-3px]"),
-        direction: "top-right" as ResizeDirection,
-        style: {
-          cursor: "nesw-resize",
-          backgroundColor: "rgba(255, 255, 255, 0.05)",
-          borderRight: "1px solid rgba(255, 255, 255, 0.1)",
-          borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-        },
-      },
-      {
-        className: cn(cornerHandleClass, "top-[-3px] left-[-3px]"),
-        direction: "top-left" as ResizeDirection,
-        style: {
-          cursor: "nwse-resize",
-          backgroundColor: "rgba(255, 255, 255, 0.05)",
-          borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
-          borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-        },
-      },
-      // Edges
-      {
-        className: cn(edgeHandleClass, "top-5 bottom-5 right-[-3px] w-[6px]"),
-        direction: "right" as ResizeDirection,
-        style: { cursor: "ew-resize" },
-      },
-      {
-        className: cn(edgeHandleClass, "top-5 bottom-5 left-[-3px] w-[6px]"),
-        direction: "left" as ResizeDirection,
-        style: { cursor: "ew-resize" },
-      },
-      {
-        className: cn(edgeHandleClass, "left-5 right-5 bottom-[-3px] h-[6px]"),
-        direction: "bottom" as ResizeDirection,
-        style: { cursor: "ns-resize" },
-      },
-      {
-        className: cn(edgeHandleClass, "left-5 right-5 top-[-3px] h-[6px]"),
-        direction: "top" as ResizeDirection,
-        style: { cursor: "ns-resize" },
-      },
-    ],
-    [cornerHandleClass, edgeHandleClass]
-  );
-
-  // Don't render if not open
-  if (!isOpen) {
-    return null;
-  }
-
-  // Handle window close with sound
-  const handleClose = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (playSounds) {
-      playSound("/sounds/close.mp3");
+  // Auto-focus when window opens or is restored
+  useEffect(() => {
+    if (isOpen && !isMinimized) {
+      focusWindow(windowId);
     }
-    onClose();
+  }, [isOpen, isMinimized, windowId, focusWindow]);
+
+  // Handle window dragStart
+  const handleDragStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (windowRef.current && !isResizingRef.current) {
+      // Bring window to front first
+      handleFocus();
+
+      isDraggingRef.current = true;
+
+      // Calculate the offset of the mouse from the window origin
+      const rect = windowRef.current.getBoundingClientRect();
+      dragOffsetRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+
+      // Set global cursor to move
+      document.body.style.cursor = "move";
+
+      // Play sound if enabled
+      if (playSounds) {
+        playSound("/sounds/loading.mp3", DRAG_SOUND);
+      }
+
+      // Capture mouse events on the entire document
+      document.addEventListener("mousemove", handleDragMove);
+      document.addEventListener("mouseup", handleDragEnd);
+    }
   };
 
-  // Handle window minimize request with sound
-  const handleMinimize = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  // Handle window dragging
+  const handleDragMove = (e: MouseEvent) => {
+    if (isDraggingRef.current && windowRef.current) {
+      // Calculate new position based on mouse movement and initial offset
+      const newX = Math.max(0, e.clientX - dragOffsetRef.current.x);
+      const newY = Math.max(0, e.clientY - dragOffsetRef.current.y);
+
+      // On mobile, constrain window within viewport
+      if (isMobileOrTablet) {
+        const maxX = window.innerWidth - size.width / 2;
+        const maxY = window.innerHeight - 40; // Leave room for window controls
+        const constrainedX = Math.min(maxX, newX);
+        const constrainedY = Math.min(maxY, newY);
+
+        updateWindowPositionSize({
+          id: windowId,
+          position: { x: constrainedX, y: constrainedY },
+          size,
+        });
+      } else {
+        // Regular desktop behavior
+        updateWindowPositionSize({
+          id: windowId,
+          position: { x: newX, y: newY },
+          size,
+        });
+      }
+    }
+  };
+
+  // Handle drag end
+  const handleDragEnd = () => {
+    if (!isDraggingRef.current) return; // Prevent running if not dragging
+
+    isDraggingRef.current = false;
+
+    // Reset global cursor
+    document.body.style.cursor = "default";
+
+    // Stop drag sound
     if (playSounds) {
-      playSound("/sounds/minimize.mp3");
+      stopSound(DRAG_SOUND);
+    }
+
+    // Remove document-level event listeners
+    document.removeEventListener("mousemove", handleDragMove);
+    document.removeEventListener("mouseup", handleDragEnd);
+  };
+
+  // Handle resizing start
+  const handleResizeStart = (e: React.MouseEvent, handle: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (windowRef.current) {
+      // Bring window to front
+      handleFocus();
+
+      isResizingRef.current = true;
+      currentResizeHandleRef.current = handle;
+
+      // Store initial size and position
+      initialSizeRef.current = { ...size };
+      initialPositionRef.current = { ...position };
+
+      // Calculate initial mouse position
+      dragOffsetRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+
+      // Play sound if enabled
+      if (playSounds) {
+        playSound("/sounds/loading.mp3", RESIZE_SOUND);
+      }
+
+      // Add document-level event listeners
+      document.addEventListener("mousemove", handleResizeMove);
+      document.addEventListener("mouseup", handleResizeEnd);
+    }
+  };
+
+  // Handle resize movement
+  const handleResizeMove = (e: MouseEvent) => {
+    if (isResizingRef.current && windowRef.current) {
+      const handle = currentResizeHandleRef.current;
+      if (!handle) return;
+
+      // Calculate deltas from initial position
+      const deltaX = e.clientX - dragOffsetRef.current.x;
+      const deltaY = e.clientY - dragOffsetRef.current.y;
+
+      // Get initial values
+      const initialWidth = initialSizeRef.current.width;
+      const initialHeight = initialSizeRef.current.height;
+      const initialX = initialPositionRef.current.x;
+      const initialY = initialPositionRef.current.y;
+
+      // Calculate new dimensions
+      let newWidth = initialWidth;
+      let newHeight = initialHeight;
+      let newX = initialX;
+      let newY = initialY;
+
+      // Calculate based on handle direction
+      if (handle.includes("right")) {
+        newWidth = Math.max(minSize.width, initialWidth + deltaX);
+      }
+      if (handle.includes("bottom")) {
+        newHeight = Math.max(minSize.height, initialHeight + deltaY);
+      }
+      if (handle.includes("left")) {
+        const potentialWidth = Math.max(minSize.width, initialWidth - deltaX);
+        if (potentialWidth !== initialWidth) {
+          newWidth = potentialWidth;
+          newX = initialX + (initialWidth - potentialWidth);
+        }
+      }
+      if (handle.includes("top")) {
+        const potentialHeight = Math.max(
+          minSize.height,
+          initialHeight - deltaY
+        );
+        if (potentialHeight !== initialHeight) {
+          newHeight = potentialHeight;
+          newY = initialY + (initialHeight - potentialHeight);
+        }
+      }
+
+      // Update window position and size
+      updateWindowPositionSize({
+        id: windowId,
+        position: { x: newX, y: newY },
+        size: { width: newWidth, height: newHeight },
+      });
+    }
+  };
+
+  // Handle resize end
+  const handleResizeEnd = () => {
+    isResizingRef.current = false;
+    currentResizeHandleRef.current = null;
+
+    // Stop resize sound
+    if (playSounds) {
+      stopSound(RESIZE_SOUND);
+    }
+
+    // Remove document-level event listeners
+    document.removeEventListener("mousemove", handleResizeMove);
+    document.removeEventListener("mouseup", handleResizeEnd);
+  };
+
+  // Handle window focus
+  const handleFocus = () => {
+    // Only focus if open and not minimized
+    if (isOpen && !isMinimized) {
+      focusWindow(windowId);
+    }
+    // Also call the original onFocus passed from parent if needed
+    onFocus(); // Keep this? User might expect it.
+  };
+
+  // Handle window minimize
+  const handleMinimize = () => {
+    if (!isOpen) return; // Can't minimize a closed window
+    if (playSounds) {
+      playSound("/sounds/minimize.mp3", MINIMIZE_SOUND);
     }
     setWindowMinimizedState({ windowId, isMinimized: true });
   };
 
-  // Main outer container - always present regardless of minimized state
+  // Early return if the window should not be rendered at all
+  if (!isOpen) {
+    return null;
+  }
+
+  // Apply hidden style if minimized, otherwise null
+  const minimizedStyle = isMinimized ? { display: "none" } : {};
+
   return (
-    <div
-      className={cn(
-        "absolute bg-background border border-secondary rounded-lg shadow-xl flex flex-col overflow-hidden",
-        className,
-        isMinimized && "opacity-0 pointer-events-none"
-      )}
-      style={{
-        top: isMinimized ? "-9999px" : `${position.y}px`,
-        left: isMinimized ? "-9999px" : `${position.x}px`,
-        width: `${size.width}px`,
-        height: `${size.height}px`,
-        minWidth: minSize?.width ? `${minSize.width}px` : "150px",
-        minHeight: minSize?.height ? `${minSize.height}px` : "100px",
-        zIndex: isMinimized ? -1 : zIndex,
-        position: isMinimized ? "fixed" : "absolute",
-        ...style,
-      }}
-      onMouseDown={!isMinimized ? onFocus : undefined}
-    >
-      {/* Title Bar */}
-      <div
-        className={cn(
-          "bg-primary px-3 py-2 border-b border-secondary flex justify-between items-center select-none h-10 rounded-t-md shadow-md",
-          titleBarClassName
-        )}
-        onMouseDown={!isMinimized ? onTitleBarMouseDown : undefined}
+    // Use the minimized style
+    <div style={minimizedStyle}>
+      <WindowUI
+        ref={windowRef}
+        windowId={windowId}
+        appId={appId}
+        title={title}
+        position={position}
+        size={size}
+        zIndex={zIndex}
+        isMobile={isMobileOrTablet}
+        onTitleBarMouseDown={handleDragStart}
+        onMinimize={handleMinimize}
+        onClose={onClose} // Pass original onClose
+        onFocus={handleFocus}
+        onResizeStart={handleResizeStart}
       >
-        <span className="overflow-hidden text-ellipsis whitespace-nowrap text-white">
-          {title}
-        </span>
-        <div className="flex items-center gap-1">
-          <button
-            className="cursor-pointer bg-yellow-500 text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
-            onClick={handleMinimize}
-            title="Minimize"
-          >
-            -
-          </button>
-          <button
-            className="cursor-pointer bg-destructive text-white rounded-sm w-5 h-5 flex justify-center items-center font-bold leading-[1px]"
-            onClick={handleClose}
-            title="Close"
-          >
-            X
-          </button>
-        </div>
-      </div>
-
-      {/* Memoized Content Area */}
-      <MemoizedContent contentClassName={contentClassName}>
+        {/* Render children directly, WindowProvider is removed */}
         {children}
-      </MemoizedContent>
-
-      {/* Resize Handles */}
-      {showResizeHandles && handleResizeStart
-        ? !isMinimized &&
-          resizeHandles.map((handle) => (
-            <div
-              key={handle.direction}
-              className={handle.className}
-              style={handle.style}
-              data-resize-handle="true"
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                handleResizeStart(e, handle.direction);
-              }}
-            />
-          ))
-        : null}
+      </WindowUI>
     </div>
   );
 };
