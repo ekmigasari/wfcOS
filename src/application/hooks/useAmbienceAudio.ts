@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  loadFeatureState,
+  saveFeatureState,
+} from "@/infrastructure/utils/storage";
 
 // Sound definition (moved from atoms)
 export interface AmbienceSound {
@@ -41,15 +45,36 @@ export const ambienceSounds: AmbienceSound[] = [
 
 const DEFAULT_VOLUME = 0.7;
 
+// Storage key for ambience player state
+const AMBIENCE_FEATURE_KEY = "ambience-player";
+
+// Interface for saved state
+interface AmbiencePlayerState {
+  currentSoundIndex: number;
+  volume: number;
+  isMuted: boolean;
+}
+
 export const useAmbienceAudio = () => {
+  // Load saved state from localStorage
+  const getSavedState = (): AmbiencePlayerState | undefined => {
+    return loadFeatureState<AmbiencePlayerState>(AMBIENCE_FEATURE_KEY);
+  };
+
+  // Get initial state values, falling back to defaults if not found
+  const savedState = getSavedState();
+
   // --- Local State ---
-  const [currentSoundIndex, setCurrentSoundIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(DEFAULT_VOLUME);
-  const [isMuted, setIsMuted] = useState(false);
+  const [currentSoundIndex, setCurrentSoundIndex] = useState(
+    savedState?.currentSoundIndex ?? 0
+  );
+  const [isPlaying, setIsPlaying] = useState(false); // Always start paused
+  const [volume, setVolume] = useState(savedState?.volume ?? DEFAULT_VOLUME);
+  const [isMuted, setIsMuted] = useState(savedState?.isMuted ?? false);
   const [isLoading, setIsLoading] = useState(false);
-  const [prevVolumeBeforeMute, setPrevVolumeBeforeMute] =
-    useState(DEFAULT_VOLUME);
+  const [prevVolumeBeforeMute, setPrevVolumeBeforeMute] = useState(
+    savedState?.volume ?? DEFAULT_VOLUME
+  );
 
   // --- Refs ---
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -58,13 +83,30 @@ export const useAmbienceAudio = () => {
   // --- Derived State ---
   const currentSound = ambienceSounds[currentSoundIndex];
 
+  // --- Save state to localStorage ---
+  const saveState = useCallback(() => {
+    const state: AmbiencePlayerState = {
+      currentSoundIndex,
+      volume,
+      isMuted,
+    };
+    saveFeatureState(AMBIENCE_FEATURE_KEY, state);
+  }, [currentSoundIndex, volume, isMuted]);
+
   // --- Effects ---
+
+  // Save state whenever it changes
+  useEffect(() => {
+    saveState();
+  }, [currentSoundIndex, volume, isMuted, saveState]);
 
   // Initialize and cleanup audio element
   useEffect(() => {
     audioRef.current = new Audio();
     audioRef.current.loop = true;
-    isInitializedRef.current = false; // Reset on mount
+
+    // Always start in non-initialized state
+    isInitializedRef.current = false;
 
     const audioElement = audioRef.current; // Capture for cleanup
 
