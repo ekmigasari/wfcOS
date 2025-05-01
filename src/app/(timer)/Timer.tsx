@@ -5,6 +5,9 @@ import TimerDisplay from "./components/TimerDisplay";
 import TimerControls from "./components/TimerControls";
 import TimerSettings from "./components/TimerSettings";
 import TimerManager from "./TimerManager";
+import { useEffect } from "react";
+import { useAtom } from "jotai";
+import { resetTimerAtom } from "@/application/atoms/timerAtom";
 
 export const Timer = () => {
   // Use the timer hook for state and actions
@@ -20,6 +23,15 @@ export const Timer = () => {
     setCustomDuration,
     setCustomTitle,
   } = useTimer();
+
+  // Direct access to reset atom to avoid sound conflicts
+  const [, silentReset] = useAtom(resetTimerAtom);
+
+  // Reset timer when component mounts (reopens)
+  useEffect(() => {
+    // Use silent reset to avoid sound conflict errors
+    silentReset();
+  }, [silentReset]);
 
   return (
     <div className="flex flex-col items-center justify-start text-secondary h-full p-4">
