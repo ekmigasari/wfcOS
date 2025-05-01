@@ -183,6 +183,7 @@ export const WindowUI = memo(
                   onFocus();
                   onMinimize();
                 }}
+                onMouseDown={(e) => e.stopPropagation()}
                 title="Minimize"
               >
                 -
@@ -194,6 +195,7 @@ export const WindowUI = memo(
                   onFocus();
                   onClose();
                 }}
+                onMouseDown={(e) => e.stopPropagation()}
                 title="Close"
               >
                 X
