@@ -55,14 +55,14 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
         <SkipBack size={20} />
       </Button>
       <Button
-        variant="ghost"
+        variant="default"
         size="icon"
         onClick={onPlayPause}
         disabled={isLoading}
-        className="text-stone-700 hover:text-stone-900 hover:bg-stone-200 disabled:opacity-50"
+        className="bg-accent hover:bg-secondary disabled:opacity-50"
       >
         {isLoading ? (
-          <span className="animate-spin h-5 w-5 border-2 border-stone-500 border-t-transparent rounded-full" />
+          <span className="animate-spin h-5 w-5 border-2 border-stone-500 border-t-transparent" />
         ) : isPlaying ? (
           <Pause size={20} />
         ) : (

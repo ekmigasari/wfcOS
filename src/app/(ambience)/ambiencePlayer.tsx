@@ -32,6 +32,21 @@ export const AmbiencePlayer: React.FC = () => {
     action();
   };
 
+  // Enhanced track controls that maintain playback state
+  const handleNextTrack = () => {
+    playUISound(() => {
+      nextTrack();
+      // No need to explicitly start playback as the hook should maintain state
+    });
+  };
+
+  const handlePreviousTrack = () => {
+    playUISound(() => {
+      previousTrack();
+      // No need to explicitly start playback as the hook should maintain state
+    });
+  };
+
   // Pass state and handlers to the UI component
   return (
     <AmbiencePlayerUI
@@ -40,8 +55,8 @@ export const AmbiencePlayer: React.FC = () => {
       isLoading={isLoading} // Pass loading state to UI
       volume={volume}
       onPlayPause={() => playUISound(togglePlayPause)}
-      onPrevious={() => playUISound(previousTrack)}
-      onNext={() => playUISound(nextTrack)}
+      onPrevious={handlePreviousTrack}
+      onNext={handleNextTrack}
       onVolumeChange={changeVolume} // Direct pass-through, hook handles mute logic
       onMuteToggle={() => playUISound(toggleMute)}
     />

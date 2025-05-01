@@ -169,8 +169,12 @@ export const useAmbienceAudio = () => {
     setCurrentSoundIndex(
       (prevIndex) => (prevIndex + 1) % ambienceSounds.length
     );
-    isInitializedRef.current = false; // Require new play action for new track
-    setIsPlaying(false); // Stop playback when changing track
+    // Maintain initialization state if user has already played audio
+    if (isInitializedRef.current) {
+      // Don't set isPlaying to false, maintain current playback state
+    } else {
+      isInitializedRef.current = true; // Mark as initialized on manual track change
+    }
   }, []);
 
   const previousTrack = useCallback(() => {
@@ -178,8 +182,12 @@ export const useAmbienceAudio = () => {
       (prevIndex) =>
         (prevIndex - 1 + ambienceSounds.length) % ambienceSounds.length
     );
-    isInitializedRef.current = false; // Require new play action for new track
-    setIsPlaying(false); // Stop playback when changing track
+    // Maintain initialization state if user has already played audio
+    if (isInitializedRef.current) {
+      // Don't set isPlaying to false, maintain current playback state
+    } else {
+      isInitializedRef.current = true; // Mark as initialized on manual track change
+    }
   }, []);
 
   const changeVolume = useCallback((newVolume: number) => {
