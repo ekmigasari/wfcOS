@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AmbienceSound } from "@/application/atoms/ambiencePlayerAtom";
+import { AmbienceSound } from "@/application/hooks/useAmbienceAudio";
 import { Slider } from "@/presentation/components/ui/slider";
 import { Button } from "@/presentation/components/ui/button";
 import {
@@ -30,6 +30,7 @@ export const TrackInfo: React.FC<TrackInfoProps> = ({ currentSound }) => {
 
 interface PlayerControlsProps {
   isPlaying: boolean;
+  isLoading: boolean;
   onPlayPause: () => void;
   onPrevious: () => void;
   onNext: () => void;
@@ -37,6 +38,7 @@ interface PlayerControlsProps {
 
 export const PlayerControls: React.FC<PlayerControlsProps> = ({
   isPlaying,
+  isLoading,
   onPlayPause,
   onPrevious,
   onNext,
@@ -47,7 +49,8 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
         variant="ghost"
         size="icon"
         onClick={onPrevious}
-        className="text-stone-700 hover:text-stone-900 hover:bg-stone-200"
+        disabled={isLoading}
+        className="text-stone-700 hover:text-stone-900 hover:bg-stone-200 disabled:opacity-50"
       >
         <SkipBack size={20} />
       </Button>
@@ -55,15 +58,23 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
         variant="ghost"
         size="icon"
         onClick={onPlayPause}
-        className="text-stone-700 hover:text-stone-900 hover:bg-stone-200"
+        disabled={isLoading}
+        className="text-stone-700 hover:text-stone-900 hover:bg-stone-200 disabled:opacity-50"
       >
-        {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+        {isLoading ? (
+          <span className="animate-spin h-5 w-5 border-2 border-stone-500 border-t-transparent rounded-full" />
+        ) : isPlaying ? (
+          <Pause size={20} />
+        ) : (
+          <Play size={20} />
+        )}
       </Button>
       <Button
         variant="ghost"
         size="icon"
         onClick={onNext}
-        className="text-stone-700 hover:text-stone-900 hover:bg-stone-200"
+        disabled={isLoading}
+        className="text-stone-700 hover:text-stone-900 hover:bg-stone-200 disabled:opacity-50"
       >
         <SkipForward size={20} />
       </Button>
@@ -109,6 +120,7 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
 interface AmbiencePlayerUIProps {
   currentSound: AmbienceSound;
   isPlaying: boolean;
+  isLoading: boolean;
   volume: number;
   onPlayPause: () => void;
   onPrevious: () => void;
@@ -120,6 +132,7 @@ interface AmbiencePlayerUIProps {
 export const AmbiencePlayerUI: React.FC<AmbiencePlayerUIProps> = ({
   currentSound,
   isPlaying,
+  isLoading,
   volume,
   onPlayPause,
   onPrevious,
@@ -133,6 +146,7 @@ export const AmbiencePlayerUI: React.FC<AmbiencePlayerUIProps> = ({
         <TrackInfo currentSound={currentSound} />
         <PlayerControls
           isPlaying={isPlaying}
+          isLoading={isLoading}
           onPlayPause={onPlayPause}
           onPrevious={onPrevious}
           onNext={onNext}

@@ -1,79 +1,49 @@
 "use client";
 
-import React, { useRef } from "react";
-import { useAtom } from "jotai";
-import {
-  currentSoundAtom,
-  isPlayingAtom,
-  volumeAtom,
-  ambiencePlayerActions,
-} from "@/application/atoms/ambiencePlayerAtom";
+import React from "react";
 import { AmbiencePlayerUI } from "./ambiencePlayerUI";
 import { playSound } from "@/infrastructure/lib/utils";
+import { useAmbienceAudio } from "@/application/hooks";
 
 /**
  * AmbiencePlayer
  *
- * UI component for the ambience player that handles user interactions.
- * The actual audio playback is managed by the GlobalAmbienceManager.
+ * UI component for the ambience player that handles user interactions
+ * and manages its own audio playback state via the useAmbienceAudio hook.
  */
 export const AmbiencePlayer: React.FC = () => {
+  // Use the dedicated hook for audio state and controls
+  const {
+    currentSound,
+    isPlaying,
+    volume,
+    // isMuted is handled internally by the hook via toggleMute/changeVolume
+    isLoading,
+    togglePlayPause,
+    nextTrack,
+    previousTrack,
+    changeVolume,
+    toggleMute,
+  } = useAmbienceAudio();
 
-
-  // Player state
-  const [currentSound] = useAtom(currentSoundAtom);
-  const [isPlaying] = useAtom(isPlayingAtom);
-  const [volume] = useAtom(volumeAtom);
-  const [, dispatchAction] = useAtom(ambiencePlayerActions);
-
-  // Track previous volume for mute toggle
-  const previousVolumeRef = useRef<number>(volume);
-
-  // Player control handlers
-  const handlePlayPause = () => {
-    // Play UI sound with small delay to avoid audio conflicts
+  // Simple UI sound player wrappers
+  const playUISound = (action: () => void) => {
     setTimeout(() => playSound("/sounds/click.mp3"), 10);
-    dispatchAction({ type: "toggle" });
+    action();
   };
 
-  const handlePrevious = () => {
-    setTimeout(() => playSound("/sounds/click.mp3"), 10);
-    dispatchAction({ type: "previous" });
-  };
-
-  const handleNext = () => {
-    setTimeout(() => playSound("/sounds/click.mp3"), 10);
-    dispatchAction({ type: "next" });
-  };
-
-  const handleVolumeChange = (newVolume: number) => {
-    dispatchAction({ type: "setVolume", payload: newVolume });
-  };
-
-  const handleMuteToggle = () => {
-    setTimeout(() => playSound("/sounds/click.mp3"), 10);
-    if (volume > 0) {
-      previousVolumeRef.current = volume;
-      dispatchAction({ type: "setVolume", payload: 0 });
-    } else {
-      dispatchAction({
-        type: "setVolume",
-        payload:
-          previousVolumeRef.current > 0 ? previousVolumeRef.current : 0.7,
-      });
-    }
-  };
-
+  // Pass state and handlers to the UI component
   return (
     <AmbiencePlayerUI
       currentSound={currentSound}
       isPlaying={isPlaying}
+      isLoading={isLoading} // Pass loading state to UI
       volume={volume}
-      onPlayPause={handlePlayPause}
-      onPrevious={handlePrevious}
-      onNext={handleNext}
-      onVolumeChange={handleVolumeChange}
-      onMuteToggle={handleMuteToggle}
+      onPlayPause={() => playUISound(togglePlayPause)}
+      onPrevious={() => playUISound(previousTrack)}
+      onNext={() => playUISound(nextTrack)}
+      onVolumeChange={changeVolume} // Direct pass-through, hook handles mute logic
+      onMuteToggle={() => playUISound(toggleMute)}
     />
   );
 };
