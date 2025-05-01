@@ -5,6 +5,34 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Global sound state with immediate access
+export let isSoundMuted = false;
+
+// Initialize from localStorage if available (client-side only)
+if (typeof window !== "undefined") {
+  try {
+    const storedMuteState = localStorage.getItem("isSoundMuted");
+    if (storedMuteState !== null) {
+      isSoundMuted = JSON.parse(storedMuteState) === true;
+    }
+  } catch (e) {
+    console.error("Error reading sound mute state from localStorage", e);
+  }
+}
+
+// Directly set global mute state
+export const setSoundMuted = (muted: boolean): void => {
+  isSoundMuted = muted;
+
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem("isSoundMuted", JSON.stringify(muted));
+    } catch (e) {
+      console.error("Error saving sound mute state to localStorage", e);
+    }
+  }
+};
+
 // Track active audio elements by sound type
 const activeSounds: Record<string, HTMLAudioElement> = {};
 const audioLoadingStates: Record<string, boolean> = {};
@@ -15,6 +43,11 @@ export const playSound = (
   soundType: string = "default"
 ): HTMLAudioElement | null => {
   try {
+    // Check if sound is muted globally
+    if (isSoundMuted) {
+      return null;
+    }
+
     // Stop previous sound of the same type if it exists
     stopSound(soundType);
 

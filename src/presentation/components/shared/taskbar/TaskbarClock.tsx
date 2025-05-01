@@ -2,6 +2,7 @@
 
 import { Coffee } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { SoundToggle } from "./SoundToggle";
 
 export const TaskbarClock = () => {
   const [time, setTime] = useState(new Date());
@@ -14,8 +15,9 @@ export const TaskbarClock = () => {
   }, []);
 
   return (
-    <div className="taskbar-clock ml-auto flex items-center gap-2">
+    <div className="taskbar-clock ml-auto flex items-center gap-3">
       <div className="flex items-center space-x-1">
+        <SoundToggle />
         <a
           href="https://ko-fi.com/workfromcoffee"
           target="_blank"
