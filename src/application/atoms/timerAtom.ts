@@ -48,7 +48,7 @@ const getDurationForSetting = (
 };
 
 // Define the initial state (load from storage or use defaults)
-const initialTimerState: TimerState = (() => {
+export const initialTimerState: TimerState = (() => {
   const savedState = loadFeatureState<TimerState>(FEATURE_KEY);
 
   // Define default values
@@ -219,7 +219,7 @@ export const setCustomTitleAtom = atom(null, (get, set, newTitle: string) => {
 // --- Window Lifecycle Callbacks ---
 
 // Type definition for the Jotai set function, simplified for this context
-type JotaiSet = <Value, Result>(
+export type JotaiSet = <Value, Result>(
   atom: WritableAtom<Value, [Value | ((prev: Value) => Value)], Result>,
   update: Value | ((prev: Value) => Value)
 ) => Result;

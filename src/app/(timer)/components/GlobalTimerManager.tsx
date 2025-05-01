@@ -131,12 +131,7 @@ export const GlobalTimerManager = () => {
         document.title = "wfcOS";
       }
     }
-  }, [
-    consumeCleanupRequests,
-    timerState.windowId,
-    setTimerState,
-    workerRef.current,
-  ]);
+  }, [consumeCleanupRequests, timerState.windowId, setTimerState]);
 
   // Control the worker based on timer state changes
   useEffect(() => {

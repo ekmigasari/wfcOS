@@ -1,6 +1,5 @@
 import { Size } from "@/application/types/window";
 import React from "react";
-import type { SetAtom } from "jotai"; // Import SetAtom type
 import { Timer } from "@/app/(timer)/Timer";
 import { BackgroundChanger } from "@/app/(settings)/(background)/background";
 import { MusicPlayer } from "@/app/(music-player)/MusicPlayer";
@@ -13,13 +12,14 @@ import {
   handleTimerOpen,
   handleTimerClose,
   handleTimerMinimize,
+  // Import JotaiSet type
+  JotaiSet,
 } from "@/application/atoms/timerAtom";
 
 // Import ambience lifecycle handlers from hooks
-import { ambienceLifecycle } from "@/app/(ambience)/ambienceLifecycle";
+import { ambienceLifecycle } from "@/application/hooks";
 
-// Simplified Jotai Set type for callbacks
-type JotaiSet = Parameters<Parameters<typeof SetAtom>[1]>[1];
+// No need to redefine, just use the imported type
 
 interface AppRegistryEntry {
   name: string; // The display name of the app

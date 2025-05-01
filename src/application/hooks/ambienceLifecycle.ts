@@ -1,7 +1,5 @@
-import { isPlayingAtom } from "../../application/atoms/ambiencePlayerAtom";
-
-// Type for Jotai set function
-type JotaiSet = (key: unknown, value: unknown, ...args: unknown[]) => void;
+import { isPlayingAtom } from "@/application/atoms/ambiencePlayerAtom";
+import { JotaiSet } from "@/application/atoms/timerAtom";
 
 /**
  * Ambience Player Lifecycle Handlers

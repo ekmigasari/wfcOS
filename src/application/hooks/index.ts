@@ -9,3 +9,4 @@
  */
 
 export * from "./useDeviceDetect";
+export { ambienceLifecycle } from "./ambienceLifecycle";
