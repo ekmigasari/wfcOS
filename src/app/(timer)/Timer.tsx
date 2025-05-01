@@ -1,40 +1,70 @@
 "use client";
 
-import { useAtom } from "jotai";
-import { timerAtom } from "@/application/atoms/timerAtom";
+import { useTimer } from "@/application/hooks/useTimer";
 import TimerDisplay from "./components/TimerDisplay";
 import TimerControls from "./components/TimerControls";
 import TimerSettings from "./components/TimerSettings";
+import TimerManager from "./TimerManager";
+import { useEffect } from "react";
+import { useAtom } from "jotai";
+import { resetTimerAtom } from "@/application/atoms/timerAtom";
 
 export const Timer = () => {
-  // Read full state directly from the atom
-  const [timerState] = useAtom(timerAtom);
+  // Use the timer hook for state and actions
+  const {
+    timeRemaining,
+    isRunning,
+    timerSetting,
+    customDurationMinutes,
+    customTitle,
+    startPause,
+    reset,
+    setSetting,
+    setCustomDuration,
+    setCustomTitle,
+  } = useTimer();
+
+  // Direct access to reset atom to avoid sound conflicts
+  const [, silentReset] = useAtom(resetTimerAtom);
+
+  // Reset timer when component mounts (reopens)
+  useEffect(() => {
+    // Use silent reset to avoid sound conflict errors
+    silentReset();
+  }, [silentReset]);
 
   return (
     <div className="flex flex-col items-center justify-start text-secondary h-full p-4">
+      {/* Timer worker manager (invisible) */}
+      <TimerManager />
+
       {/* Timer Display Area */}
       <div className="flex flex-col items-center mb-6">
         <TimerDisplay
-          timeRemaining={timerState.timeRemaining}
-          timerSetting={timerState.timerSetting}
-          customTitle={timerState.customTitle}
+          timeRemaining={timeRemaining}
+          timerSetting={timerSetting}
+          customTitle={customTitle}
         />
-        <TimerControls isRunning={timerState.isRunning} />
+
+        {/* Timer controls */}
+        <TimerControls
+          isRunning={isRunning}
+          onStartPause={startPause}
+          onReset={reset}
+        />
       </div>
 
       {/* Settings Area */}
       <TimerSettings
-        timerSetting={timerState.timerSetting}
-        customDurationMinutes={timerState.customDurationMinutes}
-        customTitle={timerState.customTitle}
+        timerSetting={timerSetting}
+        customDurationMinutes={customDurationMinutes}
+        customTitle={customTitle}
+        onSetSetting={setSetting}
+        onSetCustomDuration={setCustomDuration}
+        onSetCustomTitle={setCustomTitle}
       />
-
-      {/* Show minimized state indicator */}
-      {timerState.isMinimized && (
-        <div className="text-xs mt-2 text-green-500">
-          Timer will continue running when window is minimized
-        </div>
-      )}
     </div>
   );
 };
+
+export default Timer;

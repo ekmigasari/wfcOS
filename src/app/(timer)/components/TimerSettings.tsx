@@ -1,37 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAtom } from "jotai";
-import {
-  TimerSetting,
-  setTimerSettingAtom,
-  setCustomDurationAtom,
-  setCustomTitleAtom,
-} from "@/application/atoms/timerAtom";
-import { playSound } from "@/infrastructure/lib/utils";
+import { TimerSetting } from "@/application/atoms/timerAtom";
 
 interface TimerSettingsProps {
   timerSetting: TimerSetting;
   customDurationMinutes: number;
   customTitle: string;
+  onSetSetting: (setting: TimerSetting) => void;
+  onSetCustomDuration: (minutes: number) => void;
+  onSetCustomTitle: (title: string) => void;
 }
 
 export const TimerSettings = ({
   timerSetting,
   customDurationMinutes,
   customTitle,
+  onSetSetting,
+  onSetCustomDuration,
+  onSetCustomTitle,
 }: TimerSettingsProps) => {
-  const setSetting = useAtom(setTimerSettingAtom)[1];
-  const setCustomTime = useAtom(setCustomDurationAtom)[1];
-  const setCustomName = useAtom(setCustomTitleAtom)[1];
-
-  // Local state for the custom input fields
   const [localCustomMinutes, setLocalCustomMinutes] = useState<string>(
     customDurationMinutes.toString()
   );
   const [localCustomTitle, setLocalCustomTitle] = useState<string>(customTitle);
 
-  // Update local state when global state changes
   useEffect(() => {
     setLocalCustomMinutes(customDurationMinutes.toString());
     setLocalCustomTitle(customTitle);
@@ -39,8 +32,7 @@ export const TimerSettings = ({
 
   const handleSettingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSetting = event.target.value as TimerSetting;
-    playSound("/sounds/click.mp3");
-    setSetting(newSetting);
+    onSetSetting(newSetting);
   };
 
   const handleCustomTimeChange = (
@@ -58,8 +50,7 @@ export const TimerSettings = ({
   const updateGlobalCustomTime = () => {
     const newMinutes = parseInt(localCustomMinutes, 10);
     if (!isNaN(newMinutes) && newMinutes !== customDurationMinutes) {
-      setCustomTime(newMinutes);
-      playSound("/sounds/click.mp3");
+      onSetCustomDuration(newMinutes);
     } else if (isNaN(newMinutes)) {
       setLocalCustomMinutes(customDurationMinutes.toString());
     }
@@ -67,8 +58,7 @@ export const TimerSettings = ({
 
   const updateGlobalCustomTitle = () => {
     if (localCustomTitle !== customTitle) {
-      setCustomName(localCustomTitle);
-      playSound("/sounds/click.mp3");
+      onSetCustomTitle(localCustomTitle);
     }
   };
 
@@ -90,7 +80,6 @@ export const TimerSettings = ({
     }
   };
 
-  // Timer setting options with descriptive labels
   const durationOptions: {
     value: TimerSetting;
     label: string;
@@ -139,7 +128,6 @@ export const TimerSettings = ({
               <div className="font-medium">{option.label}</div>
               <div className="text-xs text-gray-500">{option.description}</div>
 
-              {/* Custom settings inputs */}
               {option.value === "custom" && timerSetting === "custom" && (
                 <div className="flex flex-col mt-2 space-y-2">
                   <div className="flex items-center">

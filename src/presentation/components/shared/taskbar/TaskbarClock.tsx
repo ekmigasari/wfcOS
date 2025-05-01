@@ -2,11 +2,16 @@
 
 import { Coffee } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { SoundToggle } from "./SoundToggle";
+import { Button } from "../../ui/button";
 
 export const TaskbarClock = () => {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    // Set initial time once client-side
+    setTime(new Date());
+
     const timer = setInterval(() => {
       setTime(new Date());
     }, 1000);
@@ -14,20 +19,28 @@ export const TaskbarClock = () => {
   }, []);
 
   return (
-    <div className="taskbar-clock ml-auto flex items-center gap-2">
+    <div className="taskbar-clock ml-auto flex items-center gap-3">
       <div className="flex items-center space-x-1">
+        <SoundToggle />
         <a
           href="https://ko-fi.com/workfromcoffee"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium hover:underline"
-          title="Buy me a coffee"
         >
-          <Coffee size={16} />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7"
+            title="Buy me a coffee"
+          >
+            <Coffee size={16} />
+          </Button>
         </a>
       </div>
       <div className="taskbar-clock ml-auto mr-2 text-sm font-medium">
-        {time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+        {time
+          ? time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+          : ""}
       </div>
     </div>
   );

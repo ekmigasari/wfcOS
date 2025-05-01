@@ -15,11 +15,12 @@ import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { useAtom } from "jotai";
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
 import { ResetDialog } from "./ResetDialog";
-import { ChangelogWindow, CHANGELOG_WINDOW_ID } from "./ChangelogWindow";
+import { useOpenChangelog } from "./ChangelogWindow";
 
 export const TaskbarMenu = () => {
   const openWindow = useAtom(openWindowAtom)[1];
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const openChangelog = useOpenChangelog();
 
   // Function to open an app
   const openApp = (appId: string) => {
@@ -54,14 +55,7 @@ export const TaskbarMenu = () => {
   // Function to open changelog window
   const openChangelogWindow = () => {
     playSound("/sounds/open.mp3");
-
-    openWindow({
-      id: CHANGELOG_WINDOW_ID,
-      appId: "changelog", // Custom appId that's not in the registry
-      title: "Changelog",
-      minSize: { width: 300, height: 200 },
-      initialSize: { width: 500, height: 400 },
-    });
+    openChangelog();
   };
 
   return (
@@ -76,16 +70,20 @@ export const TaskbarMenu = () => {
           Menu
         </MenubarTrigger>
         <MenubarContent>
-          {Object.entries(appRegistry).map(([appId, app]) => (
-            <MenubarItem
-              key={appId}
-              onSelect={() => openApp(appId)}
-              className="flex items-center gap-2"
-            >
-              <Image src={app.src} alt={app.name} width={16} height={16} />
-              {app.name}
-            </MenubarItem>
-          ))}
+          {Object.entries(appRegistry).map(
+            ([appId, app]) =>
+              // Skip hidden apps in the menu
+              !app.hidden && (
+                <MenubarItem
+                  key={appId}
+                  onSelect={() => openApp(appId)}
+                  className="flex items-center gap-2"
+                >
+                  <Image src={app.src} alt={app.name} width={16} height={16} />
+                  {app.name}
+                </MenubarItem>
+              )
+          )}
           <MenubarSeparator />
           <MenubarItem
             inset
@@ -102,11 +100,16 @@ export const TaskbarMenu = () => {
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem disabled>
-            WFC OS<MenubarShortcut>v 2.0</MenubarShortcut>
+            WFC OS<MenubarShortcut>v 2.1</MenubarShortcut>
           </MenubarItem>
-          <MenubarSeparator />
           <MenubarItem inset onSelect={openChangelogWindow}>
             Changelog<MenubarShortcut>history</MenubarShortcut>
+          </MenubarItem>
+          <MenubarItem
+            inset
+            onSelect={() => openUrl("https://github.com/ekmigasari/wfcOS.git")}
+          >
+            Github<MenubarShortcut>repository</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
           <MenubarItem
@@ -115,20 +118,11 @@ export const TaskbarMenu = () => {
           >
             Xmigas <MenubarShortcut>creator</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem
-            inset
-            onSelect={() => openUrl("https://github.com/ekmigasari/wfcOS.git")}
-          >
-            Github<MenubarShortcut>repository</MenubarShortcut>
-          </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
 
       {/* Reset Dialog */}
       <ResetDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen} />
-
-      {/* Changelog Window */}
-      <ChangelogWindow />
     </>
   );
 };
