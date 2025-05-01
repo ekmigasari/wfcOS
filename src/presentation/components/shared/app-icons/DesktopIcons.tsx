@@ -14,10 +14,13 @@ export const DesktopIcons = () => {
   const openWindow = useAtom(openWindowAtom)[1];
 
   // Convert appRegistry to an array for mapping (if it's an object)
-  const apps = Object.entries(appRegistry).map(([id, config]) => ({
-    id, // This is the appId
-    ...config,
-  }));
+  // Filter out apps with hidden flag
+  const apps = Object.entries(appRegistry)
+    .filter(([, config]) => !config.hidden)
+    .map(([id, config]) => ({
+      id, // This is the appId
+      ...config,
+    }));
 
   const handleOpenApp = (appId: string) => {
     const appConfig = appRegistry[appId];
