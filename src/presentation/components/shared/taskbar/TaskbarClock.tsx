@@ -37,9 +37,13 @@ export const TaskbarClock = () => {
           </Button>
         </a>
       </div>
-      <div className="taskbar-clock ml-auto mr-2 text-sm font-medium">
+      <div className="taskbar-clock ml-auto mr-2 text-sm font-medium whitespace-nowrap uppercase">
         {time
-          ? time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+          ? time.toLocaleTimeString([], {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })
           : ""}
       </div>
     </div>
