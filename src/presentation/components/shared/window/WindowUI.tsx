@@ -135,17 +135,17 @@ export const WindowUI = memo(
       // Memoize window style to prevent recalculations
       const windowStyle = useMemo(
         () => ({
-          top: `${position.y}px`,
-          left: `${position.x}px`,
-          width: `${size.width}px`,
-          height: `${size.height}px`,
+          top: isMobile ? "10px" : `${position.y}px`,
+          left: isMobile ? "10px" : `${position.x}px`,
+          width: isMobile ? "calc(100vw - 20px)" : `${size.width}px`,
+          height: isMobile ? "calc(100vh - 20px)" : `${size.height}px`,
           minWidth: "150px",
           minHeight: "100px",
           zIndex: zIndex,
           position: "absolute" as const,
           pointerEvents: "auto" as const,
         }),
-        [position.x, position.y, size.width, size.height, zIndex]
+        [position.x, position.y, size.width, size.height, zIndex, isMobile]
       );
 
       // Calculate additional classes for mobile
@@ -153,7 +153,7 @@ export const WindowUI = memo(
         () =>
           cn(
             "absolute bg-background border border-secondary rounded-lg shadow-xl flex flex-col overflow-hidden",
-            isMobile && "max-w-screen"
+            isMobile && "max-w-[calc(100vw-20px)]"
           ),
         [isMobile]
       );
