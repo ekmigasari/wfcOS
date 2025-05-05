@@ -37,6 +37,17 @@ export const tasksAtom = atom(
   }
 );
 
+export const editTaskAtom = atom(
+  null,
+  (get, set, { id, content }: { id: string; content: string }) => {
+    const currentTasks = get(tasksAtom);
+    const updatedTasks = currentTasks.map((task) =>
+      task.id === id ? { ...task, content } : task
+    );
+    set(tasksAtom, updatedTasks);
+  }
+);
+
 // Optional: Add derived atoms for specific actions if needed (often done in component)
 // export const addTaskAtom = atom(null, (get, set, newTask: string) => { ... });
 // export const removeTaskAtom = atom(null, (get, set, taskIndex: number) => { ... });
