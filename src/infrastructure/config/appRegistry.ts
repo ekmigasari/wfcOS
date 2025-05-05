@@ -59,19 +59,19 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 320, height: 400 },
     component: Notepad,
   },
-  settings: {
-    name: "Settings",
-    src: "/icons/settings.png",
-    defaultSize: { width: 400, height: 600 },
-    minSize: { width: 250, height: 300 },
-    component: BackgroundChanger,
-  },
   bookmark: {
     name: "Bookmark",
     src: "/icons/bookmark.png", // We'll need to ensure this icon exists
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 320, height: 400 },
     component: Bookmark,
+  },
+  settings: {
+    name: "Settings",
+    src: "/icons/settings.png",
+    defaultSize: { width: 400, height: 600 },
+    minSize: { width: 250, height: 300 },
+    component: BackgroundChanger,
   },
   changelog: {
     name: "Changelog",
