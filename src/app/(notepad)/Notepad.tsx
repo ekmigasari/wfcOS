@@ -1,493 +1,371 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useAtom } from "jotai";
-import { saveFeatureState } from "../../infrastructure/utils/storage";
-import {
-  notepadContentAtom,
-  notepadSettingsAtom,
-  EditorSettings,
-  NOTEPAD_STORAGE_KEY,
-  NOTEPAD_SETTINGS_KEY,
-  loadEditorSettings,
-  loadEditorContent,
-} from "@/application/atoms/notepadAtom";
-import { Button } from "../../presentation/components/ui/button";
-import { cn } from "@/infrastructure/lib/utils";
+"use client";
 
-interface NotepadProps {
-  initialContent?: string;
-  editorId?: string;
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  Component,
+  ReactElement,
+} from "react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
+import { ListItemNode, ListNode } from "@lexical/list";
+import { CodeHighlightNode, CodeNode } from "@lexical/code";
+import { AutoLinkNode, LinkNode } from "@lexical/link";
+import { EditorState, LexicalEditor } from "lexical";
+
+import {
+  notesAtom,
+  activeNoteIdAtom,
+  loadNoteContent,
+  createNewNote,
+  saveActiveNoteAtom,
+} from "@/application/atoms/notepadAtom";
+import { NoteListSidebar } from "./components/NoteListSidebar";
+import { RichTextToolbar } from "./components/RichTextToolbar";
+import { useDebouncedCallback } from "use-debounce";
+
+const editorTheme = {
+  ltr: "ltr",
+  rtl: "rtl",
+  placeholder: "editor-placeholder",
+  paragraph: "editor-paragraph",
+  quote: "editor-quote",
+  heading: {
+    h1: "editor-heading-h1",
+    h2: "editor-heading-h2",
+    h3: "editor-heading-h3",
+    h4: "editor-heading-h4",
+    h5: "editor-heading-h5",
+    h6: "editor-heading-h6",
+  },
+  list: {
+    nested: {
+      listitem: "editor-nested-listitem",
+    },
+    ol: "editor-list-ol",
+    ul: "editor-list-ul",
+    listitem: "editor-listitem",
+  },
+  image: "editor-image",
+  link: "editor-link",
+  text: {
+    bold: "editor-text-bold",
+    italic: "editor-text-italic",
+    underline: "editor-text-underline",
+    strikethrough: "editor-text-strikethrough",
+    underlineStrikethrough: "editor-text-underlineStrikethrough",
+    code: "editor-text-code",
+  },
+  code: "editor-code",
+  codeHighlight: {
+    atrule: "editor-tokenAttr",
+    attr: "editor-tokenAttr",
+    boolean: "editor-tokenProperty",
+    builtin: "editor-tokenSelector",
+    cdata: "editor-tokenComment",
+    char: "editor-tokenSelector",
+    class: "editor-tokenFunction",
+    "class-name": "editor-tokenFunction",
+    comment: "editor-tokenComment",
+    constant: "editor-tokenProperty",
+    deleted: "editor-tokenProperty",
+    doctype: "editor-tokenComment",
+    entity: "editor-tokenOperator",
+    function: "editor-tokenFunction",
+    important: "editor-tokenVariable",
+    inserted: "editor-tokenSelector",
+    keyword: "editor-tokenAttr",
+    namespace: "editor-tokenVariable",
+    number: "editor-tokenProperty",
+    operator: "editor-tokenOperator",
+    prolog: "editor-tokenComment",
+    property: "editor-tokenProperty",
+    punctuation: "editor-tokenPunctuation",
+    regex: "editor-tokenVariable",
+    selector: "editor-tokenSelector",
+    string: "editor-tokenSelector",
+    symbol: "editor-tokenProperty",
+    tag: "editor-tokenProperty",
+    url: "editor-tokenOperator",
+    variable: "editor-tokenVariable",
+  },
+};
+
+const editorNodes = [
+  HeadingNode,
+  ListNode,
+  ListItemNode,
+  QuoteNode,
+  CodeNode,
+  CodeHighlightNode,
+  TableNode,
+  TableCellNode,
+  TableRowNode,
+  AutoLinkNode,
+  LinkNode,
+];
+
+function onError(error: Error) {
+  console.error(error);
 }
 
-const Notepad: React.FC<NotepadProps> = ({
-  initialContent = "",
-  editorId = "default",
-}) => {
-  // Use global state with atoms
-  const [content, setContent] = useAtom(notepadContentAtom);
-  const [editorSettings, setEditorSettings] = useAtom(notepadSettingsAtom);
+// Define the custom Error Boundary Class Component
+class EditorErrorBoundary extends Component<
+  { children: ReactElement; onError: (error: Error) => void },
+  { error: Error | null }
+> {
+  state = { error: null };
 
-  // Status message state
-  const [statusMessage, setStatusMessage] = useState<string>("");
-  // Auto-save timer reference
-  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
-  // Track if initial load has happened
-  const [initialLoadDone, setInitialLoadDone] = useState<boolean>(false);
+  static getDerivedStateFromError(error: Error): { error: Error } {
+    return { error };
+  }
 
-  // Load instance-specific settings and content on first mount
-  useEffect(() => {
-    if (!initialLoadDone) {
-      // Load instance-specific settings
-      const savedSettings = loadEditorSettings(editorId);
-      if (savedSettings) {
-        setEditorSettings(savedSettings);
-      }
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    this.props.onError(error);
+    console.error("Uncaught error in editor:", error, errorInfo);
+  }
 
-      // Load instance-specific content or use initialContent prop
-      const savedContent = loadEditorContent(editorId);
-      if (savedContent) {
-        setContent(savedContent);
-      } else if (initialContent) {
-        setContent(initialContent);
-      }
-
-      setInitialLoadDone(true);
+  render(): React.ReactNode {
+    if (this.state.error) {
+      // Basic fallback UI
+      return <div>Editor Error! Please check console.</div>;
     }
-  }, [
-    editorId,
-    initialContent,
-    setContent,
-    setEditorSettings,
-    initialLoadDone,
-  ]);
+    return this.props.children;
+  }
+}
 
-  // Function to show status message temporarily
-  const showStatusMessage = useCallback((message: string) => {
-    setStatusMessage(message);
-    // Clear the message after 2 seconds
-    setTimeout(() => {
-      setStatusMessage("");
-    }, 2000);
+const Notepad: React.FC = () => {
+  const notes = useAtomValue(notesAtom);
+  const [activeNoteId, setActiveNoteId] = useAtom(activeNoteIdAtom);
+  const setNotes = useSetAtom(notesAtom);
+  const saveNote = useSetAtom(saveActiveNoteAtom);
+
+  const initialContentJson = useRef<string | null>(null);
+  const contentLoaded = useRef<boolean>(false);
+  const isMounted = useRef<boolean>(false);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
-  // Setup auto-save
   useEffect(() => {
-    // Skip if initial loading hasn't completed
-    if (!initialLoadDone) return;
+    if (contentLoaded.current) return;
 
-    // Clear any existing timer
-    if (autoSaveTimerRef.current) {
-      clearInterval(autoSaveTimerRef.current);
-      autoSaveTimerRef.current = null;
+    if (notes.length === 0) {
+      console.log("No notes found, creating initial note.");
+      createNewNote(setNotes, setActiveNoteId);
+      contentLoaded.current = true;
+    } else if (!activeNoteId) {
+      console.log("No active note ID, selecting first note.");
+      setActiveNoteId(notes[0].id);
+      contentLoaded.current = true;
+    } else if (activeNoteId && notes.some((n) => n.id === activeNoteId)) {
+      console.log(`Active note ID ${activeNoteId} is valid.`);
+      contentLoaded.current = true;
+    } else {
+      console.warn(
+        "Active note ID not found in notes list, selecting first note."
+      );
+      setActiveNoteId(notes[0]?.id ?? null);
+      contentLoaded.current = true;
     }
+  }, [notes, activeNoteId, setActiveNoteId, setNotes]);
 
-    // Set up new timer if auto-save is enabled
-    if (editorSettings.autoSaveInterval > 0) {
-      autoSaveTimerRef.current = setInterval(() => {
-        saveFeatureState(`${NOTEPAD_STORAGE_KEY}_${editorId}`, content);
-        // Optional: show a subtle indicator that content was saved
-        showStatusMessage("Content auto-saved");
-      }, editorSettings.autoSaveInterval * 1000);
-    }
-
-    // Cleanup function
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearInterval(autoSaveTimerRef.current);
-      }
-    };
-  }, [
-    editorSettings.autoSaveInterval,
-    content,
-    editorId,
-    showStatusMessage,
-    initialLoadDone,
-  ]);
-
-  // Function to handle saving the content as a .txt file
-  const handleSaveToFile = useCallback(() => {
-    // Create a blob with the content
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-
-    // Create a temporary anchor element and trigger download
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${editorId}_note.txt`;
-    document.body.appendChild(a);
-    a.click();
-
-    // Clean up
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, [content, editorId]);
-
-  // Function to copy content to clipboard
-  const handleCopyToClipboard = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(content);
-      showStatusMessage("Content copied to clipboard!");
-    } catch (err) {
-      console.error("Failed to copy text: ", err);
-      // Fallback method for older browsers
-      const textArea = document.createElement("textarea");
-      textArea.value = content;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
-      showStatusMessage("Content copied to clipboard!");
-    }
-  }, [content, showStatusMessage]);
-
-  // Function to clear all text content
-  const handleClearText = useCallback(() => {
-    if (
-      window.confirm(
-        "Are you sure you want to clear all text? This cannot be undone."
-      )
-    ) {
-      setContent("");
-      showStatusMessage("All text cleared");
-    }
-  }, [setContent, showStatusMessage]);
-
-  // Add keyboard shortcuts for save and copy
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Save: Ctrl+S
-      if (e.ctrlKey && e.key === "s") {
-        e.preventDefault(); // Prevent browser's save dialog
-        handleSaveToFile();
+    if (activeNoteId && contentLoaded.current) {
+      console.log(`Loading content for note: ${activeNoteId}`);
+      const content = loadNoteContent(activeNoteId, notes);
+      initialContentJson.current = content;
+    } else {
+      initialContentJson.current = null;
+    }
+  }, [activeNoteId, notes]);
+
+  const debouncedSave = useDebouncedCallback(
+    (newEditorState: EditorState, editor: LexicalEditor) => {
+      if (!activeNoteId || !contentLoaded.current || !isMounted.current) return;
+
+      const stateString = JSON.stringify(newEditorState.toJSON());
+
+      if (stateString === initialContentJson.current) {
+        return;
       }
 
-      // Copy: Ctrl+C (only when not in text selection mode)
-      if (
-        e.ctrlKey &&
-        e.key === "c" &&
-        window.getSelection()?.toString() === ""
-      ) {
-        e.preventDefault();
-        handleCopyToClipboard();
-      }
-    };
+      console.log("Saving note:", activeNoteId);
+      saveNote({ content: stateString, editor });
 
-    // Add event listener
-    document.addEventListener("keydown", handleKeyDown);
+      initialContentJson.current = stateString;
+    },
+    1000
+  );
 
-    // Cleanup
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleSaveToFile, handleCopyToClipboard]);
+  const handleOnChange = useCallback(
+    (newEditorState: EditorState, editor: LexicalEditor) => {
+      debouncedSave(newEditorState, editor);
+    },
+    [debouncedSave]
+  );
 
-  // Store editorId in a data attribute for potential future use
-  useEffect(() => {
-    // Could use editorId for instance-specific storage in the future
-    console.log(`Notepad instance ${editorId} mounted`);
-
-    return () => {
-      console.log(`Notepad instance ${editorId} unmounted`);
-    };
-  }, [editorId]);
-
-  // Save content to local storage whenever it changes
-  useEffect(() => {
-    if (initialLoadDone) {
-      // Only save after initial load to prevent overwriting
-      saveFeatureState(`${NOTEPAD_STORAGE_KEY}_${editorId}`, content);
-    }
-  }, [content, editorId, initialLoadDone]);
-
-  // Save settings to local storage whenever they change
-  useEffect(() => {
-    if (initialLoadDone) {
-      // Only save after initial load to prevent overwriting
-      saveFeatureState(`${NOTEPAD_SETTINGS_KEY}_${editorId}`, editorSettings);
-    }
-  }, [editorSettings, editorId, initialLoadDone]);
-
-  // Destructure settings for ease of use
-  const {
-    fontSize,
-    fontFamily,
-    textAlign,
-    isBold,
-    isItalic,
-    isUnderline,
-    lineHeight,
-    textColor,
-    backgroundColor,
-    wordWrap,
-  } = editorSettings;
-
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(event.target.value);
+  const initialConfig = {
+    namespace: `Notepad-${activeNoteId || "new"}`,
+    theme: editorTheme,
+    onError,
+    nodes: editorNodes,
+    editorState: activeNoteId ? initialContentJson.current : null,
   };
 
-  // Helper function to update a single setting
-  const updateSetting = <K extends keyof EditorSettings>(
-    key: K,
-    value: EditorSettings[K]
-  ) => {
-    setEditorSettings({
-      ...editorSettings,
-      [key]: value,
-    });
-  };
+  const composerKey = activeNoteId || "__EMPTY__";
 
   return (
-    <div className="w-full h-full flex flex-col relative ">
-      {/* Toolbar */}
-      <div className="flex p-2 border-b border-gray-200 bg-gray-50 flex-wrap gap-2 shadow-sm">
-        {/* Font Settings Group */}
-        <div className="flex mr-2 pr-2 border-r border-gray-200">
-          {/* Font Family */}
-          <select
-            value={fontFamily}
-            onChange={(e) => updateSetting("fontFamily", e.target.value)}
-            className="bg-gray-100 border border-gray-300 rounded text-sm px-2 py-1 mr-1 h-8"
-          >
-            <option value="monospace">Monospace</option>
-            <option value="Arial, sans-serif">Arial</option>
-            <option value="Times New Roman, serif">Times New Roman</option>
-            <option value="Courier New, monospace">Courier New</option>
-            <option value="Georgia, serif">Georgia</option>
-            <option value="Verdana, sans-serif">Verdana</option>
-          </select>
-
-          {/* Font Size */}
-          <select
-            value={fontSize}
-            onChange={(e) =>
-              updateSetting("fontSize", parseInt(e.target.value))
-            }
-            className="bg-gray-100 border border-gray-300 rounded text-sm px-2 py-1 mr-1 h-8"
-          >
-            {[8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 48, 72].map(
-              (size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              )
-            )}
-          </select>
-        </div>
-
-        {/* Text Formatting Group */}
-        <div className="flex mr-2 pr-2 border-r border-gray-200">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "min-w-[28px] p-0 h-8 w-8",
-              isBold ? "bg-gray-200 text-gray-900" : "text-gray-700"
-            )}
-            onClick={() => updateSetting("isBold", !isBold)}
-            title="Bold"
-          >
-            <b>B</b>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "min-w-[28px] p-0 h-8 w-8",
-              isItalic ? "bg-gray-200 text-gray-900" : "text-gray-700"
-            )}
-            onClick={() => updateSetting("isItalic", !isItalic)}
-            title="Italic"
-          >
-            <i>I</i>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "min-w-[28px] p-0 h-8 w-8",
-              isUnderline ? "bg-gray-200 text-gray-900" : "text-gray-700"
-            )}
-            onClick={() => updateSetting("isUnderline", !isUnderline)}
-            title="Underline"
-          >
-            <u>U</u>
-          </Button>
-        </div>
-
-        {/* Alignment Group */}
-        <div className="flex mr-2 pr-2 border-r border-gray-200">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "min-w-[28px] p-0 h-8 w-8",
-              textAlign === "left"
-                ? "bg-gray-200 text-gray-900"
-                : "text-gray-700"
-            )}
-            onClick={() => updateSetting("textAlign", "left")}
-            title="Align Left"
-          >
-            &#8676;
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "min-w-[28px] p-0 h-8 w-8",
-              textAlign === "center"
-                ? "bg-gray-200 text-gray-900"
-                : "text-gray-700"
-            )}
-            onClick={() => updateSetting("textAlign", "center")}
-            title="Align Center"
-          >
-            &#8677;
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "min-w-[28px] p-0 h-8 w-8",
-              textAlign === "right"
-                ? "bg-gray-200 text-gray-900"
-                : "text-gray-700"
-            )}
-            onClick={() => updateSetting("textAlign", "right")}
-            title="Align Right"
-          >
-            &#8678;
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "min-w-[28px] p-0 h-8 w-8",
-              textAlign === "justify"
-                ? "bg-gray-200 text-gray-900"
-                : "text-gray-700"
-            )}
-            onClick={() => updateSetting("textAlign", "justify")}
-            title="Justify"
-          >
-            &#8680;
-          </Button>
-        </div>
-
-        {/* Lists Group */}
-        <div className="flex mr-2 pr-2 border-r border-gray-200">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-gray-700"
-            onClick={() => {
-              setContent(content + "\n• ");
-            }}
-            title="Bullet List"
-          >
-            &#8226; List
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-gray-700"
-            onClick={() => {
-              setContent(content + "\n1. ");
-            }}
-            title="Numbered List"
-          >
-            1. List
-          </Button>
-        </div>
-
-        {/* File Operations Group */}
-        <div className="flex">
-          <Button
-            variant="ghost"
-            size="sm"
-            className=" mr-1"
-            onClick={handleSaveToFile}
-            title="Save as Text File"
-          >
-            💾
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className=" mr-1"
-            onClick={handleCopyToClipboard}
-            title="Copy All Text"
-          >
-            📋
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className=" mr-1"
-            onClick={handleClearText}
-            title="Clear All Text"
-          >
-            🗑️
-          </Button>
-
-          {/* Status message */}
-          {statusMessage && (
-            <div className="ml-2 px-2 py-1 bg-green-500 text-white rounded text-sm flex items-center animate-fadeIn">
-              ✓ {statusMessage}
+    <div className="w-full h-full flex relative border border-gray-300 rounded shadow overflow-hidden">
+      <NoteListSidebar />
+      <div className="flex-grow flex flex-col h-full">
+        {activeNoteId ? (
+          <LexicalComposer initialConfig={initialConfig} key={composerKey}>
+            <RichTextToolbar />
+            <div className="flex-grow relative bg-white overflow-y-auto">
+              <RichTextPlugin
+                contentEditable={
+                  <ContentEditable className="w-full h-full min-h-[200px] p-4 outline-none resize-none editor-content-editable block" />
+                }
+                placeholder={
+                  <div className="editor-placeholder absolute top-4 left-4 text-gray-400 pointer-events-none select-none">
+                    Start typing...
+                  </div>
+                }
+                ErrorBoundary={EditorErrorBoundary}
+              />
+              <OnChangePlugin
+                onChange={handleOnChange}
+                ignoreHistoryMergeTagChange={true}
+              />
+              <HistoryPlugin />
+              <ListPlugin />
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Text Area */}
-      <textarea
-        value={content}
-        onChange={handleChange}
-        className={cn(
-          "w-full h-full flex-grow border-none outline-none resize-none p-4 shadow-inner transition-colors duration-300",
-          "caret-blue-500"
+            <style jsx global>{`
+              .editor-placeholder {
+                /* Styles moved to inline style below ContentEditable */
+              }
+              .editor-content-editable {
+                caret-color: black;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                  Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
+                  "Segoe UI Emoji", "Segoe UI Symbol";
+                font-size: 16px;
+                line-height: 1.6;
+              }
+              .editor-paragraph {
+                margin-bottom: 8px;
+              }
+              .editor-list-ul {
+                padding-inline-start: 25px;
+                margin-block-start: 8px;
+                margin-block-end: 8px;
+                list-style-type: disc;
+              }
+              .editor-list-ol {
+                padding-inline-start: 25px;
+                margin-block-start: 8px;
+                margin-block-end: 8px;
+                list-style-type: decimal;
+              }
+              .editor-listitem {
+                margin-left: 16px;
+                margin-bottom: 4px;
+              }
+              .editor-nested-listitem {
+                list-style-type: circle;
+              }
+              .editor-content-editable ul,
+              .editor-content-editable ol {
+                margin: 0;
+                padding: 0;
+                margin-block-start: 8px;
+                margin-block-end: 8px;
+                padding-inline-start: 25px;
+              }
+              .editor-text-bold {
+                font-weight: bold;
+              }
+              .editor-text-italic {
+                font-style: italic;
+              }
+              .editor-text-underline {
+                text-decoration: underline;
+              }
+              .editor-text-strikethrough {
+                text-decoration: line-through;
+              }
+              .editor-text-underlineStrikethrough {
+                text-decoration: underline line-through;
+              }
+              .editor-link {
+                color: #007bff;
+                text-decoration: underline;
+                cursor: pointer;
+              }
+              .editor-heading-h1 {
+                font-size: 2em;
+                font-weight: bold;
+                margin-bottom: 0.5em;
+                margin-top: 0.5em;
+              }
+              .editor-heading-h2 {
+                font-size: 1.5em;
+                font-weight: bold;
+                margin-bottom: 0.5em;
+                margin-top: 0.5em;
+              }
+              .editor-heading-h3 {
+                font-size: 1.17em;
+                font-weight: bold;
+                margin-bottom: 0.5em;
+                margin-top: 0.5em;
+              }
+              .editor-quote {
+                margin: 0 0 8px 20px;
+                padding-left: 10px;
+                border-left: 4px solid #ccc;
+                color: #555;
+              }
+              .editor-code {
+                background-color: #f0f0f0;
+                font-family: monospace;
+                padding: 8px;
+                border-radius: 4px;
+                margin-bottom: 8px;
+                overflow-x: auto;
+              }
+              .editor-text-code {
+                background-color: #f0f0f0;
+                font-family: monospace;
+                padding: 0.1em 0.3em;
+                border-radius: 3px;
+              }
+            `}</style>
+          </LexicalComposer>
+        ) : (
+          <div className="flex-grow flex items-center justify-center text-gray-500 bg-gray-50">
+            {notes.length > 0 ? (
+              <p>Loading note...</p>
+            ) : (
+              <p>Create a new note to start editing.</p>
+            )}
+          </div>
         )}
-        style={{
-          fontFamily,
-          fontSize: `${fontSize}px`,
-          textAlign,
-          fontWeight: isBold ? "bold" : "normal",
-          fontStyle: isItalic ? "italic" : "normal",
-          textDecoration: isUnderline ? "underline" : "none",
-          backgroundColor,
-          color: textColor,
-          lineHeight: lineHeight.toString(),
-          wordWrap: wordWrap ? "break-word" : "normal",
-          whiteSpace: wordWrap ? "pre-wrap" : "pre",
-          overflowWrap: wordWrap ? "break-word" : "normal",
-        }}
-        spellCheck={true}
-        placeholder="Type your text here..."
-      />
-
-      {/* CSS for animations */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s;
-        }
-      `}</style>
+      </div>
     </div>
   );
 };
