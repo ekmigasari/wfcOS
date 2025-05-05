@@ -18,6 +18,7 @@ type CategorySectionProps = {
   onToggle: (category: string) => void;
   onRemoveTask: (id: string) => void;
   onMoveTask: (id: string, category: TaskItem["category"]) => void;
+  onEditTask: (id: string, content: string) => void;
 };
 
 export const SortableCategorySection = ({
@@ -29,6 +30,7 @@ export const SortableCategorySection = ({
   onToggle,
   onRemoveTask,
   onMoveTask,
+  onEditTask,
 }: CategorySectionProps) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: `category-${category}` });
@@ -82,6 +84,7 @@ export const SortableCategorySection = ({
                     task={task}
                     onRemove={onRemoveTask}
                     onMove={onMoveTask}
+                    onEdit={onEditTask}
                   />
                 ))}
               </ul>
