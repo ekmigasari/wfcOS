@@ -186,7 +186,7 @@ export const NoteListSidebar = () => {
           <FilePlus className="h-5 w-5" />
         </Button>
       </div>
-      
+
       {/* Improved ScrollArea with proper constraints */}
       <div className="flex-grow overflow-hidden">
         <ScrollArea className="h-full w-full">
@@ -255,7 +255,9 @@ export const NoteListSidebar = () => {
                             // Make edit button visible if focused or active
                             activeNoteId === note.id && "opacity-100"
                           )}
-                          onClick={(e) => handleStartEditing(note.id, note.name, e)}
+                          onClick={(e) =>
+                            handleStartEditing(note.id, note.name, e)
+                          }
                           title="Rename Note"
                         >
                           <Pencil className="h-4 w-4" />

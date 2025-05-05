@@ -14,6 +14,11 @@ Built with a cutting-edge stack including Next.js 15, React 19, and Tailwind CSS
 
 - Added edit task feature
 
+**Notepad**
+
+- Implemented new text editor with rich text capabilities
+- Support multiple notes
+
 ## 🛠️ Tech Stack
 
 - **Framework:** [Next.js](https://nextjs.org/) v15.3.1 with App Router

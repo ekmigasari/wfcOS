@@ -53,8 +53,8 @@ export const addBookmarkAtom = atom(
         : `https://${url}`;
 
     set(bookmarksAtom, (prev) => [
-      ...prev,
       { id: uuidv4(), name, url: formattedUrl },
+      ...prev,
     ]);
   }
 );

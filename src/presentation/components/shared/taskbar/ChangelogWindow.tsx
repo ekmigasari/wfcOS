@@ -27,6 +27,9 @@ export const ChangelogContent = () => {
             <li>Added bookmark app</li>
             <p className="font-bold underline">To-do List</p>
             <li>Added edit task feature</li>
+            <p className="font-bold underline">Notepad</p>
+            <li>Implemented new text editor with rich text capabilities</li>
+            <li>Support multiple notes</li>
           </ul>
         </div>
 
