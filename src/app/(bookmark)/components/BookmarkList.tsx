@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   BookmarkItem,
   bookmarksAtom,
@@ -9,26 +9,26 @@ import {
 } from "@/application/atoms/bookmarkAtom";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  ExternalLink,
-  Edit,
-  Trash2,
-  GripVertical,
-  MoreVertical,
-} from "lucide-react";
+import { GripVertical, MoreVertical } from "lucide-react";
+import { BookmarkOptions } from "./BookmarkOptions";
+
+// --- Type for the state holding active options data ---
+interface ActiveOptionsState {
+  bookmarkId: string;
+  position: { top: number; left: number };
+  bookmark: BookmarkItem; // Include full bookmark for edit callback
+}
 
 interface SortableBookmarkItemProps {
   bookmark: BookmarkItem;
-  onEdit: (bookmark: BookmarkItem) => void;
+  onShowOptions: (data: ActiveOptionsState | null) => void; // Callback to show/hide options at parent level
 }
 
 const SortableBookmarkItem = ({
   bookmark,
-  onEdit,
+  onShowOptions,
 }: SortableBookmarkItemProps) => {
-  const [, deleteBookmark] = useAtom(deleteBookmarkAtom);
-  const [showOptions, setShowOptions] = useState(false);
-  const optionsRef = useRef<HTMLDivElement>(null);
+  // Removed state for showOptions and menuPosition
   const optionsButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
@@ -52,30 +52,22 @@ const SortableBookmarkItem = ({
     window.open(bookmark.url, "_blank");
   };
 
-  const toggleOptions = (e: React.MouseEvent) => {
+  // --- Updated toggleOptions to call parent callback ---
+  const handleOptionsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowOptions(!showOptions);
+    if (optionsButtonRef.current) {
+      const rect = optionsButtonRef.current.getBoundingClientRect();
+      const position = {
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX - 100,
+      };
+      // Call parent to show options for this item
+      onShowOptions({ bookmarkId: bookmark.id, position, bookmark });
+    } else {
+      // Fallback or error handling if ref not available
+      onShowOptions(null); // Ensure any open options are closed
+    }
   };
-
-  // Close options menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        showOptions &&
-        optionsRef.current &&
-        optionsButtonRef.current &&
-        !optionsRef.current.contains(event.target as Node) &&
-        !optionsButtonRef.current.contains(event.target as Node)
-      ) {
-        setShowOptions(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showOptions]);
 
   return (
     <div
@@ -83,6 +75,7 @@ const SortableBookmarkItem = ({
       style={style}
       className={`flex items-center p-3 mb-2 bg-card rounded-md border border-border shadow-sm hover:shadow-md transition-shadow`}
     >
+      {/* Drag Handle */}
       <div
         className="cursor-grab mr-2 text-muted-foreground hover:text-foreground"
         {...attributes}
@@ -91,6 +84,7 @@ const SortableBookmarkItem = ({
         <GripVertical size={18} />
       </div>
 
+      {/* Bookmark Info (Clickable) */}
       <div
         className="flex-1 min-w-0 mr-4 cursor-pointer"
         onClick={handleOpenLink}
@@ -105,84 +99,79 @@ const SortableBookmarkItem = ({
           {bookmark.url}
         </p>
       </div>
-      <div className="relative" style={{ zIndex: 50 }}>
-        <button
-          ref={optionsButtonRef}
-          onClick={toggleOptions}
-          title="More options"
-          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
-        >
-          <MoreVertical size={16} />
-        </button>
 
-        {showOptions && (
-          <div
-            ref={optionsRef}
-            className="right-0 mt-1 w-32 bg-card rounded-md shadow-lg border border-border"
-            style={{
-              zIndex: 9999,
-              position: "absolute",
-              transform: "translateZ(0)",
-            }}
+      {/* Actions Container */}
+      <div className="flex items-center gap-1">
+        {/* Options Button - triggers parent state update */}
+        <div className="relative">
+          <button
+            ref={optionsButtonRef}
+            onClick={handleOptionsClick} // Use updated handler
+            title="More options"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
           >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(bookmark);
-                setShowOptions(false);
-              }}
-              className="w-full flex items-center gap-2 p-2 text-sm text-left hover:bg-accent/50 transition-colors rounded-t-md"
-            >
-              <Edit size={14} />
-              <span>Edit</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteBookmark(bookmark.id);
-                setShowOptions(false);
-              }}
-              className="w-full flex items-center gap-2 p-2 text-sm text-left hover:bg-destructive/10 hover:text-destructive transition-colors rounded-b-md"
-            >
-              <Trash2 size={14} />
-              <span>Delete</span>
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="flex gap-1">
-        <button
-          onClick={handleOpenLink}
-          title="Open link"
-          className="p-1.5 rounded-md text-primary hover:text-primary-foreground hover:bg-primary/80 transition-colors"
-        >
-          <ExternalLink size={16} />
-        </button>
+            <MoreVertical size={16} />
+          </button>
+        </div>
+
+        {/* Options menu is no longer rendered here */}
       </div>
     </div>
   );
 };
 
+// --- Updated BookmarkList component ---
 export interface BookmarkListProps {
-  onEdit: (bookmark: BookmarkItem) => void;
+  onEdit: (bookmark: BookmarkItem) => void; // Passed to BookmarkOptions
 }
 
 export const BookmarkList = ({ onEdit }: BookmarkListProps) => {
   const [bookmarks] = useAtom(bookmarksAtom);
+  const [, deleteBookmark] = useAtom(deleteBookmarkAtom); // Get delete atom here
+  const [activeOptions, setActiveOptions] = useState<ActiveOptionsState | null>(
+    null
+  );
+
+  const handleShowOptions = (data: ActiveOptionsState | null) => {
+    setActiveOptions(data);
+  };
+
+  const handleCloseOptions = () => {
+    setActiveOptions(null);
+  };
+
+  // Handle edit request from BookmarkOptions
+  const handleEdit = () => {
+    if (activeOptions) {
+      onEdit(activeOptions.bookmark); // Call the original onEdit passed from Bookmark.tsx
+    }
+  };
 
   if (bookmarks.length === 0) {
     return null;
   }
 
   return (
-    <div className="space-y-1">
+    // Added position relative to potentially help stacking context if needed
+    <div className="space-y-1 relative">
       {bookmarks.map((bookmark) => (
         <SortableBookmarkItem
           key={bookmark.id}
           bookmark={bookmark}
-          onEdit={onEdit}
+          onShowOptions={handleShowOptions}
         />
       ))}
+
+      {/* Render BookmarkOptions at the list level */}
+      {activeOptions && (
+        <BookmarkOptions
+          bookmarkId={activeOptions.bookmarkId}
+          position={activeOptions.position}
+          onEdit={handleEdit} // Use the specific handler
+          onDelete={deleteBookmark} // Pass delete atom setter
+          onClose={handleCloseOptions} // Pass the closer handler
+        />
+      )}
     </div>
   );
 };
