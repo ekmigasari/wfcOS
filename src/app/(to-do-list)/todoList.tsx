@@ -16,6 +16,8 @@ import {
 import { useTodoList } from "../../application/hooks/useTodoList";
 import { SortableCategorySection } from "./components/CategorySection";
 import { TaskItemForOverlay } from "./components/TaskItem";
+import { useAtom } from "jotai";
+import { editTaskAtom } from "../../application/atoms/todoListAtom";
 
 const TodoList = () => {
   const {
@@ -33,6 +35,12 @@ const TodoList = () => {
     getTasksByCategory,
     getActiveTask,
   } = useTodoList();
+
+  const [, editTask] = useAtom(editTaskAtom);
+
+  const handleEditTask = (id: string, content: string) => {
+    editTask({ id, content });
+  };
 
   // Sensors for drag and drop
   const sensors = useSensors(
@@ -106,6 +114,7 @@ const TodoList = () => {
                   onToggle={toggleCategory}
                   onRemoveTask={handleRemoveTask}
                   onMoveTask={handleMoveTask}
+                  onEditTask={handleEditTask}
                 />
               );
             })}
