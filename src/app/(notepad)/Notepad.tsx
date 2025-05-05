@@ -6,6 +6,7 @@ import React, {
   useRef,
   Component,
   ReactElement,
+  useState,
 } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -24,13 +25,14 @@ import { EditorState, LexicalEditor } from "lexical";
 import {
   notesAtom,
   activeNoteIdAtom,
-  loadNoteContent,
   createNewNote,
   saveActiveNoteAtom,
+  activeNoteContentAtom,
 } from "@/application/atoms/notepadAtom";
 import { NoteListSidebar } from "./components/NoteListSidebar";
 import { RichTextToolbar } from "./components/RichTextToolbar";
 import { useDebouncedCallback } from "use-debounce";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 const editorTheme = {
   ltr: "ltr",
@@ -145,10 +147,11 @@ class EditorErrorBoundary extends Component<
 const Notepad: React.FC = () => {
   const notes = useAtomValue(notesAtom);
   const [activeNoteId, setActiveNoteId] = useAtom(activeNoteIdAtom);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const setNotes = useSetAtom(notesAtom);
   const saveNote = useSetAtom(saveActiveNoteAtom);
+  const activeNoteContent = useAtomValue(activeNoteContentAtom);
 
-  const initialContentJson = useRef<string | null>(null);
   const contentLoaded = useRef<boolean>(false);
   const isMounted = useRef<boolean>(false);
 
@@ -166,53 +169,43 @@ const Notepad: React.FC = () => {
       console.log("No notes found, creating initial note.");
       createNewNote(setNotes, setActiveNoteId);
       contentLoaded.current = true;
-    } else if (!activeNoteId) {
+    } else if (!activeNoteId && notes.length > 0) {
       console.log("No active note ID, selecting first note.");
       setActiveNoteId(notes[0].id);
       contentLoaded.current = true;
     } else if (activeNoteId && notes.some((n) => n.id === activeNoteId)) {
       console.log(`Active note ID ${activeNoteId} is valid.`);
       contentLoaded.current = true;
-    } else {
+    } else if (notes.length > 0) {
       console.warn(
         "Active note ID not found in notes list, selecting first note."
       );
-      setActiveNoteId(notes[0]?.id ?? null);
+      setActiveNoteId(notes[0].id);
       contentLoaded.current = true;
     }
   }, [notes, activeNoteId, setActiveNoteId, setNotes]);
 
-  useEffect(() => {
-    if (activeNoteId && contentLoaded.current) {
-      console.log(`Loading content for note: ${activeNoteId}`);
-      const content = loadNoteContent(activeNoteId, notes);
-      initialContentJson.current = content;
-    } else {
-      initialContentJson.current = null;
-    }
-  }, [activeNoteId, notes]);
-
   const debouncedSave = useDebouncedCallback(
     (newEditorState: EditorState, editor: LexicalEditor) => {
-      if (!activeNoteId || !contentLoaded.current || !isMounted.current) return;
+      if (!activeNoteId || !isMounted.current) return;
 
       const stateString = JSON.stringify(newEditorState.toJSON());
 
-      if (stateString === initialContentJson.current) {
+      if (stateString === activeNoteContent) {
         return;
       }
 
       console.log("Saving note:", activeNoteId);
       saveNote({ content: stateString, editor });
-
-      initialContentJson.current = stateString;
     },
     1000
   );
 
   const handleOnChange = useCallback(
     (newEditorState: EditorState, editor: LexicalEditor) => {
-      debouncedSave(newEditorState, editor);
+      if (contentLoaded.current) {
+        debouncedSave(newEditorState, editor);
+      }
     },
     [debouncedSave]
   );
@@ -222,14 +215,38 @@ const Notepad: React.FC = () => {
     theme: editorTheme,
     onError,
     nodes: editorNodes,
-    editorState: activeNoteId ? initialContentJson.current : null,
+    editorState: activeNoteId ? activeNoteContent : null,
   };
 
   const composerKey = activeNoteId || "__EMPTY__";
 
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarOpen((prev) => !prev);
+  }, []);
+
   return (
     <div className="w-full h-full flex relative border border-gray-300 rounded shadow overflow-hidden">
-      <NoteListSidebar />
+      {isSidebarOpen && <NoteListSidebar />}
+
+      {/* Toggle button as a vertical divider */}
+      <div
+        onClick={toggleSidebar}
+        className={`
+          group flex flex-col items-center justify-center h-full w-5 
+          border-l border-r border-gray-200 bg-gray-50 hover:bg-gray-100 cursor-pointer
+          transition-colors duration-200 select-none
+        `}
+        title={isSidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
+      >
+        <div className="flex flex-col h-16 justify-center items-center">
+          {isSidebarOpen ? (
+            <PanelLeftClose className="h-4 w-4 text-gray-500 group-hover:text-gray-700" />
+          ) : (
+            <PanelLeftOpen className="h-4 w-4 text-gray-500 group-hover:text-gray-700" />
+          )}
+        </div>
+      </div>
+
       <div className="flex-grow flex flex-col h-full">
         {activeNoteId ? (
           <LexicalComposer initialConfig={initialConfig} key={composerKey}>

@@ -153,6 +153,25 @@ export const deleteNote = (
   setActiveNoteId(nextActiveId); // Set the new active note
 };
 
+// Function to update a note's name
+export const updateNoteName = (
+  setNotes: (update: Note[] | ((prev: Note[]) => Note[])) => void,
+  noteIdToUpdate: string,
+  newName: string
+) => {
+  setNotes((prevNotes) =>
+    prevNotes.map((note) =>
+      note.id === noteIdToUpdate
+        ? {
+            ...note,
+            name: newName.trim() || "Untitled Note", // Ensure name isn't empty
+            lastModified: Date.now(), // Update timestamp on name change
+          }
+        : note
+    )
+  );
+};
+
 // Note: The EditorSettings atom is removed as formatting is now part of the Lexical state.
 // If global settings unrelated to content are needed (e.g., theme), add new atoms.
 
