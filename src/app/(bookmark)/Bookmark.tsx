@@ -20,6 +20,7 @@ import {
 } from "@dnd-kit/sortable";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { reorderBookmarksAtom } from "@/application/atoms/bookmarkAtom";
+import { Button } from "@/presentation/components/ui/button";
 
 export const Bookmark = () => {
   const [bookmarks] = useAtom(bookmarksAtom);
@@ -53,28 +54,27 @@ export const Bookmark = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 bg-background">
-      <header className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-primary">Bookmarks</h1>
+    <div className="flex flex-col h-full p-4 bg-stone-50">
+      <div className="flex items-center justify-center mb-6">
         {isAddingBookmark || editingBookmark ? (
-          <button
-            className="px-3 py-1 text-sm bg-secondary/20 hover:bg-secondary/30 rounded-md transition-colors"
+          <Button
+            className="bg-secondary hover:bg-accent"
             onClick={() => {
               setIsAddingBookmark(false);
               setEditingBookmark(null);
             }}
           >
             Cancel
-          </button>
+          </Button>
         ) : (
-          <button
-            className="px-3 py-1 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition-colors"
+          <Button
+            className="bg-secondary hover:bg-accent"
             onClick={() => setIsAddingBookmark(true)}
           >
             Add Bookmark
-          </button>
+          </Button>
         )}
-      </header>
+      </div>
 
       {isAddingBookmark && (
         <BookmarkForm onAddComplete={() => setIsAddingBookmark(false)} />

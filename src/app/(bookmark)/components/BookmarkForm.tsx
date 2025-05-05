@@ -6,6 +6,7 @@ import {
   addBookmarkAtom,
   updateBookmarkAtom,
 } from "@/application/atoms/bookmarkAtom";
+import { Button } from "@/presentation/components/ui/button";
 
 interface BookmarkFormProps {
   initialValues?: {
@@ -104,7 +105,7 @@ export const BookmarkForm = ({
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className={`w-full p-2 rounded-md bg-background border ${
+          className={`w-full p-2 rounded-md border ${
             nameError ? "border-destructive" : "border-input"
           }`}
           placeholder="Enter bookmark name"
@@ -123,7 +124,7 @@ export const BookmarkForm = ({
           id="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          className={`w-full p-2 rounded-md bg-background border ${
+          className={`w-full p-2 rounded-md border ${
             urlError ? "border-destructive" : "border-input"
           }`}
           placeholder="Enter URL (e.g., https://example.com)"
@@ -133,12 +134,9 @@ export const BookmarkForm = ({
         )}
       </div>
 
-      <button
-        type="submit"
-        className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition-colors"
-      >
+      <Button type="submit" className="bg-secondary hover:bg-accent w-full">
         {isEditing ? "Update Bookmark" : "Add Bookmark"}
-      </button>
+      </Button>
     </form>
   );
 };
