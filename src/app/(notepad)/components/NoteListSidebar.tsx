@@ -165,7 +165,7 @@ export const NoteListSidebar = () => {
   return (
     <div
       ref={sidebarRef}
-      className="relative border-r border-gray-200 bg-gray-50 flex flex-col h-full"
+      className="relative border-r border-gray-200 bg-gray-50 flex flex-col h-full overflow-hidden"
       style={{ width: `${sidebarWidth}px`, flexShrink: 0 }} // Apply dynamic width and prevent shrinking
     >
       {/* Resize Handle */}
@@ -186,97 +186,103 @@ export const NoteListSidebar = () => {
           <FilePlus className="h-5 w-5" />
         </Button>
       </div>
-      <ScrollArea className="flex-grow">
-        {notes.length === 0 ? (
-          <div className="p-4 text-center text-gray-500">No notes yet.</div>
-        ) : (
-          <ul className="p-2 space-y-1">
-            {notes.map((note) => (
-              <li key={note.id}>
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => {
-                    if (editingNoteId !== note.id) {
-                      setActiveNoteId(note.id);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (
-                      editingNoteId !== note.id &&
-                      (e.key === "Enter" || e.key === " ")
-                    ) {
-                      e.preventDefault();
-                      setActiveNoteId(note.id);
-                    }
-                  }}
-                  className={cn(
-                    "w-full text-left p-2 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-300 flex justify-between items-start group cursor-pointer",
-                    activeNoteId === note.id
-                      ? "bg-blue-100 hover:bg-blue-200"
-                      : ""
-                  )}
-                >
-                  <div className="flex-grow overflow-hidden mr-2 w-0">
-                    {editingNoteId === note.id ? (
-                      <Input
-                        ref={inputRef}
-                        value={editedName}
-                        onBlur={() => handleSaveName(note.id)}
-                        onChange={handleNameChange}
-                        onKeyDown={(e) => handleKeyDown(e, note.id)}
-                        onFocus={(e) => e.target.select()}
-                        className="h-7 py-1 px-1.5 text-sm"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      <>
-                        <div className="font-medium truncate text-sm">
-                          {note.name || "Untitled Note"}
-                        </div>
-                        <div className="text-xs text-gray-500 truncate">
-                          {formatTimestamp(note.lastModified)}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  {/* Action Buttons Container */}
-                  <div className="flex flex-shrink-0 items-center space-x-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-                    {/* Edit Button */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
+      
+      {/* Improved ScrollArea with proper constraints */}
+      <div className="flex-grow overflow-hidden">
+        <ScrollArea className="h-full w-full">
+          <div className="p-2">
+            {notes.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">No notes yet.</div>
+            ) : (
+              <ul className="space-y-1">
+                {notes.map((note) => (
+                  <li key={note.id}>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        if (editingNoteId !== note.id) {
+                          setActiveNoteId(note.id);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (
+                          editingNoteId !== note.id &&
+                          (e.key === "Enter" || e.key === " ")
+                        ) {
+                          e.preventDefault();
+                          setActiveNoteId(note.id);
+                        }
+                      }}
                       className={cn(
-                        "h-6 w-6 p-0 text-gray-600 hover:bg-gray-200",
-                        // Make edit button visible if focused or active
-                        activeNoteId === note.id && "opacity-100"
+                        "w-full text-left p-2 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-300 flex justify-between items-start group cursor-pointer",
+                        activeNoteId === note.id
+                          ? "bg-blue-100 hover:bg-blue-200"
+                          : ""
                       )}
-                      onClick={(e) => handleStartEditing(note.id, note.name, e)}
-                      title="Rename Note"
                     >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    {/* Delete Button */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className={cn(
-                        "h-6 w-6 p-0 text-red-500 hover:bg-red-100",
-                        // Make delete button visible if focused or active
-                        activeNoteId === note.id && "opacity-100"
-                      )}
-                      onClick={(e) => handleDeleteNote(note.id, e)}
-                      title="Delete Note"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </ScrollArea>
+                      <div className="flex-grow overflow-hidden mr-2 w-0">
+                        {editingNoteId === note.id ? (
+                          <Input
+                            ref={inputRef}
+                            value={editedName}
+                            onBlur={() => handleSaveName(note.id)}
+                            onChange={handleNameChange}
+                            onKeyDown={(e) => handleKeyDown(e, note.id)}
+                            onFocus={(e) => e.target.select()}
+                            className="h-7 py-1 px-1.5 text-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        ) : (
+                          <>
+                            <div className="font-medium truncate text-sm">
+                              {note.name || "Untitled Note"}
+                            </div>
+                            <div className="text-xs text-gray-500 truncate">
+                              {formatTimestamp(note.lastModified)}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      {/* Action Buttons Container */}
+                      <div className="flex flex-shrink-0 items-center space-x-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                        {/* Edit Button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={cn(
+                            "h-6 w-6 p-0 text-gray-600 hover:bg-gray-200",
+                            // Make edit button visible if focused or active
+                            activeNoteId === note.id && "opacity-100"
+                          )}
+                          onClick={(e) => handleStartEditing(note.id, note.name, e)}
+                          title="Rename Note"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        {/* Delete Button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={cn(
+                            "h-6 w-6 p-0 text-red-500 hover:bg-red-100",
+                            // Make delete button visible if focused or active
+                            activeNoteId === note.id && "opacity-100"
+                          )}
+                          onClick={(e) => handleDeleteNote(note.id, e)}
+                          title="Delete Note"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 };
