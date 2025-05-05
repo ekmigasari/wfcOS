@@ -7,6 +7,7 @@ import TodoList from "@/app/(to-do-list)/todoList";
 import { AmbiencePlayer } from "@/app/(ambience)/ambiencePlayer";
 import Notepad from "@/app/(notepad)/Notepad";
 import { ChangelogWindow } from "@/presentation/components/shared/taskbar/ChangelogWindow";
+import Bookmark from "@/app/(bookmark)/Bookmark";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -54,9 +55,16 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   notepad: {
     name: "Notepad",
     src: "/icons/notepad.png",
-    defaultSize: { width: 400, height: 600 },
+    defaultSize: { width: 600, height: 600 },
     minSize: { width: 320, height: 400 },
     component: Notepad,
+  },
+  bookmark: {
+    name: "Bookmark",
+    src: "/icons/bookmark.png", // We'll need to ensure this icon exists
+    defaultSize: { width: 400, height: 600 },
+    minSize: { width: 320, height: 400 },
+    component: Bookmark,
   },
   settings: {
     name: "Settings",
