@@ -147,13 +147,13 @@ class EditorErrorBoundary extends Component<
 const Notepad: React.FC = () => {
   const notes = useAtomValue(notesAtom);
   const [activeNoteId, setActiveNoteId] = useAtom(activeNoteIdAtom);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const setNotes = useSetAtom(notesAtom);
   const saveNote = useSetAtom(saveActiveNoteAtom);
   const activeNoteContent = useAtomValue(activeNoteContentAtom);
 
-  const contentLoaded = useRef<boolean>(false);
   const isMounted = useRef<boolean>(false);
+  const currentActiveNoteId = useRef<string | null>(null);
 
   useEffect(() => {
     isMounted.current = true;
@@ -163,49 +163,57 @@ const Notepad: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (contentLoaded.current) return;
+    currentActiveNoteId.current = activeNoteId;
+  }, [activeNoteId]);
 
-    if (notes.length === 0) {
+  useEffect(() => {
+    if (notes.length === 0 && isMounted.current) {
       console.log("No notes found, creating initial note.");
       createNewNote(setNotes, setActiveNoteId);
-      contentLoaded.current = true;
-    } else if (!activeNoteId && notes.length > 0) {
+    } else if (!activeNoteId && notes.length > 0 && isMounted.current) {
       console.log("No active note ID, selecting first note.");
       setActiveNoteId(notes[0].id);
-      contentLoaded.current = true;
-    } else if (activeNoteId && notes.some((n) => n.id === activeNoteId)) {
-      console.log(`Active note ID ${activeNoteId} is valid.`);
-      contentLoaded.current = true;
-    } else if (notes.length > 0) {
+    } else if (
+      activeNoteId &&
+      !notes.some((n) => n.id === activeNoteId) &&
+      notes.length > 0 &&
+      isMounted.current
+    ) {
       console.warn(
         "Active note ID not found in notes list, selecting first note."
       );
       setActiveNoteId(notes[0].id);
-      contentLoaded.current = true;
     }
   }, [notes, activeNoteId, setActiveNoteId, setNotes]);
 
   const debouncedSave = useDebouncedCallback(
-    (newEditorState: EditorState, editor: LexicalEditor) => {
-      if (!activeNoteId || !isMounted.current) return;
+    (
+      noteIdToSave: string | null,
+      newEditorState: EditorState,
+      editor: LexicalEditor
+    ) => {
+      if (!noteIdToSave || !isMounted.current) return;
 
       const stateString = JSON.stringify(newEditorState.toJSON());
 
-      if (stateString === activeNoteContent) {
+      const noteAtChangeTime = notes.find((n) => n.id === noteIdToSave);
+      const contentAtChangeTime = noteAtChangeTime?.content;
+
+      if (stateString === contentAtChangeTime) {
+        // console.log(`Note ${noteIdToSave}: Content hasn't changed, skipping save.`); // Optional: uncomment for debugging
         return;
       }
 
-      console.log("Saving note:", activeNoteId);
-      saveNote({ content: stateString, editor });
+      console.log("Saving note:", noteIdToSave);
+      saveNote({ noteId: noteIdToSave, content: stateString, editor });
     },
     1000
   );
 
   const handleOnChange = useCallback(
     (newEditorState: EditorState, editor: LexicalEditor) => {
-      if (contentLoaded.current) {
-        debouncedSave(newEditorState, editor);
-      }
+      const capturedNoteId = currentActiveNoteId.current;
+      debouncedSave(capturedNoteId, newEditorState, editor);
     },
     [debouncedSave]
   );

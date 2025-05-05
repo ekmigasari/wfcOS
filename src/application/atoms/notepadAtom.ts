@@ -3,7 +3,7 @@ import {
   loadFeatureState,
   saveFeatureState,
 } from "@/infrastructure/utils/storage";
-import { LexicalEditor, $getRoot } from "lexical";
+import { LexicalEditor } from "lexical";
 
 // Define the structure for a single note
 export interface Note {
@@ -69,37 +69,22 @@ export const activeNoteContentAtom = atom<string | null>((get) => {
 // Atom to handle saving the active note content and deriving its name
 export const saveActiveNoteAtom = atom(
   null,
-  (get, set, payload: { content: string; editor: LexicalEditor }) => {
-    const activeId = get(activeNoteIdAtom);
-    if (!activeId) return;
+  (
+    get,
+    set,
+    payload: { content: string; editor?: LexicalEditor; noteId?: string }
+  ) => {
+    const noteIdToSave = payload.noteId ?? get(activeNoteIdAtom);
+    if (!noteIdToSave) return;
 
-    const { content: newContent, editor } = payload;
-    let noteName = "Untitled Note";
-
-    try {
-      // Use public API within read() callback
-      editor.getEditorState().read(() => {
-        const root = $getRoot(); // Get the root node
-        const firstChild = root.getFirstChild(); // Get the first child of the root
-
-        if (firstChild && firstChild.getTextContent) {
-          const text = firstChild.getTextContent().trim();
-          if (text) {
-            noteName = text.substring(0, 50); // Limit name length
-          }
-        }
-      });
-    } catch (e) {
-      console.warn("Could not derive note name from content:", e);
-    }
+    const { content: newContent } = payload;
 
     set(notesAtom, (prevNotes) =>
       prevNotes.map((note) =>
-        note.id === activeId
+        note.id === noteIdToSave
           ? {
               ...note,
               content: newContent,
-              name: noteName || note.name,
               lastModified: Date.now(),
             }
           : note

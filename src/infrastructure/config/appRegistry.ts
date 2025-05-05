@@ -55,7 +55,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   notepad: {
     name: "Notepad",
     src: "/icons/notepad.png",
-    defaultSize: { width: 400, height: 600 },
+    defaultSize: { width: 600, height: 600 },
     minSize: { width: 320, height: 400 },
     component: Notepad,
   },

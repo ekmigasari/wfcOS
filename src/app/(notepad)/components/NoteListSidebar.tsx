@@ -13,7 +13,7 @@ import { Button } from "@/presentation/components/ui/button";
 import { ScrollArea } from "@/presentation/components/ui/scroll-area";
 import { Input } from "@/presentation/components/ui/input";
 import { cn } from "@/infrastructure/lib/utils";
-import { Trash2, FilePlus } from "lucide-react";
+import { Trash2, FilePlus, Pencil } from "lucide-react";
 
 // Constants for resizing
 const MIN_WIDTH = 150; // Minimum sidebar width in pixels
@@ -147,7 +147,7 @@ export const NoteListSidebar = () => {
   const handleStartEditing = (
     noteId: string,
     currentName: string,
-    event: React.MouseEvent<HTMLDivElement>
+    event: React.MouseEvent<HTMLElement>
   ) => {
     event.stopPropagation();
     setEditingNoteId(noteId);
@@ -231,12 +231,7 @@ export const NoteListSidebar = () => {
                       />
                     ) : (
                       <>
-                        <div
-                          className="font-medium truncate text-sm cursor-text"
-                          onClick={(e) =>
-                            handleStartEditing(note.id, note.name, e)
-                          }
-                        >
+                        <div className="font-medium truncate text-sm">
                           {note.name || "Untitled Note"}
                         </div>
                         <div className="text-xs text-gray-500 truncate">
@@ -245,20 +240,37 @@ export const NoteListSidebar = () => {
                       </>
                     )}
                   </div>
-                  {/* Ensure button doesn't shrink when sidebar is narrow */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "h-6 w-6 p-0 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity text-red-500 hover:bg-red-100 flex-shrink-0",
-                      // Make delete button visible if focused, even if not hovering
-                      activeNoteId === note.id && "opacity-100" // Keep visible on active for narrow widths
-                    )}
-                    onClick={(e) => handleDeleteNote(note.id, e)}
-                    title="Delete Note"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  {/* Action Buttons Container */}
+                  <div className="flex flex-shrink-0 items-center space-x-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                    {/* Edit Button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={cn(
+                        "h-6 w-6 p-0 text-gray-600 hover:bg-gray-200",
+                        // Make edit button visible if focused or active
+                        activeNoteId === note.id && "opacity-100"
+                      )}
+                      onClick={(e) => handleStartEditing(note.id, note.name, e)}
+                      title="Rename Note"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    {/* Delete Button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={cn(
+                        "h-6 w-6 p-0 text-red-500 hover:bg-red-100",
+                        // Make delete button visible if focused or active
+                        activeNoteId === note.id && "opacity-100"
+                      )}
+                      onClick={(e) => handleDeleteNote(note.id, e)}
+                      title="Delete Note"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </li>
             ))}
