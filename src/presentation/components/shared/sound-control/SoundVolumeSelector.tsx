@@ -30,7 +30,7 @@ const VolumeOption = ({
 }) => (
   <Label
     htmlFor={id}
-    className="flex flex-col items-center justify-between space-y-2 cursor-pointer p-2 rounded-md hover:bg-accent/50"
+    className="flex flex-col items-center justify-between space-y-2 cursor-pointer p-2 rounded-md hover:bg-stone-50"
   >
     <Icon
       size={20}
@@ -57,8 +57,8 @@ export const SoundVolumeSelector = ({
   };
 
   return (
-    <div className="space-y-3 bg-amber-400">
-      <h3 className="text-sm font-medium text-muted-foreground">
+    <div>
+      <h3 className="text-sm font-medium text-muted-foreground mb-2">
         Sound Effects Volume
       </h3>
       <RadioGroup

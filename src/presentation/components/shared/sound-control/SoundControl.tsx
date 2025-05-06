@@ -9,7 +9,6 @@ import {
 } from "@/application/atoms/soundAtoms";
 import { SoundVolumeSelector } from "./SoundVolumeSelector";
 import { setSoundVolumeLevel, playSound } from "@/infrastructure/lib/utils";
-import { Card, CardContent } from "@/presentation/components/ui/card";
 
 interface SoundControlProps {
   onSettingsChange: () => void;
@@ -74,14 +73,12 @@ export const SoundControl = ({
   }, [onApplySettings, applySoundSettings]);
 
   return (
-    <Card className="w-full bg-card text-card-foreground border-none shadow-none">
-      <CardContent className="p-4 sm:p-6">
-        <SoundVolumeSelector
-          selectedLevel={tempVolumeLevel}
-          onSelect={handleVolumeLevelChange}
-        />
-      </CardContent>
-    </Card>
+    <div className="w-full">
+      <SoundVolumeSelector
+        selectedLevel={tempVolumeLevel}
+        onSelect={handleVolumeLevelChange}
+      />
+    </div>
   );
 };
 

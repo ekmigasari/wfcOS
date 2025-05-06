@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import { Card, CardContent } from "@/presentation/components/ui/card";
 import { SoundControl } from "@/presentation/components/shared/sound-control/SoundControl";
 import { SettingsActionButtons } from "@/presentation/components/shared/settings/SettingsActionButtons";
 import { playSound } from "@/infrastructure/lib/utils";
@@ -50,25 +49,21 @@ export const SoundChanger: React.FC<SoundChangerProps> = ({ onClose }) => {
   };
 
   return (
-    <Card className="w-full max-w-[95vw] sm:max-w-[500px] lg:max-w-none bg-card text-card-foreground border-none shadow-none">
-      <CardContent className="p-4 sm:p-6 space-y-4">
-        <div>
-          {/* Sound Controls */}
-          <SoundControl
-            onSettingsChange={handleSettingsChange}
-            onApplySettings={registerApplyFn}
-            onRegisterResetFn={registerResetFn}
-          />
-        </div>
+    <div className="flex flex-col gap-2 items-center justify-start text-secondary h-full p-4">
+      {/* Sound Controls */}
+      <SoundControl
+        onSettingsChange={handleSettingsChange}
+        onApplySettings={registerApplyFn}
+        onRegisterResetFn={registerResetFn}
+      />
 
-        {/* Action Buttons */}
-        <SettingsActionButtons
-          hasChanges={hasChanges}
-          onApply={handleApply}
-          onCancel={handleCancel}
-        />
-      </CardContent>
-    </Card>
+      {/* Action Buttons */}
+      <SettingsActionButtons
+        hasChanges={hasChanges}
+        onApply={handleApply}
+        onCancel={handleCancel}
+      />
+    </div>
   );
 };
 
