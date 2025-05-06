@@ -8,13 +8,14 @@ import {
   BackgroundFit,
 } from "@/application/atoms/backgroundAtom";
 import { Card, CardContent } from "@/presentation/components/ui/card";
+import { playSound } from "@/infrastructure/lib/utils";
 
 // Import the components
 import { BackgroundSelector } from "./components/BackgroundSelector";
 import { NoImageOption } from "./components/NoImageOption";
 import { BackgroundUploader } from "./components/BackgroundUploader";
 import { BackgroundFitSelector } from "./components/BackgroundFitSelector";
-import { ActionButtons } from "./components/ActionButtons";
+import { SettingsActionButtons } from "@/presentation/components/shared/settings/SettingsActionButtons";
 
 // Main component
 interface BackgroundChangerProps {
@@ -77,11 +78,13 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
   };
 
   const handleApply = () => {
+    playSound("/sounds/click.mp3", "apply");
     applyPreview();
     onClose?.();
   };
 
   const handleCancel = () => {
+    playSound("/sounds/click.mp3", "cancel");
     setPreviewSettings(null);
     onClose?.();
   };
@@ -126,7 +129,7 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
         />
 
         {/* Action Buttons */}
-        <ActionButtons
+        <SettingsActionButtons
           hasChanges={hasChanges}
           onApply={handleApply}
           onCancel={handleCancel}

@@ -1,41 +1,73 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, Volume1, Volume } from "lucide-react";
 import { Button } from "@/presentation/components/ui/button";
-import { isSoundMutedAtom } from "@/application/atoms/soundAtoms";
-import { playSound, setSoundMuted } from "@/infrastructure/lib/utils";
-import { useEffect, useState } from "react";
+import {
+  soundVolumeLevelAtom,
+  SoundVolumeLevel,
+} from "@/application/atoms/soundAtoms";
+import { playSound, setSoundVolumeLevel } from "@/infrastructure/lib/utils";
+
+// Define the order of volume levels for cycling
+const volumeCycle: SoundVolumeLevel[] = ["mute", "low", "medium", "full"];
 
 export const SoundToggle = () => {
-  // Local state to force re-render, even if atom hasn't synced yet
-  const [localMuted, setLocalMuted] = useState(false);
+  // Only need the volume level atom
+  const [volumeLevel, setVolumeLevel] = useAtom(soundVolumeLevelAtom);
 
-  // Keep atom in sync for persistence
-  const [atomMuted, setAtomMuted] = useAtom(isSoundMutedAtom);
+  const cycleVolume = () => {
+    const currentIndex = volumeCycle.indexOf(volumeLevel);
+    // Determine the next index, wrapping around
+    const nextIndex = (currentIndex + 1) % volumeCycle.length;
+    const nextLevel = volumeCycle[nextIndex];
 
-  // Initialize local state from atom
-  useEffect(() => {
-    setLocalMuted(atomMuted);
-  }, [atomMuted]);
+    // Update the atom state
+    setVolumeLevel(nextLevel);
 
-  const toggleMute = () => {
-    const newMuteState = !localMuted;
+    // Update the global util state for immediate effect
+    setSoundVolumeLevel(nextLevel);
 
-    // Update local state for immediate UI update
-    setLocalMuted(newMuteState);
-
-    // Update the atom for persistence
-    setAtomMuted(newMuteState);
-
-    // Use direct access to ensure changes take effect immediately
-    setSoundMuted(newMuteState);
-
-    // Play a quick test sound when unmuting
-    if (!newMuteState) {
+    // Play a click sound, except when transitioning to 'mute'
+    if (nextLevel !== "mute") {
       setTimeout(() => {
         playSound("/sounds/click.mp3", "toggle");
-      }, 100);
+      }, 50); // Reduced timeout slightly
+    }
+  };
+
+  // Determine icon based on the current volumeLevel
+  const getVolumeIcon = () => {
+    switch (volumeLevel) {
+      case "mute":
+        return <VolumeX size={16} />;
+      case "low":
+        return <Volume size={16} />;
+      case "medium":
+        return <Volume1 size={16} />;
+      case "full":
+        return <Volume2 size={16} />;
+      default:
+        return <Volume2 size={16} />; // Default icon
+    }
+  };
+
+  // Generate tooltip based on the *next* state
+  const getTooltip = () => {
+    const currentIndex = volumeCycle.indexOf(volumeLevel);
+    const nextIndex = (currentIndex + 1) % volumeCycle.length;
+    const nextLevel = volumeCycle[nextIndex];
+    switch (nextLevel) {
+      case "mute":
+        return "Mute sound";
+      case "low":
+        return "Set sound to Low";
+      case "medium":
+        return "Set sound to Medium";
+      case "full":
+        return "Set sound to Full";
+      default:
+        return "Toggle sound";
     }
   };
 
@@ -44,10 +76,10 @@ export const SoundToggle = () => {
       variant="ghost"
       size="icon"
       className="size-7"
-      onClick={toggleMute}
-      title={localMuted ? "Unmute click sounds" : "Mute click sounds"}
+      onClick={cycleVolume}
+      title={getTooltip()} // Use dynamic tooltip
     >
-      {localMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+      {getVolumeIcon()}
     </Button>
   );
 };
