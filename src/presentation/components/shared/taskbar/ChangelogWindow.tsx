@@ -21,10 +21,11 @@ export const ChangelogContent = () => {
 
       <div className="space-y-4 mt-4">
         <div>
-          <h3 className="text-lg font-semibold">Version 2.2</h3>
+          <h3 className="text-lg font-semibold">Version 2.2.2</h3>
           <ul className="list-disc pl-5 space-y-1 text-sm">
             <p className="font-bold underline">New Feature</p>
             <li>Added bookmark app</li>
+            <li>Added sound effects settings</li>
             <p className="font-bold underline">To-do List</p>
             <li>Added edit task feature</li>
             <p className="font-bold underline">Notepad</p>

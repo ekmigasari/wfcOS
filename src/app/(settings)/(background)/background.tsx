@@ -7,14 +7,14 @@ import {
   applyPreviewBackgroundAtom,
   BackgroundFit,
 } from "@/application/atoms/backgroundAtom";
-import { Card, CardContent } from "@/presentation/components/ui/card";
+import { playSound } from "@/infrastructure/lib/utils";
 
 // Import the components
 import { BackgroundSelector } from "./components/BackgroundSelector";
 import { NoImageOption } from "./components/NoImageOption";
 import { BackgroundUploader } from "./components/BackgroundUploader";
 import { BackgroundFitSelector } from "./components/BackgroundFitSelector";
-import { ActionButtons } from "./components/ActionButtons";
+import { SettingsActionButtons } from "@/presentation/components/shared/settings/SettingsActionButtons";
 
 // Main component
 interface BackgroundChangerProps {
@@ -77,11 +77,13 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
   };
 
   const handleApply = () => {
+    playSound("/sounds/click.mp3", "apply");
     applyPreview();
     onClose?.();
   };
 
   const handleCancel = () => {
+    playSound("/sounds/click.mp3", "cancel");
     setPreviewSettings(null);
     onClose?.();
   };
@@ -90,49 +92,45 @@ export const BackgroundChanger: React.FC<BackgroundChangerProps> = ({
   const hasChanges = previewSettings !== null;
 
   return (
-    <Card className="w-full max-w-[95vw] sm:max-w-[500px] lg:max-w-none bg-card text-card-foreground border-none shadow-none">
-      <CardContent className="p-4 sm:p-6 space-y-4">
-        {/* Background Options */}
-        <div>
-          <h3 className="text-sm font-medium mb-2">Image</h3>
+    <div className="flex flex-col gap-2 items-center justify-start text-secondary h-full p-4">
+      {/* Background Options */}
+      <div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 mb-4 w-full">
+          {/* No Image Option */}
+          <NoImageOption
+            isSelected={tempSettings.url === null}
+            onSelect={() => handleSelectBackground(null)}
+          />
 
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 mb-4">
-            {/* No Image Option */}
-            <NoImageOption
-              isSelected={tempSettings.url === null}
-              onSelect={() => handleSelectBackground(null)}
-            />
-
-            {/* Upload Image Slot */}
-            <BackgroundUploader
-              uploadedImage={uploadedImage}
-              tempSettings={tempSettings}
-              onSelectBackground={handleSelectBackground}
-              onUploadImage={handleUploadImage}
-            />
-          </div>
-
-          {/* Background selector component */}
-          <BackgroundSelector
+          {/* Upload Image Slot */}
+          <BackgroundUploader
+            uploadedImage={uploadedImage}
             tempSettings={tempSettings}
             onSelectBackground={handleSelectBackground}
+            onUploadImage={handleUploadImage}
           />
         </div>
 
-        {/* Fit Options */}
-        <BackgroundFitSelector
-          fit={tempSettings.fit}
-          onChangeFit={handleChangeFit}
+        {/* Background selector component */}
+        <BackgroundSelector
+          tempSettings={tempSettings}
+          onSelectBackground={handleSelectBackground}
         />
+      </div>
 
-        {/* Action Buttons */}
-        <ActionButtons
-          hasChanges={hasChanges}
-          onApply={handleApply}
-          onCancel={handleCancel}
-        />
-      </CardContent>
-    </Card>
+      {/* Fit Options */}
+      <BackgroundFitSelector
+        fit={tempSettings.fit}
+        onChangeFit={handleChangeFit}
+      />
+
+      {/* Action Buttons */}
+      <SettingsActionButtons
+        hasChanges={hasChanges}
+        onApply={handleApply}
+        onCancel={handleCancel}
+      />
+    </div>
   );
 };
 

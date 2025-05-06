@@ -1,34 +1,61 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import {
+  SoundVolumeLevel,
+  volumeLevelPercentages,
+} from "@/application/atoms/soundAtoms";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 // Global sound state with immediate access
-export let isSoundMuted = false;
+export let soundVolumeLevel: SoundVolumeLevel = "medium"; // Default to medium
+export let soundVolume = volumeLevelPercentages[soundVolumeLevel] / 100; // Initialize based on level
 
 // Initialize from localStorage if available (client-side only)
 if (typeof window !== "undefined") {
   try {
-    const storedMuteState = localStorage.getItem("isSoundMuted");
-    if (storedMuteState !== null) {
-      isSoundMuted = JSON.parse(storedMuteState) === true;
+    const storedVolumeLevel = localStorage.getItem("soundVolumeLevel");
+    if (storedVolumeLevel !== null) {
+      const parsedLevel = JSON.parse(storedVolumeLevel) as SoundVolumeLevel;
+      // Validate the stored level against the type
+      if (["mute", "low", "medium", "full"].includes(parsedLevel)) {
+        soundVolumeLevel = parsedLevel;
+        soundVolume = volumeLevelPercentages[soundVolumeLevel] / 100;
+      } else {
+        // Fallback to default if stored value is invalid
+        soundVolume = volumeLevelPercentages["medium"] / 100;
+        localStorage.setItem("soundVolumeLevel", JSON.stringify("medium"));
+      }
     }
   } catch (e) {
-    console.error("Error reading sound mute state from localStorage", e);
+    console.error("Error reading sound state from localStorage", e);
+    // Fallback to default on error
+    soundVolumeLevel = "medium";
+    soundVolume = volumeLevelPercentages[soundVolumeLevel] / 100;
   }
 }
 
-// Directly set global mute state
-export const setSoundMuted = (muted: boolean): void => {
-  isSoundMuted = muted;
+// Directly set global volume level
+export const setSoundVolumeLevel = (level: SoundVolumeLevel): void => {
+  // Validate level
+  if (!["mute", "low", "medium", "full"].includes(level)) {
+    console.warn(
+      `Invalid sound level provided: ${level}. Defaulting to medium.`
+    );
+    level = "medium";
+  }
 
+  soundVolumeLevel = level;
+  soundVolume = volumeLevelPercentages[level] / 100;
+
+  // Only save valid level to storage
   if (typeof window !== "undefined") {
     try {
-      localStorage.setItem("isSoundMuted", JSON.stringify(muted));
+      localStorage.setItem("soundVolumeLevel", JSON.stringify(level));
     } catch (e) {
-      console.error("Error saving sound mute state to localStorage", e);
+      console.error("Error saving sound volume state to localStorage", e);
     }
   }
 };
@@ -37,14 +64,23 @@ export const setSoundMuted = (muted: boolean): void => {
 const activeSounds: Record<string, HTMLAudioElement> = {};
 const audioLoadingStates: Record<string, boolean> = {};
 
-// Play a sound with type identification (drag, resize, etc.)
+// Play a sound with type identification and optional volume override
 export const playSound = (
   soundPath: string,
-  soundType: string = "default"
+  soundType: string = "default",
+  volumeOverride?: number // Optional volume override (0.0 to 1.0)
 ): HTMLAudioElement | null => {
   try {
-    // Check if sound is muted globally
-    if (isSoundMuted) {
+    // Determine effective volume: override > global > default (1.0)
+    const effectiveVolume =
+      volumeOverride !== undefined ? volumeOverride : soundVolume;
+
+    // Check if sound level is effectively 'mute' or volume is 0
+    if (
+      (soundVolumeLevel === "mute" && volumeOverride === undefined) ||
+      effectiveVolume <= 0
+    ) {
+      // Don't play if globally muted (and no override) OR if effective volume is zero
       return null;
     }
 
@@ -52,6 +88,9 @@ export const playSound = (
     stopSound(soundType);
 
     const audio = new Audio(soundPath);
+
+    // Apply the effective volume level
+    audio.volume = effectiveVolume;
 
     // Set loading state
     audioLoadingStates[soundType] = true;

@@ -4,13 +4,14 @@ WFCOS (Work From Cafe OS) is a web-based desktop environment designed to central
 
 Built with a cutting-edge stack including Next.js 15, React 19, and Tailwind CSS v4, WFCOS offers a customizable and performant workspace. Leveraging Radix UI and shadcn/ui, it provides a familiar, desktop-like environment tailored to your needs. Ideal for remote workers, developers, and anyone seeking a consistent and personalized command center for their online activities.
 
-### Version 2.2
+### Version 2.2.2
 
 **New Feature**
 
 - Added bookmark app
+- Added sound effects settings
 
-  **To-do List**
+**To-do List**
 
 - Added edit task feature
 
@@ -53,6 +54,7 @@ Built with a cutting-edge stack including Next.js 15, React 19, and Tailwind CSS
 │   │   │   ├── page.tsx    # Page component
 │   │   │   ├── layout.tsx  # Page-specific layout
 │   │   │   └── components/ # Page-specific components
+│   │   ├── (app)/          # Main app related components and settings
 │   │   ├── layout.tsx      # Root layout component
 │   │   └── page.tsx        # Home page component
 │   │
