@@ -21,6 +21,7 @@ import {
 import type { DragEndEvent } from "@dnd-kit/core";
 import { reorderBookmarksAtom } from "@/application/atoms/bookmarkAtom";
 import { Button } from "@/presentation/components/ui/button";
+import { playSound } from "@/infrastructure/lib/utils";
 
 export const Bookmark = () => {
   const [bookmarks] = useAtom(bookmarksAtom);
@@ -60,6 +61,7 @@ export const Bookmark = () => {
           <Button
             className="bg-secondary hover:bg-accent"
             onClick={() => {
+              playSound("/sounds/click.mp3");
               setIsAddingBookmark(false);
               setEditingBookmark(null);
             }}
@@ -69,7 +71,10 @@ export const Bookmark = () => {
         ) : (
           <Button
             className="bg-secondary hover:bg-accent"
-            onClick={() => setIsAddingBookmark(true)}
+            onClick={() => {
+              playSound("/sounds/click.mp3");
+              setIsAddingBookmark(true);
+            }}
           >
             Add Bookmark
           </Button>
@@ -77,13 +82,21 @@ export const Bookmark = () => {
       </div>
 
       {isAddingBookmark && (
-        <BookmarkForm onAddComplete={() => setIsAddingBookmark(false)} />
+        <BookmarkForm
+          onAddComplete={() => {
+            playSound("/sounds/click.mp3");
+            setIsAddingBookmark(false);
+          }}
+        />
       )}
 
       {editingBookmark && (
         <BookmarkForm
           initialValues={editingBookmark}
-          onAddComplete={() => setEditingBookmark(null)}
+          onAddComplete={() => {
+            playSound("/sounds/click.mp3");
+            setEditingBookmark(null);
+          }}
         />
       )}
 
@@ -97,7 +110,12 @@ export const Bookmark = () => {
             items={bookmarks.map((b) => b.id)}
             strategy={verticalListSortingStrategy}
           >
-            <BookmarkList onEdit={(bookmark) => setEditingBookmark(bookmark)} />
+            <BookmarkList
+              onEdit={(bookmark) => {
+                playSound("/sounds/click.mp3");
+                setEditingBookmark(bookmark);
+              }}
+            />
           </SortableContext>
         </DndContext>
       </div>
@@ -107,7 +125,10 @@ export const Bookmark = () => {
           <p>No bookmarks yet.</p>
           <button
             className="mt-2 px-3 py-1 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition-colors"
-            onClick={() => setIsAddingBookmark(true)}
+            onClick={() => {
+              playSound("/sounds/click.mp3");
+              setIsAddingBookmark(true);
+            }}
           >
             Add your first bookmark
           </button>

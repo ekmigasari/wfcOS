@@ -11,6 +11,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, MoreVertical } from "lucide-react";
 import { BookmarkOptions } from "./BookmarkOptions";
+import { playSound } from "@/infrastructure/lib/utils";
 
 // --- Type for the state holding active options data ---
 interface ActiveOptionsState {
@@ -49,12 +50,14 @@ const SortableBookmarkItem = ({
   };
 
   const handleOpenLink = () => {
+    playSound("/sounds/click.mp3");
     window.open(bookmark.url, "_blank");
   };
 
   // --- Updated toggleOptions to call parent callback ---
   const handleOptionsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    playSound("/sounds/click.mp3");
     if (optionsButtonRef.current) {
       const rect = optionsButtonRef.current.getBoundingClientRect();
       const position = {
