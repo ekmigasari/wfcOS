@@ -53,8 +53,6 @@ export const SoundChanger: React.FC<SoundChangerProps> = ({ onClose }) => {
     <Card className="w-full max-w-[95vw] sm:max-w-[500px] lg:max-w-none bg-card text-card-foreground border-none shadow-none">
       <CardContent className="p-4 sm:p-6 space-y-4">
         <div>
-          <h3 className="text-base font-medium mb-4">Sound Settings</h3>
-
           {/* Sound Controls */}
           <SoundControl
             onSettingsChange={handleSettingsChange}

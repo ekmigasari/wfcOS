@@ -48,7 +48,7 @@ export const SoundToggle = () => {
       case "full":
         return <Volume2 size={16} />;
       default:
-        return <Volume2 size={16} />; // Default icon
+        return <Volume1 size={16} />; // Default icon
     }
   };
 

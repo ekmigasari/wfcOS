@@ -14,7 +14,7 @@ export const SettingsActionButtons = ({
 }: SettingsActionButtonsProps) => {
   // No sound playing here - parent components handle sound
   return (
-    <div className="flex justify-end gap-2 mt-6">
+    <div className="flex justify-end gap-2 mt-6 w-full">
       <Button
         variant="outline"
         onClick={onCancel}

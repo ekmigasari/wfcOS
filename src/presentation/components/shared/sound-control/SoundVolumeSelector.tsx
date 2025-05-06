@@ -57,9 +57,9 @@ export const SoundVolumeSelector = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 bg-amber-400">
       <h3 className="text-sm font-medium text-muted-foreground">
-        Sound Volume
+        Sound Effects Volume
       </h3>
       <RadioGroup
         value={selectedLevel}
