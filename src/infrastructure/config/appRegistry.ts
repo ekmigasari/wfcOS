@@ -10,6 +10,7 @@ import Notepad from "@/app/(notepad)/Notepad";
 import { ChangelogWindow } from "@/presentation/components/shared/taskbar/ChangelogWindow";
 import Bookmark from "@/app/(bookmark)/Bookmark";
 import { SettingsPanel } from "@/app/(settings)/SettingsPanel";
+import SessionLogApp from "@/app/(session-log)/SessionLogApp";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -106,6 +107,14 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 300, height: 200 },
     component: ChangelogWindow,
     hidden: true, // Hide from desktop icons
+  },
+  sessionLog: {
+    name: "Session Log",
+    src: "/icons/list.png",
+    defaultSize: { width: 700, height: 500 },
+    minSize: { width: 450, height: 300 },
+    component: SessionLogApp,
+    hidden: true,
   },
 };
 

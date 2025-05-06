@@ -48,6 +48,11 @@ export const editTaskAtom = atom(
   }
 );
 
+// Derived atom for incomplete tasks (useful for the timer's task selector)
+export const incompleteTasksAtom = atom((get) =>
+  get(tasksAtom).filter((task) => task.category !== "done")
+);
+
 // Optional: Add derived atoms for specific actions if needed (often done in component)
 // export const addTaskAtom = atom(null, (get, set, newTask: string) => { ... });
 // export const removeTaskAtom = atom(null, (get, set, taskIndex: number) => { ... });

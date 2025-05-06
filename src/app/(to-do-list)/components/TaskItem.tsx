@@ -6,6 +6,7 @@ import { useState } from "react";
 
 type TaskItemProps = {
   task: TaskItem;
+  sessionCount: number;
   onRemove: (id: string) => void;
   onMove: (id: string, category: TaskItem["category"]) => void;
   onEdit: (id: string, content: string) => void;
@@ -13,6 +14,7 @@ type TaskItemProps = {
 
 export const SortableTaskItem = ({
   task,
+  sessionCount,
   onRemove,
   onMove,
   onEdit,
@@ -72,6 +74,11 @@ export const SortableTaskItem = ({
           )}
         </div>
         <div className="flex items-center justify-end w-full mt-2">
+          {sessionCount > 0 && (
+            <span className="text-xs text-gray-500 mr-2">
+              🍅 {sessionCount}
+            </span>
+          )}
           <select
             value={task.category}
             onChange={(e) =>
