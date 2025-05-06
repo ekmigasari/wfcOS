@@ -54,6 +54,7 @@ Built with a cutting-edge stack including Next.js 15, React 19, and Tailwind CSS
 │   │   │   ├── page.tsx    # Page component
 │   │   │   ├── layout.tsx  # Page-specific layout
 │   │   │   └── components/ # Page-specific components
+│   │   ├── (app)/          # Main app related components and settings
 │   │   ├── layout.tsx      # Root layout component
 │   │   └── page.tsx        # Home page component
 │   │
