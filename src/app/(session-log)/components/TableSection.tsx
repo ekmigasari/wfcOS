@@ -48,7 +48,7 @@ export const TableSection = () => {
             size="sm"
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
-            className="hover:bg-secondary/20 disabled:hidden"
+            className="hover:bg-secondary/20 disabled:opacity-0"
           >
             <ChevronLeft className="size-4" />
           </Button>
@@ -60,7 +60,7 @@ export const TableSection = () => {
             size="sm"
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="hover:bg-secondary/20 disabled:hidden"
+            className="hover:bg-secondary/20 disabled:opacity-0"
           >
             <ChevronRight className="size-4" />
           </Button>

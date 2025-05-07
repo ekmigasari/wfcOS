@@ -40,7 +40,7 @@ export const SessionLogTable: React.FC<SessionLogTableProps> = ({
   // }
 
   return (
-    <div className="overflow-auto flex-grow min-h-16 border">
+    <div className="flex-grow border">
       <Table>
         <TableHeader>
           <TableRow>
