@@ -15,6 +15,7 @@ import {
   type ChartConfig,
 } from "@/presentation/components/ui/chart";
 import { Button } from "@/presentation/components/ui/button";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 interface ChartDataPoint {
   name: string;
@@ -71,12 +72,14 @@ const InternalChartComponent = ({
           axisLine={false}
         />
         <ChartTooltip
-          content={<ChartTooltipContent />}
+          content={
+            <ChartTooltipContent className="bg-white border rounded-md shadow-sm" />
+          }
           cursor={{ fill: "hsl(var(--muted))" }}
         />
         <Recharts.Bar
           dataKey={dataKey}
-          fill="var(--color-sessions)"
+          fill="var(--color-chart-4)"
           radius={[3, 3, 0, 0]}
           barSize={20}
         />
@@ -171,102 +174,119 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
 
   return (
     <div className="mb-6">
-      <h2 className="text-lg font-semibold text-primary mb-3">
-        Activity Overview
-      </h2>
-      <Tabs defaultValue="weekly" className="w-full">
+      <Tabs
+        defaultValue="weekly"
+        className="w-full flex flex-col items-center justify-center"
+      >
         <TabsList className="grid w-full grid-cols-3 mb-2 bg-stone-100 dark:bg-stone-800 p-1 rounded-md">
           <TabsTrigger
             value="weekly"
             className="text-xs data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
           >
-            Weekly
+            Week
           </TabsTrigger>
           <TabsTrigger
             value="monthly"
             className="text-xs data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
           >
-            Monthly
+            Month
           </TabsTrigger>
           <TabsTrigger
             value="yearly"
             className="text-xs data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
           >
-            Yearly
+            Year
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="weekly" className="p-1">
-          <div className="flex items-center justify-between mb-3 px-1">
-            <Button variant="outline" size="sm" onClick={onPrevWeek}>
-              Prev
+        <TabsContent
+          value="weekly"
+          className="p-1 flex flex-col items-center justify-center w-full"
+        >
+          <div className="flex items-center gap-2 mb-3  w-fit border rounded-md">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onPrevWeek}
+              className="hover:bg-secondary/20"
+            >
+              <ChevronLeftIcon className="w-4 h-4 " />
             </Button>
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="text-xs font-medium text-muted-foreground px-2">
               {getPeriodLabel(weekOffset, "week")}
             </span>
-            <Button variant="outline" size="sm" onClick={onNextWeek}>
-              Next
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onNextWeek}
+              className="hover:bg-secondary/20"
+            >
+              <ChevronRightIcon className="w-4 h-4" />
             </Button>
           </div>
-          {weeklyChartData.length > 0 &&
-          weeklyChartData.some((d) => d.sessions > 0) ? (
-            <InternalChartComponent // InternalChartComponent should not receive navigation props
-              data={weeklyChartData}
-              config={chartConfig}
-            />
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-10">
-              No session data for the{" "}
-              {getPeriodLabel(weekOffset, "week").toLowerCase()}.
-            </p>
-          )}
+          <InternalChartComponent // InternalChartComponent should not receive navigation props
+            data={weeklyChartData}
+            config={chartConfig}
+          />
         </TabsContent>
-        <TabsContent value="monthly" className="p-1">
-          <div className="flex items-center justify-between mb-3 px-1">
-            <Button variant="outline" size="sm" onClick={onPrevMonth}>
-              Prev
+        <TabsContent
+          value="monthly"
+          className="p-1 flex flex-col items-center justify-center w-full"
+        >
+          <div className="flex items-center gap-2 mb-3 w-fit border rounded-md">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onPrevMonth}
+              className="hover:bg-secondary/20"
+            >
+              <ChevronLeftIcon className="w-4 h-4" />
             </Button>
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="text-xs font-medium text-muted-foreground px-2">
               {getPeriodLabel(monthOffset, "month")}
             </span>
-            <Button variant="outline" size="sm" onClick={onNextMonth}>
-              Next
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onNextMonth}
+              className="hover:bg-secondary/20"
+            >
+              <ChevronRightIcon className="w-4 h-4" />
             </Button>
           </div>
-          {monthlyChartData.some((d) => d.sessions > 0) ? (
-            <InternalChartComponent // InternalChartComponent should not receive navigation props
-              data={monthlyChartData}
-              config={chartConfig}
-            />
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-10">
-              No session data for the{" "}
-              {getPeriodLabel(monthOffset, "month").toLowerCase()}.
-            </p>
-          )}
+          <InternalChartComponent // InternalChartComponent should not receive navigation props
+            data={monthlyChartData}
+            config={chartConfig}
+          />
         </TabsContent>
-        <TabsContent value="yearly" className="p-1">
-          <div className="flex items-center justify-between mb-3 px-1">
-            <Button variant="outline" size="sm" onClick={onPrevYear}>
-              Prev
+        <TabsContent
+          value="yearly"
+          className="p-1 flex flex-col items-center justify-center w-full"
+        >
+          <div className="flex items-center gap-2 mb-3 w-fit border rounded-md">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onPrevYear}
+              className="hover:bg-secondary/20"
+            >
+              <ChevronLeftIcon className="w-4 h-4" />
             </Button>
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="text-xs font-medium text-muted-foreground px-2">
               {getPeriodLabel(yearOffset, "year")}
             </span>
-            <Button variant="outline" size="sm" onClick={onNextYear}>
-              Next
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onNextYear}
+              className="hover:bg-secondary/20"
+            >
+              <ChevronRightIcon className="w-4 h-4" />
             </Button>
           </div>
-          {yearlyChartData.some((d) => d.sessions > 0) ? (
-            <InternalChartComponent // InternalChartComponent should not receive navigation props
-              data={yearlyChartData}
-              config={chartConfig}
-            />
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-10">
-              No session data for the{" "}
-              {getPeriodLabel(yearOffset, "year").toLowerCase()}.
-            </p>
-          )}
+          <InternalChartComponent // InternalChartComponent should not receive navigation props
+            data={yearlyChartData}
+            config={chartConfig}
+          />
         </TabsContent>
       </Tabs>
     </div>

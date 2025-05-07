@@ -111,6 +111,7 @@ export const Timer = () => {
             onValueChange={(value) =>
               setSelectedTaskId(value === "none" ? null : value)
             }
+            disabled={isRunning}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Link a task (optional)" />

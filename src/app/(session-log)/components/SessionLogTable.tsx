@@ -26,29 +26,28 @@ export const SessionLogTable: React.FC<SessionLogTableProps> = ({
   allTasks,
   deleteSession,
 }) => {
-  if (sessions.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full p-4 flex-grow">
-        <p className="text-xl text-muted-foreground mb-2">
-          No sessions recorded yet.
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Complete a work timer to see your sessions here.
-        </p>
-      </div>
-    );
-  }
+  // if (sessions.length === 0) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center h-full p-4 flex-grow">
+  //       <p className="text-xl text-muted-foreground mb-2">
+  //         No sessions recorded yet.
+  //       </p>
+  //       <p className="text-sm text-muted-foreground">
+  //         Complete a work timer to see your sessions here.
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className="overflow-auto flex-grow">
+    <div className="overflow-auto flex-grow min-h-16 border">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[110px]">Date</TableHead>
+            <TableHead>Task</TableHead>
             <TableHead className="w-[90px]">Start</TableHead>
             <TableHead className="w-[90px]">End</TableHead>
-            <TableHead className="w-[70px]">Duration</TableHead>
-            <TableHead>Task</TableHead>
             <TableHead className="w-[70px] text-right">Delete</TableHead>
           </TableRow>
         </TableHeader>
@@ -57,17 +56,15 @@ export const SessionLogTable: React.FC<SessionLogTableProps> = ({
             <TableRow key={session.id} className="text-xs">
               <TableCell className="py-1.5 px-2">{session.date}</TableCell>
               <TableCell className="py-1.5 px-2">
+                {getTaskName(session.taskId, allTasks)}
+              </TableCell>
+              <TableCell className="py-1.5 px-2">
                 {formatTime(session.startTime)}
               </TableCell>
               <TableCell className="py-1.5 px-2">
                 {formatTime(session.endTime)}
               </TableCell>
-              <TableCell className="py-1.5 px-2">
-                {session.duration} min
-              </TableCell>
-              <TableCell className="py-1.5 px-2">
-                {getTaskName(session.taskId, allTasks)}
-              </TableCell>
+
               <TableCell className="text-right py-1.5 px-2">
                 <Button
                   variant="ghost"
