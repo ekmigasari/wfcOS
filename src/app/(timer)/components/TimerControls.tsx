@@ -17,7 +17,7 @@ export const TimerControls = ({
     <div className="flex space-x-2">
       <button
         onClick={onStartPause}
-        className={`px-8 py-2 rounded text-white transition ${
+        className={`px-12 py-2 rounded text-white transition ${
           isRunning
             ? "bg-orange-500 hover:bg-orange-600"
             : "bg-primary hover:bg-secondary"
