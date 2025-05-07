@@ -1,8 +1,8 @@
-import { GripVertical, Trash2, Pencil } from "lucide-react";
+import { GripVertical, Trash2, Pencil, Timer } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskItem } from "@/application/atoms/todoListAtom";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 type TaskItemProps = {
   task: TaskItem;
@@ -21,6 +21,8 @@ export const SortableTaskItem = ({
 }: TaskItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(task.content);
+  const [showOptions, setShowOptions] = useState(false);
+  const optionsButtonRef = useRef<HTMLButtonElement>(null);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: task.id });
@@ -46,6 +48,26 @@ export const SortableTaskItem = ({
     }
   };
 
+  const handleClickOutside = (e: MouseEvent) => {
+    if (
+      optionsButtonRef.current &&
+      !optionsButtonRef.current.contains(e.target as Node)
+    ) {
+      setShowOptions(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showOptions) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showOptions]);
+
   return (
     <li ref={setNodeRef} style={style} className="bg-white p-3 my-1 rounded">
       <div className="flex flex-col justify-center items-start relative w-full">
@@ -64,7 +86,7 @@ export const SortableTaskItem = ({
               onChange={(e) => setEditedContent(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleEdit}
-              className="text-sm flex-grow border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm flex-grow border rounded px-1 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoFocus
             />
           ) : (
@@ -73,33 +95,38 @@ export const SortableTaskItem = ({
             </span>
           )}
         </div>
-        <div className="flex items-center justify-end w-full mt-2">
-          {sessionCount > 0 && (
-            <span className="text-xs text-gray-500 mr-2">
-              🍅 {sessionCount}
-            </span>
-          )}
-          <select
-            value={task.category}
-            onChange={(e) =>
-              onMove(task.id, e.target.value as TaskItem["category"])
-            }
-            className="text-xs bg-amber-50 p-1"
-          >
-            <option value="todo">To Do</option>
-            <option value="inProgress">In Progress</option>
-            <option value="done">Done</option>
-          </select>
-          <button onClick={handleEdit} className="ml-2">
-            <div className="relative hover:bg-blue-200 p-1 rounded-full">
-              <Pencil className="h-5 w-5 text-blue-500" />
-            </div>
-          </button>
-          <button onClick={() => onRemove(task.id)} className="ml-2">
-            <div className="relative hover:bg-red-200 p-1 rounded-full">
-              <Trash2 className="h-5 w-5 text-red-500" />
-            </div>
-          </button>
+        <div className="flex items-center justify-between w-full mt-2">
+          <div className="flex items-center justify-start ml-1 ">
+            {sessionCount > 0 && (
+              <div className="text-xs text-gray-500 flex items-center truncate">
+                <Timer className="size-3 text-gray-400 mr-1" />
+                {sessionCount} sessions
+              </div>
+            )}
+          </div>
+          <div className="flex items-center justify-end gap-1">
+            <select
+              value={task.category}
+              onChange={(e) =>
+                onMove(task.id, e.target.value as TaskItem["category"])
+              }
+              className="text-xs bg-transparent border rounded"
+            >
+              <option value="todo">To Do</option>
+              <option value="inProgress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+            <button onClick={handleEdit}>
+              <div className="relative hover:bg-blue-200 p-1 rounded">
+                <Pencil className="size-4" />
+              </div>
+            </button>
+            <button onClick={() => onRemove(task.id)}>
+              <div className="relative hover:bg-red-200 p-1 rounded">
+                <Trash2 className="size-4 text-red-500" />
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </li>
