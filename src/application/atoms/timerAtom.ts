@@ -22,6 +22,8 @@ export interface TimerState {
   windowId: string | null;
   isMinimized: boolean;
   isActive: boolean;
+  sessionStartTime: number | null; // Timestamp when the current work session started
+  workCycleDuration: number | null; // Original duration of the current work cycle in seconds
 }
 
 // Helper function to get the correct duration in seconds based on the current setting
@@ -61,6 +63,8 @@ export const initialTimerState: TimerState = (() => {
     windowId: null,
     isMinimized: false,
     isActive: false, // Ensure timer starts inactive
+    sessionStartTime: null,
+    workCycleDuration: DEFAULT_WORK_TIME,
   };
 
   // Merge saved state with defaults, ensuring new fields have defaults
@@ -70,9 +74,11 @@ export const initialTimerState: TimerState = (() => {
     isRunning: false, // Crucial: ensure timer isn't running on load regardless of saved state
     isActive: false, // Ensure timer is inactive on load
     windowId: null, // Ensure no window association on load
+    sessionStartTime: null, // Ensure no session start time on load
+    // workCycleDuration will be set based on timerSetting if not present
   };
 
-  // Set initial timeRemaining based on merged settings
+  // Set initial timeRemaining and workCycleDuration based on merged settings
   const initialTime = getDurationForSetting(
     mergedState.timerSetting,
     mergedState.customDurationMinutes
@@ -82,6 +88,7 @@ export const initialTimerState: TimerState = (() => {
   return {
     ...mergedState,
     timeRemaining: initialTime,
+    workCycleDuration: mergedState.workCycleDuration ?? initialTime, // Set workCycleDuration based on initialTime if not in saved state
   };
 })();
 
@@ -119,10 +126,36 @@ export const timerAtom = atom(
 export const startPauseTimerAtom = atom(
   null, // write-only atom
   (get, set) => {
-    set(timerAtom, (prev) => ({
-      ...prev,
-      isRunning: !prev.isRunning,
-    }));
+    const currentTimerState = get(timerAtom);
+    const newIsRunning = !currentTimerState.isRunning;
+
+    if (newIsRunning) {
+      // Timer is starting
+      // Only set startTime if it's a work session and not already started
+      if (
+        (currentTimerState.timerSetting === "work25" ||
+          currentTimerState.timerSetting === "custom") &&
+        !currentTimerState.sessionStartTime
+      ) {
+        set(timerAtom, (prev) => ({
+          ...prev,
+          isRunning: newIsRunning,
+          sessionStartTime: Date.now(),
+          // Ensure workCycleDuration reflects the current setting when starting
+          workCycleDuration: getDurationForSetting(
+            prev.timerSetting,
+            prev.customDurationMinutes
+          ),
+        }));
+      } else {
+        set(timerAtom, (prev) => ({ ...prev, isRunning: newIsRunning }));
+      }
+    } else {
+      // Timer is pausing
+      // Optionally, clear sessionStartTime if paused, or keep it to resume session.
+      // For now, let's keep it to allow resuming.
+      set(timerAtom, (prev) => ({ ...prev, isRunning: newIsRunning }));
+    }
   }
 );
 
@@ -147,6 +180,8 @@ export const resetTimerAtom = atom(null, (get, set) => {
       ...prev,
       timeRemaining: newTimeRemaining,
       isRunning: false, // Stop timer on reset
+      sessionStartTime: null, // Clear session start time on reset
+      workCycleDuration: newTimeRemaining, // Update work cycle duration on reset
     };
   });
 });
@@ -165,6 +200,8 @@ export const setTimerSettingAtom = atom(
         timerSetting: newSetting,
         timeRemaining: newTimeRemaining,
         isRunning: false, // Stop timer on setting change
+        sessionStartTime: null, // Clear session start time on setting change
+        workCycleDuration: newTimeRemaining, // Update work cycle duration
       };
     });
   }
@@ -174,7 +211,6 @@ export const setTimerSettingAtom = atom(
 export const setCustomDurationAtom = atom(
   null,
   (get, set, newMinutes: number) => {
-    // Ensure the input is a valid number, default to DEFAULT_CUSTOM_MINUTES if not
     const parsedMinutes = Number(newMinutes);
     const validatedMinutes =
       Number.isNaN(parsedMinutes) || parsedMinutes <= 0
@@ -184,25 +220,26 @@ export const setCustomDurationAtom = atom(
     set(timerAtom, (prev) => {
       let newTimeRemaining = prev.timeRemaining;
       let shouldStopTimer = false;
+      let updatedWorkCycleDuration = prev.workCycleDuration; // Initialize with previous value
 
-      // If currently using the 'custom' setting, update timer immediately and stop it
       if (prev.timerSetting === "custom") {
-        newTimeRemaining = getDurationForSetting(
-          "custom",
-          validatedMinutes // Use the new minutes
-        );
-        shouldStopTimer = true; // Stop timer when custom time is changed while active
+        newTimeRemaining = getDurationForSetting("custom", validatedMinutes);
+        shouldStopTimer = true;
+        updatedWorkCycleDuration = newTimeRemaining; // Update for custom setting
       }
       return {
         ...prev,
         customDurationMinutes: validatedMinutes,
-        // Only reset time if custom is the active setting
         timeRemaining:
           prev.timerSetting === "custom"
             ? newTimeRemaining
             : prev.timeRemaining,
-        // Stop the timer if we changed the time while the custom setting was active
         isRunning: shouldStopTimer ? false : prev.isRunning,
+        sessionStartTime:
+          prev.timerSetting === "custom" && shouldStopTimer
+            ? null
+            : prev.sessionStartTime,
+        workCycleDuration: updatedWorkCycleDuration, // Assign the potentially updated value
       };
     });
   }

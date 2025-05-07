@@ -88,7 +88,8 @@ export const TimerSettings = ({
     {
       value: "work25",
       label: "Work (25min)",
-      description: "Focus time for maximum productivity",
+      description:
+        "Focus time for maximum productivity. Recorded in session log",
     },
     {
       value: "short5",
@@ -108,9 +109,9 @@ export const TimerSettings = ({
   ];
 
   return (
-    <div className="w-full border-t pt-4">
+    <div className="w-full border-t py-4">
       <h3 className="text-sm font-medium mb-2 text-center">Timer Settings</h3>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 max-w-md mx-auto">
         {durationOptions.map((option) => (
           <label
             key={option.value}

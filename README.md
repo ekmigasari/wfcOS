@@ -4,21 +4,24 @@ WFCOS (Work From Cafe OS) is a web-based desktop environment designed to central
 
 Built with a cutting-edge stack including Next.js 15, React 19, and Tailwind CSS v4, WFCOS offers a customizable and performant workspace. Leveraging Radix UI and shadcn/ui, it provides a familiar, desktop-like environment tailored to your needs. Ideal for remote workers, developers, and anyone seeking a consistent and personalized command center for their online activities.
 
-### Version 2.2.2
+### Version 2.3
 
-**New Feature**
+**New Features**
 
-- Added bookmark app
-- Added sound effects settings
+**Timer**
+
+- Now timer can track your work sessions and productivity
+- You can link a task to your work session
+
+**Session Log**
+
+- You can see your sessions log as chart and table
+- Chart show data of week, month, year
+- Table show all your sessions data
 
 **To-do List**
 
-- Added edit task feature
-
-**Notepad**
-
-- Implemented new text editor with rich text capabilities
-- Support multiple notes
+- Show session count in task item
 
 ## 🛠️ Tech Stack
 

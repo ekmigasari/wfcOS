@@ -10,6 +10,7 @@ import Notepad from "@/app/(notepad)/Notepad";
 import { ChangelogWindow } from "@/presentation/components/shared/taskbar/ChangelogWindow";
 import Bookmark from "@/app/(bookmark)/Bookmark";
 import { SettingsPanel } from "@/app/(settings)/SettingsPanel";
+import SessionLogApp from "@/app/(session-log)/SessionLogApp";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -52,7 +53,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     name: "Timer",
     src: "/icons/clock.png",
     defaultSize: { width: 400, height: 600 },
-    minSize: { width: 250, height: 300 },
+    minSize: { width: 400, height: 350 },
     component: Timer,
   },
 
@@ -101,11 +102,19 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   },
   changelog: {
     name: "Changelog",
-    src: "/icons/info.png",
+    src: "/icons/default.png",
     defaultSize: { width: 500, height: 400 },
     minSize: { width: 300, height: 200 },
     component: ChangelogWindow,
     hidden: true, // Hide from desktop icons
+  },
+  sessionLog: {
+    name: "Session Log",
+    src: "/icons/default.png",
+    defaultSize: { width: 700, height: 500 },
+    minSize: { width: 450, height: 300 },
+    component: SessionLogApp,
+    hidden: true,
   },
 };
 
