@@ -15,17 +15,24 @@ export const formatDurationFromMinutes = (totalMinutes: number): string => {
 
 // Helper functions for chart data
 export const getWeeklyChartData = (
-  currentSessions: Session[]
+  currentSessions: Session[],
+  offset: number
 ): { name: string; sessions: number }[] => {
   const data: { name: string; sessions: number }[] = [];
-  const today = new Date();
+  const baseDate = new Date();
+  baseDate.setDate(baseDate.getDate() + offset * 7);
+
   const dayFormatter = new Intl.DateTimeFormat("en-US", {
     weekday: "short",
   });
 
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
+  const targetSunday = new Date(baseDate);
+  targetSunday.setDate(baseDate.getDate() - baseDate.getDay());
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(targetSunday);
+    date.setDate(targetSunday.getDate() + i);
+
     const dateString = `${date.getFullYear()}-${String(
       date.getMonth() + 1
     ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -42,18 +49,22 @@ export const getWeeklyChartData = (
 };
 
 export const getMonthlyChartData = (
-  currentSessions: Session[]
+  currentSessions: Session[],
+  offset: number
 ): { name: string; sessions: number }[] => {
-  const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
+  const targetDate = new Date();
+  targetDate.setDate(1);
+  targetDate.setMonth(targetDate.getMonth() + offset);
+
+  const targetMonth = targetDate.getMonth();
+  const targetYear = targetDate.getFullYear();
 
   const sessionsThisMonth = currentSessions.filter((s) => {
     const [year, month] = s.date.split("-").map(Number);
-    return year === currentYear && month - 1 === currentMonth;
+    return year === targetYear && month - 1 === targetMonth;
   });
 
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
   const numWeeks = Math.ceil(daysInMonth / 7);
   const weeklyData: { name: string; sessions: number }[] = Array.from(
     { length: numWeeks },
@@ -74,10 +85,11 @@ export const getMonthlyChartData = (
 };
 
 export const getYearlyChartData = (
-  currentSessions: Session[]
+  currentSessions: Session[],
+  offset: number
 ): { name: string; sessions: number }[] => {
-  const today = new Date();
-  const currentYear = today.getFullYear();
+  const targetYear = new Date().getFullYear() + offset;
+
   const monthNames = [
     "Jan",
     "Feb",
@@ -102,9 +114,9 @@ export const getYearlyChartData = (
   currentSessions.forEach((s) => {
     const [year, monthStr] = s.date.split("-");
     const sessionYear = parseInt(year, 10);
-    const sessionMonth = parseInt(monthStr, 10) - 1; // 0-indexed
+    const sessionMonth = parseInt(monthStr, 10) - 1;
 
-    if (sessionYear === currentYear && sessionMonth >= 0 && sessionMonth < 12) {
+    if (sessionYear === targetYear && sessionMonth >= 0 && sessionMonth < 12) {
       monthlyData[sessionMonth].sessions++;
     }
   });

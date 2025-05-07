@@ -5,6 +5,7 @@ import { useAtom, useAtomValue } from "jotai";
 import {
   type ChartConfig, // Import ChartConfig type
 } from "@/presentation/components/ui/chart"; // Import Shadcn chart components
+import { Button } from "@/presentation/components/ui/button"; // Added import for Button
 import {
   deleteSessionAtom,
   sortedSessionsAtom,
@@ -43,11 +44,22 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const ITEMS_PER_PAGE = 10; // Added for pagination
+
 // Component to be rendered inside a window
 const SessionLogApp = () => {
   const sessions = useAtomValue(sortedSessionsAtom);
   const allTasks = useAtomValue(tasksAtom);
   const [, deleteSession] = useAtom(deleteSessionAtom);
+
+  // State for pagination
+  const [currentPage, setCurrentPage] = React.useState(1);
+
+  // State for chart navigation
+  // 0 = current, -1 = previous, 1 = next (adjust as needed for your utility functions)
+  const [weekOffset, setWeekOffset] = React.useState(0);
+  const [monthOffset, setMonthOffset] = React.useState(0);
+  const [yearOffset, setYearOffset] = React.useState(0);
 
   // Helper functions for chart data
   // const getWeeklyChartData = React.useCallback(
@@ -154,17 +166,19 @@ const SessionLogApp = () => {
   //   []
   // );
 
+  // REMINDER: Update getWeeklyChartData, getMonthlyChartData, getYearlyChartData in sessionLogUtils.ts
+  // to accept and use the offset parameters.
   const weeklyChartData = React.useMemo(
-    () => getWeeklyChartData(sessions),
-    [sessions]
+    () => getWeeklyChartData(sessions, weekOffset),
+    [sessions, weekOffset]
   );
   const monthlyChartData = React.useMemo(
-    () => getMonthlyChartData(sessions),
-    [sessions]
+    () => getMonthlyChartData(sessions, monthOffset),
+    [sessions, monthOffset]
   );
   const yearlyChartData = React.useMemo(
-    () => getYearlyChartData(sessions),
-    [sessions]
+    () => getYearlyChartData(sessions, yearOffset),
+    [sessions, yearOffset]
   );
 
   // Calculate summary data
@@ -219,6 +233,31 @@ const SessionLogApp = () => {
     }
   }
 
+  // Pagination logic for table
+  const totalPages = Math.ceil(sessions.length / ITEMS_PER_PAGE);
+  const paginatedSessions = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return sessions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [sessions, currentPage]);
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  // Handlers for chart navigation
+  const handlePreviousWeek = () => setWeekOffset((prev) => prev - 1);
+  const handleNextWeek = () => setWeekOffset((prev) => prev + 1); // Can go into future
+
+  const handlePreviousMonth = () => setMonthOffset((prev) => prev - 1);
+  const handleNextMonth = () => setMonthOffset((prev) => prev + 1); // Can go into future
+
+  const handlePreviousYear = () => setYearOffset((prev) => prev - 1);
+  const handleNextYear = () => setYearOffset((prev) => prev + 1); // Can go into future
+
   return (
     <div className="p-4 h-full flex flex-col text-sm">
       <SessionLogHeader />
@@ -252,6 +291,18 @@ const SessionLogApp = () => {
         monthlyChartData={monthlyChartData}
         yearlyChartData={yearlyChartData}
         chartConfig={chartConfig}
+        // Pass down offset state and handlers
+        // The SessionLogCharts component will need to be updated to use these
+        // to display navigation controls (e.g., buttons)
+        onPrevWeek={handlePreviousWeek}
+        onNextWeek={handleNextWeek}
+        onPrevMonth={handlePreviousMonth}
+        onNextMonth={handleNextMonth}
+        onPrevYear={handlePreviousYear}
+        onNextYear={handleNextYear}
+        weekOffset={weekOffset}
+        monthOffset={monthOffset}
+        yearOffset={yearOffset}
       />
       {/* <div className="mb-6">
         <h2 className="text-lg font-semibold text-primary mb-3">
@@ -262,10 +313,34 @@ const SessionLogApp = () => {
 
       {/* Table or No Sessions Message */}
       <SessionLogTable
-        sessions={sessions}
+        sessions={paginatedSessions} // Use paginated sessions
         allTasks={allTasks}
         deleteSession={deleteSession}
       />
+      {/* Pagination Controls for Table */}
+      {sessions.length > ITEMS_PER_PAGE && (
+        <div className="mt-4 flex justify-center items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
       {/* {sessions.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full p-4 flex-grow">
           <p className="text-xl text-muted-foreground mb-2">
