@@ -100,13 +100,71 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
   monthOffset,
   yearOffset,
 }) => {
-  // Helper function to get a display label for the offset period
+  // Updated Helper function to get a display label for the offset period
   const getPeriodLabel = (
     offset: number,
     unit: "week" | "month" | "year"
   ): string => {
+    const today = new Date(); // Base for calculations, uses user's local time
+
+    if (unit === "week") {
+      const targetDate = new Date(today);
+      targetDate.setDate(today.getDate() + offset * 7);
+
+      const dayOfWeek = targetDate.getDay(); // 0 (Sun) - 6 (Sat)
+      const startDate = new Date(targetDate);
+      startDate.setDate(targetDate.getDate() - dayOfWeek);
+
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 6);
+
+      const options: Intl.DateTimeFormatOptions = {
+        month: "short",
+        day: "numeric",
+      };
+      const yearOption: Intl.DateTimeFormatOptions = { year: "numeric" };
+
+      const startStr = startDate.toLocaleDateString(undefined, options);
+      const endStr = endDate.toLocaleDateString(undefined, options);
+      const yearStr = endDate.getFullYear(); // Or startDate, should be same for typical week display
+
+      // Handle cases where the week might span across different years for the start/end display
+      const startYear = startDate.getFullYear();
+      const endYear = endDate.getFullYear();
+
+      if (startYear !== endYear) {
+        return `${startDate.toLocaleDateString(undefined, {
+          ...options,
+          ...yearOption,
+        })} - ${endDate.toLocaleDateString(undefined, {
+          ...options,
+          ...yearOption,
+        })}`;
+      }
+      return `${startStr} - ${endStr}, ${yearStr}`;
+    }
+
+    if (unit === "month") {
+      const targetDate = new Date(today);
+      targetDate.setDate(1); // Set to first day of month to avoid issues with month rollovers
+      targetDate.setMonth(today.getMonth() + offset);
+      const options: Intl.DateTimeFormatOptions = {
+        month: "long",
+        year: "numeric",
+      };
+      return targetDate.toLocaleDateString(undefined, options);
+    }
+
+    if (unit === "year") {
+      const targetDate = new Date(today);
+      targetDate.setFullYear(today.getFullYear() + offset);
+      const options: Intl.DateTimeFormatOptions = { year: "numeric" };
+      return targetDate.toLocaleDateString(undefined, options);
+    }
+
+    // Fallback (should not be reached)
     if (offset === 0) return `Current ${unit}`;
-    const unitPlural = Math.abs(offset) === 1 ? unit : `${unit}s`; // Corrected pluralization for -1, 0, 1
+    const unitPlural = Math.abs(offset) === 1 ? unit : `${unit}s`;
     if (offset < 0) return `${Math.abs(offset)} ${unitPlural} ago`;
     return `${offset} ${unitPlural} from now`;
   };
