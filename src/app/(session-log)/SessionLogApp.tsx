@@ -3,33 +3,45 @@
 import React from "react";
 import { useAtom, useAtomValue } from "jotai";
 import {
-  sortedSessionsAtom,
-  deleteSessionAtom,
-} from "@/application/atoms/sessionAtoms";
-import { tasksAtom, TaskItem } from "@/application/atoms/todoListAtom"; // To get task names
-import { Session } from "@/application/types/session.types";
+  type ChartConfig, // Import ChartConfig type
+} from "@/presentation/components/ui/chart"; // Import Shadcn chart components
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/presentation/components/ui/table";
-import { Button } from "@/presentation/components/ui/button";
-import { Trash2 } from "lucide-react";
+  deleteSessionAtom,
+  sortedSessionsAtom,
+} from "@/application/atoms/sessionAtoms";
+import { tasksAtom } from "@/application/atoms/todoListAtom";
+// import { Session } from "@/application/types/session.types";
+import {
+  // formatTime,
+  getMonthlyChartData,
+  // getTaskName,
+  getWeeklyChartData,
+  getYearlyChartData,
+} from "./sessionLogUtils";
+import { SessionLogHeader } from "./components/SessionLogHeader";
+import { SessionLogSummary } from "./components/SessionLogSummary";
+import { SessionLogCharts } from "./components/SessionLogCharts";
+import { SessionLogTable } from "./components/SessionLogTable";
 
 // Helper function to format duration from minutes to hours and minutes
-const formatDurationFromMinutes = (totalMinutes: number): string => {
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  let result = "";
-  if (hours > 0) {
-    result += `${hours}h `;
-  }
-  result += `${minutes}m`;
-  return result.trim() || "0m"; // Handle case where totalMinutes is 0
-};
+// const formatDurationFromMinutes = (totalMinutes: number): string => {
+//   const hours = Math.floor(totalMinutes / 60);
+//   const minutes = totalMinutes % 60;
+//   let result = "";
+//   if (hours > 0) {
+//     result += `${hours}h `;
+//   }
+//   result += `${minutes}m`;
+//   return result.trim() || "0m";
+// };
+
+// Define chart configuration for Shadcn Chart components
+const chartConfig = {
+  sessions: {
+    label: "Sessions",
+    color: "orange", // Temporarily changed to direct color for testing
+  },
+} satisfies ChartConfig;
 
 // Component to be rendered inside a window
 const SessionLogApp = () => {
@@ -37,18 +49,123 @@ const SessionLogApp = () => {
   const allTasks = useAtomValue(tasksAtom);
   const [, deleteSession] = useAtom(deleteSessionAtom);
 
-  const getTaskName = (taskId: string | null): string => {
-    if (!taskId) return "N/A";
-    const task = allTasks.find((t: TaskItem) => t.id === taskId);
-    return task ? task.content : "Deleted Task";
-  };
+  // Helper functions for chart data
+  // const getWeeklyChartData = React.useCallback(
+  //   (currentSessions: Session[]): { name: string; sessions: number }[] => {
+  //     const data: { name: string; sessions: number }[] = [];
+  //     const today = new Date();
+  //     const dayFormatter = new Intl.DateTimeFormat("en-US", {
+  //       weekday: "short",
+  //     });
 
-  const formatTime = (timestamp: number): string => {
-    return new Date(timestamp).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  //     for (let i = 6; i >= 0; i--) {
+  //       const date = new Date(today);
+  //       date.setDate(today.getDate() - i);
+  //       const dateString = `${date.getFullYear()}-${String(
+  //         date.getMonth() + 1
+  //       ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+  //       const sessionsOnDate = currentSessions.filter(
+  //         (s) => s.date === dateString
+  //       ).length;
+  //       data.push({
+  //         name: dayFormatter.format(date),
+  //         sessions: sessionsOnDate,
+  //       });
+  //     }
+  //     return data;
+  //   },
+  //   []
+  // );
+
+  // const getMonthlyChartData = React.useCallback(
+  //   (currentSessions: Session[]): { name: string; sessions: number }[] => {
+  //     const today = new Date();
+  //     const currentMonth = today.getMonth();
+  //     const currentYear = today.getFullYear();
+
+  //     const sessionsThisMonth = currentSessions.filter((s) => {
+  //       const [year, month] = s.date.split("-").map(Number);
+  //       return year === currentYear && month - 1 === currentMonth;
+  //     });
+
+  //     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  //     const numWeeks = Math.ceil(daysInMonth / 7);
+  //     const weeklyData: { name: string; sessions: number }[] = Array.from(
+  //       { length: numWeeks },
+  //       (_, i) => ({
+  //         name: `Week ${i + 1}`,
+  //         sessions: 0,
+  //       })
+  //     );
+
+  //     sessionsThisMonth.forEach((s) => {
+  //       const dayOfMonth = parseInt(s.date.split("-")[2], 10);
+  //       const weekIndex = Math.ceil(dayOfMonth / 7) - 1;
+  //       if (weekIndex >= 0 && weekIndex < numWeeks) {
+  //         weeklyData[weekIndex].sessions++;
+  //       }
+  //     });
+  //     return weeklyData;
+  //   },
+  //   []
+  // );
+
+  // const getYearlyChartData = React.useCallback(
+  //   (currentSessions: Session[]): { name: string; sessions: number }[] => {
+  //     const today = new Date();
+  //     const currentYear = today.getFullYear();
+  //     const monthNames = [
+  //       "Jan",
+  //       "Feb",
+  //       "Mar",
+  //       "Apr",
+  //       "May",
+  //       "Jun",
+  //       "Jul",
+  //       "Aug",
+  //       "Sep",
+  //       "Oct",
+  //       "Nov",
+  //       "Dec",
+  //     ];
+  //     const monthlyData: { name: string; sessions: number }[] = monthNames.map(
+  //       (name) => ({
+  //         name,
+  //         sessions: 0,
+  //       })
+  //     );
+
+  //     currentSessions.forEach((s) => {
+  //       const [year, monthStr] = s.date.split("-");
+  //       const sessionYear = parseInt(year, 10);
+  //       const sessionMonth = parseInt(monthStr, 10) - 1; // 0-indexed
+
+  //       if (
+  //         sessionYear === currentYear &&
+  //         sessionMonth >= 0 &&
+  //         sessionMonth < 12
+  //       ) {
+  //         monthlyData[sessionMonth].sessions++;
+  //       }
+  //     });
+  //     return monthlyData;
+  //   },
+  //   []
+  // );
+
+  const weeklyChartData = React.useMemo(
+    () => getWeeklyChartData(sessions),
+    [sessions]
+  );
+  const monthlyChartData = React.useMemo(
+    () => getMonthlyChartData(sessions),
+    [sessions]
+  );
+  const yearlyChartData = React.useMemo(
+    () => getYearlyChartData(sessions),
+    [sessions]
+  );
 
   // Calculate summary data
   const currentDate = new Date();
@@ -69,9 +186,9 @@ const SessionLogApp = () => {
   if (sessions.length > 0) {
     const uniqueSortedDates = [...new Set(sessions.map((s) => s.date))].sort(
       (a, b) => b.localeCompare(a)
-    ); // Sort YYYY-MM-DD strings descending
+    );
 
-    const currentDateToMatch = new Date(); // Start with today (local)
+    const currentDateToMatch = new Date();
 
     for (const dateStr of uniqueSortedDates) {
       const expectedDateStr = `${currentDateToMatch.getFullYear()}-${String(
@@ -83,21 +200,12 @@ const SessionLogApp = () => {
 
       if (dateStr === expectedDateStr) {
         dayStreak++;
-        currentDateToMatch.setDate(currentDateToMatch.getDate() - 1); // Move to check for the previous day
+        currentDateToMatch.setDate(currentDateToMatch.getDate() - 1);
       } else if (dayStreak > 0) {
-        // If a streak was started but the current dateStr doesn't continue it, break.
-        // This handles gaps correctly if the dates are not perfectly consecutive from today.
-        // However, if dateStr is older than expectedDateStr, it also means the streak is broken.
-        // To be more precise, if dateStr < expectedDateStr (lexicographically for YYYY-MM-DD), the streak is broken.
         if (dateStr < expectedDateStr) {
           break;
         }
-        // If dateStr is somehow newer (shouldn't happen with sorted dates and decrementing currentDateToMatch starting from today)
-        // or if there's a gap, the streak ends.
       } else {
-        // If no streak started and the first date isn't today or yesterday, streak remains 0.
-        // If the very first unique date is not today, we need to check if it was yesterday.
-        // If it wasn't today, and dayStreak is still 0, check if it's yesterday for a streak of 1.
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayDateStr = `${yesterday.getFullYear()}-${String(
@@ -105,116 +213,65 @@ const SessionLogApp = () => {
         ).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
         if (dateStr === yesterdayDateStr) {
           dayStreak++;
-          // For this specific case, we don't continue checking further back from yesterday if today had no session.
         }
-        break; // Break because the first available date didn't start a streak from today.
+        break;
       }
     }
   }
 
   return (
     <div className="p-4 h-full flex flex-col text-sm">
-      <header className="mb-4">
+      <SessionLogHeader />
+      {/* <header className="mb-4">
         <h1 className="text-xl font-bold text-primary">Work Session Log</h1>
         <p className="text-xs text-muted-foreground">
           Review your completed work sessions.
         </p>
-      </header>
+      </header> */}
 
       {/* Summary Section */}
-      <div className="mb-6 p-3 bg-stone-100 rounded-lg">
+      <SessionLogSummary
+        todaySessionCount={todaySessionCount}
+        todayTotalMinutes={todayTotalMinutes}
+        dayStreak={dayStreak}
+        allSessionCount={allSessionCount}
+        allTotalMinutes={allTotalMinutes}
+      />
+      {/* <div className="mb-6 p-3 bg-stone-100 dark:bg-stone-800 rounded-lg">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
           <div>
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Today
-            </h3>
-            <p className="text-lg font-bold text-primary">
-              {todaySessionCount} sessions
-            </p>
-            <p className="text-xs text-muted-foreground">
-              ~ {formatDurationFromMinutes(todayTotalMinutes)}
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Day Streak
-            </h3>
-            <p className="text-lg font-bold text-primary">
-              {dayStreak} {dayStreak === 1 ? "day" : "days"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Consecutive activity
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              All Time
-            </h3>
-            <p className="text-lg font-bold text-primary">
-              {allSessionCount} sessions
-            </p>
-            <p className="text-xs text-muted-foreground">
-              ~ {formatDurationFromMinutes(allTotalMinutes)}
+// ... existing code ...
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
+
+      {/* Chart Section */}
+      <SessionLogCharts
+        weeklyChartData={weeklyChartData}
+        monthlyChartData={monthlyChartData}
+        yearlyChartData={yearlyChartData}
+        chartConfig={chartConfig}
+      />
+      {/* <div className="mb-6">
+        <h2 className="text-lg font-semibold text-primary mb-3">
+          Activity Overview
+// ... existing code ...
+        </Tabs>
+      </div> */}
 
       {/* Table or No Sessions Message */}
-      {sessions.length === 0 ? (
+      <SessionLogTable
+        sessions={sessions}
+        allTasks={allTasks}
+        deleteSession={deleteSession}
+      />
+      {/* {sessions.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full p-4 flex-grow">
           <p className="text-xl text-muted-foreground mb-2">
-            No sessions recorded yet.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Complete a work timer to see your sessions here.
-          </p>
+// ... existing code ...
         </div>
-      ) : (
-        <div className="overflow-auto flex-grow">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[110px]">Date</TableHead>
-                <TableHead className="w-[90px]">Start</TableHead>
-                <TableHead className="w-[90px]">End</TableHead>
-                <TableHead className="w-[70px]">Duration</TableHead>
-                <TableHead>Task</TableHead>
-                <TableHead className="w-[70px] text-right">Delete</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sessions.map((session: Session) => (
-                <TableRow key={session.id} className="text-xs">
-                  <TableCell className="py-1.5 px-2">{session.date}</TableCell>
-                  <TableCell className="py-1.5 px-2">
-                    {formatTime(session.startTime)}
-                  </TableCell>
-                  <TableCell className="py-1.5 px-2">
-                    {formatTime(session.endTime)}
-                  </TableCell>
-                  <TableCell className="py-1.5 px-2">
-                    {session.duration} min
-                  </TableCell>
-                  <TableCell className="py-1.5 px-2">
-                    {getTaskName(session.taskId)}
-                  </TableCell>
-                  <TableCell className="text-right py-1.5 px-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => deleteSession(session.id)}
-                      aria-label="Delete session"
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      )} */}
     </div>
   );
 };
