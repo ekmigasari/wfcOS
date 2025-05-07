@@ -2,11 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { TimerSetting } from "@/application/atoms/timerAtom";
-import { Button } from "@/presentation/components/ui/button";
-import { ListCollapse } from "lucide-react";
-import { useSetAtom } from "jotai";
-import { openWindowAtom } from "@/application/atoms/windowAtoms";
-import { appRegistry } from "@/infrastructure/config/appRegistry";
 
 interface TimerSettingsProps {
   timerSetting: TimerSetting;
@@ -29,7 +24,6 @@ export const TimerSettings = ({
     customDurationMinutes.toString()
   );
   const [localCustomTitle, setLocalCustomTitle] = useState<string>(customTitle);
-  const openWindow = useSetAtom(openWindowAtom);
 
   useEffect(() => {
     setLocalCustomMinutes(customDurationMinutes.toString());
@@ -86,19 +80,6 @@ export const TimerSettings = ({
     }
   };
 
-  const handleOpenSessionLog = () => {
-    const appConfig = appRegistry.sessionLog;
-    if (appConfig) {
-      openWindow({
-        id: "sessionLog",
-        appId: "sessionLog",
-        title: appConfig.name,
-        initialSize: appConfig.defaultSize,
-        minSize: appConfig.minSize,
-      });
-    }
-  };
-
   const durationOptions: {
     value: TimerSetting;
     label: string;
@@ -107,7 +88,8 @@ export const TimerSettings = ({
     {
       value: "work25",
       label: "Work (25min)",
-      description: "Focus time for maximum productivity",
+      description:
+        "Focus time for maximum productivity. Recorded in session log",
     },
     {
       value: "short5",
@@ -127,9 +109,9 @@ export const TimerSettings = ({
   ];
 
   return (
-    <div className="w-full border-t pt-4">
+    <div className="w-full border-t py-4">
       <h3 className="text-sm font-medium mb-2 text-center">Timer Settings</h3>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 max-w-md mx-auto">
         {durationOptions.map((option) => (
           <label
             key={option.value}
@@ -179,18 +161,6 @@ export const TimerSettings = ({
             </div>
           </label>
         ))}
-      </div>
-
-      {/* Session Log Button */}
-      <div className="mt-6 text-center">
-        <Button
-          variant="outline"
-          className="w-full sm:w-auto"
-          onClick={handleOpenSessionLog}
-        >
-          <ListCollapse className="mr-2 h-4 w-4" />
-          View Session Log
-        </Button>
       </div>
     </div>
   );
