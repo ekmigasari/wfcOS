@@ -9,6 +9,8 @@ import {
 import { tasksAtom } from "@/application/atoms/todoListAtom";
 import { SessionLogTable } from "./SessionLogTable"; // Assuming SessionLogTable.tsx is in the same directory
 import { Button } from "@/presentation/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -42,23 +44,25 @@ export const TableSection = () => {
       {sessions.length > ITEMS_PER_PAGE && (
         <div className="mt-4 flex justify-center items-center space-x-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
+            className="hover:bg-secondary/20 disabled:hidden"
           >
-            Previous
+            <ChevronLeft className="size-4" />
           </Button>
           <span className="text-xs text-muted-foreground">
             Page {currentPage} of {totalPages}
           </span>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
+            className="hover:bg-secondary/20 disabled:hidden"
           >
-            Next
+            <ChevronRight className="size-4" />
           </Button>
         </div>
       )}
