@@ -13,6 +13,7 @@ import {
   ArrowUpDown,
   ArrowDown,
   ArrowUp,
+  Plus,
 } from "lucide-react";
 import {
   musicPlayerAtom,
@@ -351,20 +352,20 @@ const PlaylistManager = () => {
     <div className="flex-1 overflow-hidden flex flex-col">
       {/* Add Song Form */}
       <form onSubmit={handleAddSong} className="mb-4">
-        <div className="flex">
+        <div className="flex ">
           <input
             type="url"
             value={newSongUrl}
             onChange={(e) => setNewSongUrl(e.target.value)}
             placeholder="Enter YouTube URL"
-            className="flex-grow p-2 rounded-l-md bg-input border border-border focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
+            className="flex-grow min-w-0 p-2 rounded-l-md bg-input border border-border focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
             required
           />
           <button
             type="submit"
-            className="px-3 py-2 rounded-r-md bg-accent hover:bg-accent/90 text-accent-foreground"
+            className="px-3 py-2 rounded-r-md bg-accent hover:bg-accent/90 text-white"
           >
-            Add
+            <Plus className="w-4 h-4" />
           </button>
         </div>
       </form>
