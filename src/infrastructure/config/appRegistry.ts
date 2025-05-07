@@ -53,7 +53,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     name: "Timer",
     src: "/icons/clock.png",
     defaultSize: { width: 400, height: 600 },
-    minSize: { width: 250, height: 300 },
+    minSize: { width: 400, height: 350 },
     component: Timer,
   },
 
@@ -102,7 +102,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   },
   changelog: {
     name: "Changelog",
-    src: "/icons/info.png",
+    src: "/icons/default.png",
     defaultSize: { width: 500, height: 400 },
     minSize: { width: 300, height: 200 },
     component: ChangelogWindow,
@@ -110,7 +110,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   },
   sessionLog: {
     name: "Session Log",
-    src: "/icons/list.png",
+    src: "/icons/default.png",
     defaultSize: { width: 700, height: 500 },
     minSize: { width: 450, height: 300 },
     component: SessionLogApp,

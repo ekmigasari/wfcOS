@@ -105,27 +105,29 @@ export const Timer = () => {
         />
 
         {/* Task Selector */}
-        <div className="my-4 w-full max-w-xs">
-          <Select
-            value={selectedTaskId || ""}
-            onValueChange={(value) =>
-              setSelectedTaskId(value === "none" ? null : value)
-            }
-            disabled={isRunning}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Link a task (optional)" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">No task selected</SelectItem>
-              {incompleteTasks.map((task: TaskItem) => (
-                <SelectItem key={task.id} value={task.id}>
-                  {task.content}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {timerSetting === "work25" && (
+          <div className="my-4 w-full max-w-xs">
+            <Select
+              value={selectedTaskId || ""}
+              onValueChange={(value) =>
+                setSelectedTaskId(value === "none" ? null : value)
+              }
+              disabled={isRunning}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Link a task (optional)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No task selected</SelectItem>
+                {incompleteTasks.map((task: TaskItem) => (
+                  <SelectItem key={task.id} value={task.id}>
+                    {task.content}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
       {/* Activity Summary Display */}
       <ActivitySummary {...activitySummaryData} />
