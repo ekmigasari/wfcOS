@@ -107,6 +107,12 @@ export const TaskbarMenu = () => {
           </MenubarItem>
           <MenubarItem
             inset
+            onSelect={() => openUrl("https://workfromcoffee.featurebase.app")}
+          >
+            Give us feedback
+          </MenubarItem>
+          <MenubarItem
+            inset
             onSelect={() => openUrl("https://github.com/ekmigasari/wfcOS.git")}
           >
             Github<MenubarShortcut>repository</MenubarShortcut>

@@ -1,7 +1,6 @@
 "use client";
 
-// Removed unused import
-// import { playSound } from "@/infrastructure/lib/utils";
+import { RotateCcwIcon } from "lucide-react";
 
 interface TimerControlsProps {
   isRunning: boolean;
@@ -15,22 +14,22 @@ export const TimerControls = ({
   onReset,
 }: TimerControlsProps) => {
   return (
-    <div className="flex space-x-4">
+    <div className="flex space-x-2">
       <button
         onClick={onStartPause}
-        className={`px-4 py-2 rounded text-white transition w-20 ${
+        className={`px-12 py-2 rounded text-white transition ${
           isRunning
             ? "bg-orange-500 hover:bg-orange-600"
-            : "bg-primary hover:bg-primary-dark"
+            : "bg-primary hover:bg-secondary"
         }`}
       >
         {isRunning ? "Pause" : "Start"}
       </button>
       <button
         onClick={onReset}
-        className="px-4 py-2 bg-gray-300 text-secondary rounded hover:bg-gray-400 transition w-20"
+        className="px-2 py-2 bg-gray-300 text-secondary rounded hover:bg-background transition"
       >
-        Reset
+        <RotateCcwIcon />
       </button>
     </div>
   );

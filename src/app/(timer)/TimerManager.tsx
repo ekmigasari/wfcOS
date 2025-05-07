@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { timerAtom } from "@/application/atoms/timerAtom";
+import {
+  addSessionAtom,
+  selectedTaskForTimerAtom,
+} from "@/application/atoms/sessionAtoms";
 import { formatTime, getDisplayTitle } from "./utils/timerUtils";
 
 /**
@@ -13,6 +17,8 @@ import { formatTime, getDisplayTitle } from "./utils/timerUtils";
  */
 export const TimerManager = () => {
   const [timerState, setTimerState] = useAtom(timerAtom);
+  const selectedTaskId = useAtomValue(selectedTaskForTimerAtom);
+  const [, addNewSession] = useAtom(addSessionAtom);
   const workerRef = useRef<Worker | null>(null);
   const originalTitle = useRef<string>("");
 
@@ -62,9 +68,30 @@ export const TimerManager = () => {
             });
           }
 
+          // Log session if it was a work timer
+          if (
+            timerState.timerSetting === "work25" &&
+            timerState.sessionStartTime &&
+            timerState.workCycleDuration
+          ) {
+            const endTime = Date.now();
+            const durationInMinutes = Math.round(
+              timerState.workCycleDuration / 60
+            );
+
+            addNewSession({
+              taskId: selectedTaskId,
+              startTime: timerState.sessionStartTime,
+              endTime: endTime,
+              duration: durationInMinutes, // Ensure this is in minutes
+            });
+          }
+
           setTimerState((prev) => ({
             ...prev,
             isRunning: false,
+            sessionStartTime: null, // Clear session start time after completion
+            // workCycleDuration can remain as is, or be reset, depends on desired flow for next timer start
           }));
           break;
 
@@ -122,7 +149,14 @@ export const TimerManager = () => {
       // Restore original title on unmount
       document.title = originalTitle.current;
     };
-  }, [setTimerState]); // Only depends on the stable setTimerState function
+  }, [
+    setTimerState,
+    selectedTaskId,
+    addNewSession,
+    timerState.timerSetting,
+    timerState.sessionStartTime,
+    timerState.workCycleDuration,
+  ]); // Only depends on the stable setTimerState function
 
   // Update document title when timer state changes
   useEffect(() => {

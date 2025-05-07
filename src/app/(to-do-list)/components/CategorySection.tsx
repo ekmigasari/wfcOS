@@ -8,6 +8,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { TaskItem } from "@/application/atoms/todoListAtom";
 import { SortableTaskItem } from "./TaskItem";
 import { EmptyDropArea } from "./EmptyDropArea";
+import { useAtomValue } from "jotai";
+import { getTaskSessionCountAtom } from "@/application/atoms/sessionAtoms";
 
 type CategorySectionProps = {
   title: string;
@@ -34,6 +36,8 @@ export const SortableCategorySection = ({
 }: CategorySectionProps) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: `category-${category}` });
+
+  const getTaskSessionCount = useAtomValue(getTaskSessionCountAtom);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -78,15 +82,19 @@ export const SortableCategorySection = ({
               strategy={verticalListSortingStrategy}
             >
               <ul>
-                {tasks.map((task) => (
-                  <SortableTaskItem
-                    key={task.id}
-                    task={task}
-                    onRemove={onRemoveTask}
-                    onMove={onMoveTask}
-                    onEdit={onEditTask}
-                  />
-                ))}
+                {tasks.map((task) => {
+                  const sessionCount = getTaskSessionCount(task.id);
+                  return (
+                    <SortableTaskItem
+                      key={task.id}
+                      task={task}
+                      sessionCount={sessionCount}
+                      onRemove={onRemoveTask}
+                      onMove={onMoveTask}
+                      onEdit={onEditTask}
+                    />
+                  );
+                })}
               </ul>
             </SortableContext>
           ) : (

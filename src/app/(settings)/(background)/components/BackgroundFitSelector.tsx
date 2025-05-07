@@ -26,7 +26,7 @@ export const BackgroundFitSelector = ({
   onChangeFit,
 }: BackgroundFitSelectorProps) => {
   return (
-    <div>
+    <div className="w-full mt-4">
       <label htmlFor="fit-selector" className="block text-sm font-medium mb-2">
         Image Fit
       </label>

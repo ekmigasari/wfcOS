@@ -16,10 +16,10 @@ export const TimerDisplay = ({
 }: TimerDisplayProps) => {
   return (
     <>
-      <h2 className="text-xl font-semibold mb-2">
+      <h2 className="text-2xl font-semibold mb-4">
         {getDisplayTitle(timerSetting, customTitle)}
       </h2>
-      <div className="text-6xl font-mono mb-4 tabular-nums">
+      <div className="text-6xl font-mono mb-6 tabular-nums">
         {formatTime(timeRemaining)}
       </div>
     </>

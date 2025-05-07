@@ -21,6 +21,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { EditorState, LexicalEditor } from "lexical";
+import { playSound } from "@/infrastructure/lib/utils";
 
 import {
   notesAtom,
@@ -229,6 +230,7 @@ const Notepad: React.FC = () => {
   const composerKey = activeNoteId || "__EMPTY__";
 
   const toggleSidebar = useCallback(() => {
+    playSound("/sounds/click.mp3");
     setIsSidebarOpen((prev) => !prev);
   }, []);
 

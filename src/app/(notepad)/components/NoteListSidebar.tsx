@@ -14,6 +14,7 @@ import { ScrollArea } from "@/presentation/components/ui/scroll-area";
 import { Input } from "@/presentation/components/ui/input";
 import { cn } from "@/infrastructure/lib/utils";
 import { Trash2, FilePlus, Pencil } from "lucide-react";
+import { playSound } from "@/infrastructure/lib/utils";
 
 // Constants for resizing
 const MIN_WIDTH = 150; // Minimum sidebar width in pixels
@@ -98,6 +99,7 @@ export const NoteListSidebar = () => {
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
   const handleCreateNote = () => {
+    playSound("/sounds/click.mp3");
     const newNoteId = createNewNote(setNotes, setActiveNoteId);
     setEditingNoteId(newNoteId);
     setEditedName("New Note");
@@ -108,6 +110,7 @@ export const NoteListSidebar = () => {
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.stopPropagation();
+    playSound("/sounds/click.mp3");
     if (editingNoteId === noteId) {
       setEditingNoteId(null);
     }
@@ -128,6 +131,7 @@ export const NoteListSidebar = () => {
 
   const handleSaveName = (noteId: string) => {
     if (editingNoteId === noteId && editedName.trim() !== "") {
+      playSound("/sounds/click.mp3");
       updateNoteName(setNotes, noteId, editedName.trim());
     }
     setEditingNoteId(null);
@@ -150,6 +154,7 @@ export const NoteListSidebar = () => {
     event: React.MouseEvent<HTMLElement>
   ) => {
     event.stopPropagation();
+    playSound("/sounds/click.mp3");
     setEditingNoteId(noteId);
     setEditedName(currentName || "Untitled Note");
   };
@@ -202,6 +207,7 @@ export const NoteListSidebar = () => {
                       tabIndex={0}
                       onClick={() => {
                         if (editingNoteId !== note.id) {
+                          playSound("/sounds/click.mp3");
                           setActiveNoteId(note.id);
                         }
                       }}
@@ -211,6 +217,7 @@ export const NoteListSidebar = () => {
                           (e.key === "Enter" || e.key === " ")
                         ) {
                           e.preventDefault();
+                          playSound("/sounds/click.mp3");
                           setActiveNoteId(note.id);
                         }
                       }}

@@ -2,12 +2,15 @@ import { Size } from "@/application/types/window";
 import React from "react";
 import { Timer } from "@/app/(timer)/Timer";
 import { BackgroundChanger } from "@/app/(settings)/(background)/background";
+import { SoundChanger } from "@/app/(settings)/(sound)/sound";
 import { MusicPlayer } from "@/app/(music-player)/MusicPlayer";
 import TodoList from "@/app/(to-do-list)/todoList";
 import { AmbiencePlayer } from "@/app/(ambience)/ambiencePlayer";
 import Notepad from "@/app/(notepad)/Notepad";
 import { ChangelogWindow } from "@/presentation/components/shared/taskbar/ChangelogWindow";
 import Bookmark from "@/app/(bookmark)/Bookmark";
+import { SettingsPanel } from "@/app/(settings)/SettingsPanel";
+import SessionLogApp from "@/app/(session-log)/SessionLogApp";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -19,6 +22,30 @@ interface AppRegistryEntry {
   hidden?: boolean; // Flag to hide app from desktop icons
 }
 
+// Settings module specific entries
+export interface SettingsEntry {
+  id: string;
+  name: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: React.ComponentType<any>;
+  icon: string;
+}
+
+export const settingsRegistry: SettingsEntry[] = [
+  {
+    id: "background",
+    name: "Background",
+    component: BackgroundChanger,
+    icon: "/icons/wallpaper.png",
+  },
+  {
+    id: "sound",
+    name: "Sound",
+    component: SoundChanger,
+    icon: "/icons/volume.png",
+  },
+];
+
 export const appRegistry: Record<string, AppRegistryEntry> = {
   // Using appId as the key (e.g., 'pomodoro'), and name for display
 
@@ -26,7 +53,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     name: "Timer",
     src: "/icons/clock.png",
     defaultSize: { width: 400, height: 600 },
-    minSize: { width: 250, height: 300 },
+    minSize: { width: 400, height: 350 },
     component: Timer,
   },
 
@@ -69,17 +96,25 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   settings: {
     name: "Settings",
     src: "/icons/settings.png",
-    defaultSize: { width: 400, height: 600 },
-    minSize: { width: 250, height: 300 },
-    component: BackgroundChanger,
+    defaultSize: { width: 500, height: 550 },
+    minSize: { width: 300, height: 300 },
+    component: SettingsPanel,
   },
   changelog: {
     name: "Changelog",
-    src: "/icons/info.png",
+    src: "/icons/default.png",
     defaultSize: { width: 500, height: 400 },
     minSize: { width: 300, height: 200 },
     component: ChangelogWindow,
     hidden: true, // Hide from desktop icons
+  },
+  sessionLog: {
+    name: "Session Log",
+    src: "/icons/default.png",
+    defaultSize: { width: 700, height: 500 },
+    minSize: { width: 450, height: 300 },
+    component: SessionLogApp,
+    hidden: true,
   },
 };
 

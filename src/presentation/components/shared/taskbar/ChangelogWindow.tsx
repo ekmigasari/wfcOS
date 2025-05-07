@@ -14,17 +14,28 @@ export const ChangelogContent = () => {
       <p className="text-sm text-muted-foreground">
         Recent updates and changes
       </p>
-      <p className="text-sm text-muted-foreground">
-        Feel free to mention @ekmigasari on X or open an issue on the repo if
-        you have any feedback!
-      </p>
 
       <div className="space-y-4 mt-4">
         <div>
-          <h3 className="text-lg font-semibold">Version 2.2</h3>
+          <h3 className="text-lg font-semibold">Version 2.3</h3>
+          <ul className="list-disc pl-5 space-y-1 text-sm">
+            <p className="font-bold underline">Timer</p>
+            <li>Now timer can track your work sessions and productivity</li>
+            <li>You can link a task to your work session</li>
+            <p className="font-bold underline">Session Log</p>
+            <li>You can see your sessions log as chart and table</li>
+            <li>Chart show data of week, month, year</li>
+            <li>Table show all your sessions data</li>
+            <p className="font-bold underline">To-do List</p>
+            <li>Show session count in task item</li>
+          </ul>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold">Version 2.2.2</h3>
           <ul className="list-disc pl-5 space-y-1 text-sm">
             <p className="font-bold underline">New Feature</p>
             <li>Added bookmark app</li>
+            <li>Added sound effects settings</li>
             <p className="font-bold underline">To-do List</p>
             <li>Added edit task feature</li>
             <p className="font-bold underline">Notepad</p>
