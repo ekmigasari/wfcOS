@@ -8,7 +8,10 @@ import TimerManager from "./TimerManager";
 import { useEffect } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { resetTimerAtom } from "@/application/atoms/timerAtom";
-import { selectedTaskForTimerAtom } from "@/application/atoms/sessionAtoms";
+import {
+  selectedTaskForTimerAtom,
+  sortedSessionsAtom,
+} from "@/application/atoms/sessionAtoms";
 import {
   incompleteTasksAtom,
   TaskItem,
@@ -20,6 +23,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/presentation/components/ui/select";
+import ActivitySummary from "./components/ActivitySummary";
+import {
+  calculateCurrentMonthSessions,
+  calculateDayStreak,
+} from "@/app/(session-log)/sessionLogUtils";
+import { Session } from "@/application/types/session.types";
 
 export const Timer = () => {
   // Use the timer hook for state and actions
@@ -40,6 +49,8 @@ export const Timer = () => {
   const [, silentReset] = useAtom(resetTimerAtom);
   const incompleteTasks = useAtomValue(incompleteTasksAtom);
   const [selectedTaskId, setSelectedTaskId] = useAtom(selectedTaskForTimerAtom);
+  const sessions = useAtomValue(sortedSessionsAtom);
+  const currentDate = new Date();
 
   // Reset timer when component mounts (reopens)
   useEffect(() => {
@@ -47,8 +58,37 @@ export const Timer = () => {
     silentReset();
   }, [silentReset]);
 
+  // Calculate data for ActivitySummary
+  const localTodayDateString = `${currentDate.getFullYear()}-${String(
+    currentDate.getMonth() + 1
+  ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
+
+  const todaySessions = sessions.filter(
+    (s: Session) => s.date === localTodayDateString
+  );
+  const todaySessionCount = todaySessions.length;
+  const todayTotalMinutes = todaySessions.reduce(
+    (acc: number, s: Session) => acc + (s.duration || 25),
+    0
+  );
+
+  const currentStreak = calculateDayStreak(sessions, currentDate);
+  const { count: thisMonthSessionCount, totalMinutes: thisMonthTotalMinutes } =
+    calculateCurrentMonthSessions(sessions, currentDate);
+
+  const activitySummaryData = {
+    todaySessionCount,
+    todayTotalMinutes,
+    currentStreak,
+    thisMonthSessionCount,
+    thisMonthTotalMinutes,
+  };
+
   return (
     <div className="flex flex-col items-center justify-start text-secondary h-full p-4">
+      {/* Activity Summary Display */}
+      <ActivitySummary {...activitySummaryData} />
+
       {/* Timer worker manager (invisible) */}
       <TimerManager />
 

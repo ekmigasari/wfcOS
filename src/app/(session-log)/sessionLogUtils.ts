@@ -138,3 +138,123 @@ export const formatTime = (timestamp: number): string => {
     minute: "2-digit",
   });
 };
+
+// --- New Utility Functions ---
+
+const DEFAULT_SESSION_DURATION_MINUTES = 25; // Assuming a default, adjust if actual duration is in Session object
+
+export const calculateCurrentWeekSessions = (
+  sessions: Session[],
+  currentDate: Date = new Date()
+): { count: number; totalMinutes: number } => {
+  const firstDayOfWeek = new Date(currentDate);
+  firstDayOfWeek.setDate(currentDate.getDate() - currentDate.getDay()); // Sunday
+  firstDayOfWeek.setHours(0, 0, 0, 0);
+
+  const lastDayOfWeek = new Date(firstDayOfWeek);
+  lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6); // Saturday
+  lastDayOfWeek.setHours(23, 59, 59, 999);
+
+  let count = 0;
+  sessions.forEach((session) => {
+    const sessionDate = new Date(session.date + "T00:00:00"); // Ensure date parsing is robust
+    if (sessionDate >= firstDayOfWeek && sessionDate <= lastDayOfWeek) {
+      count++;
+    }
+  });
+  return { count, totalMinutes: count * DEFAULT_SESSION_DURATION_MINUTES };
+};
+
+export const calculateCurrentMonthSessions = (
+  sessions: Session[],
+  currentDate: Date = new Date()
+): { count: number; totalMinutes: number } => {
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+  let count = 0;
+
+  sessions.forEach((session) => {
+    const sessionDate = new Date(session.date + "T00:00:00");
+    if (
+      sessionDate.getMonth() === currentMonth &&
+      sessionDate.getFullYear() === currentYear
+    ) {
+      count++;
+    }
+  });
+  return { count, totalMinutes: count * DEFAULT_SESSION_DURATION_MINUTES };
+};
+
+export const calculateCurrentYearSessions = (
+  sessions: Session[],
+  currentDate: Date = new Date()
+): { count: number; totalMinutes: number } => {
+  const currentYear = currentDate.getFullYear();
+  let count = 0;
+
+  sessions.forEach((session) => {
+    const sessionDate = new Date(session.date + "T00:00:00");
+    if (sessionDate.getFullYear() === currentYear) {
+      count++;
+    }
+  });
+  return { count, totalMinutes: count * DEFAULT_SESSION_DURATION_MINUTES };
+};
+
+export const calculateDayStreak = (
+  sessions: Session[],
+  currentDate: Date = new Date()
+): number => {
+  if (sessions.length === 0) {
+    return 0;
+  }
+
+  const uniqueSortedDates = [...new Set(sessions.map((s) => s.date))].sort(
+    (a, b) => b.localeCompare(a)
+  ); // Sorts YYYY-MM-DD strings descending
+
+  let dayStreak = 0;
+  const currentDateToMatch = new Date(currentDate); // Use a copy of the passed current date
+  currentDateToMatch.setHours(0, 0, 0, 0);
+
+  for (const dateStr of uniqueSortedDates) {
+    const expectedDate = new Date(currentDateToMatch);
+    expectedDate.setHours(0, 0, 0, 0);
+    // const expectedDateStr = `${expectedDate.getFullYear()}-${String(
+    //   expectedDate.getMonth() + 1
+    // ).padStart(2, "0")}-${String(expectedDate.getDate()).padStart(2, "0")}`;
+
+    const sessionDate = new Date(dateStr + "T00:00:00"); // Normalize session date for comparison
+
+    if (sessionDate.getTime() === expectedDate.getTime()) {
+      dayStreak++;
+      currentDateToMatch.setDate(currentDateToMatch.getDate() - 1); // Move to previous day
+    } else if (sessionDate.getTime() < expectedDate.getTime()) {
+      // If the session date is older than the expected date for the streak, the streak is broken.
+      // This also handles the case where the most recent session is not today or yesterday.
+      break;
+    }
+    // If sessionDate > expectedDate, it implies a future date, which shouldn't happen with sorted dates.
+  }
+  // Special case: if no session today, but there was one yesterday, streak is 1.
+  // The loop above handles this if today is `currentDate`.
+  // If the latest session is not today, but currentDate is today, and the latest session was yesterday,
+  // the streak calculated above will be 0. We need to check this explicitly if dayStreak is 0 after the loop.
+  if (dayStreak === 0 && uniqueSortedDates.length > 0) {
+    const latestSessionDate = new Date(uniqueSortedDates[0] + "T00:00:00");
+    const yesterday = new Date(currentDate);
+    yesterday.setDate(currentDate.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    if (latestSessionDate.getTime() === yesterday.getTime()) {
+      const todayFormatted = `${currentDate.getFullYear()}-${String(
+        currentDate.getMonth() + 1
+      ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
+      if (uniqueSortedDates[0] !== todayFormatted) {
+        // ensure latest session is not today
+        return 1;
+      }
+    }
+  }
+
+  return dayStreak;
+};
