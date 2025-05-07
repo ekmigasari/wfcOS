@@ -16,6 +16,7 @@ import {
 } from "@/presentation/components/ui/chart";
 import { Button } from "@/presentation/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { playSound } from "@/infrastructure/lib/utils";
 
 interface ChartDataPoint {
   name: string;
@@ -103,6 +104,10 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
   monthOffset,
   yearOffset,
 }) => {
+  const handleInteractionSound = () => {
+    playSound("/sounds/click.mp3", "ui-interaction");
+  };
+
   // Updated Helper function to get a display label for the offset period
   const getPeriodLabel = (
     offset: number,
@@ -177,6 +182,7 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
       <Tabs
         defaultValue="weekly"
         className="w-full flex flex-col items-center justify-center"
+        onValueChange={handleInteractionSound}
       >
         <TabsList className="grid w-full grid-cols-3 mb-2 bg-stone-100 dark:bg-stone-800 p-1 rounded-md">
           <TabsTrigger
@@ -206,7 +212,10 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onPrevWeek}
+              onClick={() => {
+                onPrevWeek();
+                handleInteractionSound();
+              }}
               className="hover:bg-secondary/20"
             >
               <ChevronLeftIcon className="w-4 h-4 " />
@@ -217,16 +226,16 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onNextWeek}
+              onClick={() => {
+                onNextWeek();
+                handleInteractionSound();
+              }}
               className="hover:bg-secondary/20"
             >
               <ChevronRightIcon className="w-4 h-4" />
             </Button>
           </div>
-          <InternalChartComponent // InternalChartComponent should not receive navigation props
-            data={weeklyChartData}
-            config={chartConfig}
-          />
+          <InternalChartComponent data={weeklyChartData} config={chartConfig} />
         </TabsContent>
         <TabsContent
           value="monthly"
@@ -236,7 +245,10 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onPrevMonth}
+              onClick={() => {
+                onPrevMonth();
+                handleInteractionSound();
+              }}
               className="hover:bg-secondary/20"
             >
               <ChevronLeftIcon className="w-4 h-4" />
@@ -247,13 +259,16 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onNextMonth}
+              onClick={() => {
+                onNextMonth();
+                handleInteractionSound();
+              }}
               className="hover:bg-secondary/20"
             >
               <ChevronRightIcon className="w-4 h-4" />
             </Button>
           </div>
-          <InternalChartComponent // InternalChartComponent should not receive navigation props
+          <InternalChartComponent
             data={monthlyChartData}
             config={chartConfig}
           />
@@ -266,7 +281,10 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onPrevYear}
+              onClick={() => {
+                onPrevYear();
+                handleInteractionSound();
+              }}
               className="hover:bg-secondary/20"
             >
               <ChevronLeftIcon className="w-4 h-4" />
@@ -277,16 +295,16 @@ export const SessionLogCharts: React.FC<SessionLogChartsProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onNextYear}
+              onClick={() => {
+                onNextYear();
+                handleInteractionSound();
+              }}
               className="hover:bg-secondary/20"
             >
               <ChevronRightIcon className="w-4 h-4" />
             </Button>
           </div>
-          <InternalChartComponent // InternalChartComponent should not receive navigation props
-            data={yearlyChartData}
-            config={chartConfig}
-          />
+          <InternalChartComponent data={yearlyChartData} config={chartConfig} />
         </TabsContent>
       </Tabs>
     </div>

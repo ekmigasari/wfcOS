@@ -11,6 +11,7 @@ import { SessionLogTable } from "./SessionLogTable"; // Assuming SessionLogTable
 import { Button } from "@/presentation/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { ChevronRight } from "lucide-react";
+import { playSound } from "@/infrastructure/lib/utils";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -20,6 +21,10 @@ export const TableSection = () => {
   const [, deleteSession] = useAtom(deleteSessionAtom);
   const [currentPage, setCurrentPage] = React.useState(1);
 
+  const handleInteractionSound = () => {
+    playSound("/sounds/click.mp3", "ui-interaction");
+  };
+
   const totalPages = Math.ceil(sessions.length / ITEMS_PER_PAGE);
   const paginatedSessions = React.useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -28,10 +33,12 @@ export const TableSection = () => {
 
   const handlePreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
+    handleInteractionSound();
   };
 
   const handleNextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    handleInteractionSound();
   };
 
   return (

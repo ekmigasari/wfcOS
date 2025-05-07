@@ -29,6 +29,7 @@ import {
   calculateDayStreak,
 } from "@/app/(session-log)/sessionLogUtils";
 import { Session } from "@/application/types/session.types";
+import { playSound } from "@/infrastructure/lib/utils";
 
 export const Timer = () => {
   // Use the timer hook for state and actions
@@ -109,12 +110,16 @@ export const Timer = () => {
           <div className="my-4 w-full max-w-xs">
             <Select
               value={selectedTaskId || ""}
-              onValueChange={(value) =>
-                setSelectedTaskId(value === "none" ? null : value)
-              }
+              onValueChange={(value) => {
+                playSound("/sounds/click.mp3");
+                setSelectedTaskId(value === "none" ? null : value);
+              }}
               disabled={isRunning}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger
+                className="w-full"
+                onPointerDown={() => playSound("/sounds/click.mp3")}
+              >
                 <SelectValue placeholder="Link a task (optional)" />
               </SelectTrigger>
               <SelectContent>

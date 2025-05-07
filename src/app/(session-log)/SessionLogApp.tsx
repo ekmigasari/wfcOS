@@ -9,7 +9,9 @@ import { TableSection } from "./components/TableSection";
 const SessionLogApp = () => {
   return (
     <div className="p-4 h-full flex flex-col text-sm overflow-y-auto">
-      <SessionLogHeader />
+      <div>
+        <SessionLogHeader />
+      </div>
 
       {/* Chart Section */}
       <ChartsSection />

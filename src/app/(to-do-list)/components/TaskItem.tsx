@@ -3,7 +3,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskItem } from "@/application/atoms/todoListAtom";
 import { useState, useRef, useEffect } from "react";
-
+import { playSound } from "@/infrastructure/lib/utils";
 type TaskItemProps = {
   task: TaskItem;
   sessionCount: number;
@@ -33,6 +33,7 @@ export const SortableTaskItem = ({
   };
 
   const handleEdit = () => {
+    playSound("/sounds/click.mp3");
     if (isEditing) {
       onEdit(task.id, editedContent);
     }

@@ -14,6 +14,7 @@ import {
 import { Button } from "@/presentation/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { formatTime, getTaskName } from "../sessionLogUtils";
+import { playSound } from "@/infrastructure/lib/utils";
 
 interface SessionLogTableProps {
   sessions: Session[];
@@ -26,18 +27,22 @@ export const SessionLogTable: React.FC<SessionLogTableProps> = ({
   allTasks,
   deleteSession,
 }) => {
-  // if (sessions.length === 0) {
-  //   return (
-  //     <div className="flex flex-col items-center justify-center h-full p-4 flex-grow">
-  //       <p className="text-xl text-muted-foreground mb-2">
-  //         No sessions recorded yet.
-  //       </p>
-  //       <p className="text-sm text-muted-foreground">
-  //         Complete a work timer to see your sessions here.
-  //       </p>
-  //     </div>
-  //   );
-  // }
+  if (sessions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-4 flex-grow">
+        <p className="text-xl text-muted-foreground mb-2">
+          No sessions recorded yet.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Complete a work timer to see your sessions here.
+        </p>
+      </div>
+    );
+  }
+
+  const handleInteractionSound = () => {
+    playSound("/sounds/click.mp3", "ui-interaction");
+  };
 
   return (
     <div className="flex-grow border">
@@ -69,7 +74,10 @@ export const SessionLogTable: React.FC<SessionLogTableProps> = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => deleteSession(session.id)}
+                  onClick={() => {
+                    deleteSession(session.id);
+                    handleInteractionSound();
+                  }}
                   aria-label="Delete session"
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
