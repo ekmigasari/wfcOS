@@ -86,9 +86,6 @@ export const Timer = () => {
 
   return (
     <div className="flex flex-col items-center justify-start text-secondary h-full p-4">
-      {/* Activity Summary Display */}
-      <ActivitySummary {...activitySummaryData} />
-
       {/* Timer worker manager (invisible) */}
       <TimerManager />
 
@@ -98,6 +95,13 @@ export const Timer = () => {
           timeRemaining={timeRemaining}
           timerSetting={timerSetting}
           customTitle={customTitle}
+        />
+
+        {/* Timer controls */}
+        <TimerControls
+          isRunning={isRunning}
+          onStartPause={startPause}
+          onReset={reset}
         />
 
         {/* Task Selector */}
@@ -123,14 +127,9 @@ export const Timer = () => {
             </Select>
           </div>
         )}
-
-        {/* Timer controls */}
-        <TimerControls
-          isRunning={isRunning}
-          onStartPause={startPause}
-          onReset={reset}
-        />
       </div>
+      {/* Activity Summary Display */}
+      <ActivitySummary {...activitySummaryData} />
 
       {/* Settings Area */}
       <TimerSettings
