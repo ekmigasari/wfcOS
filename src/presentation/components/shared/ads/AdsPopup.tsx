@@ -130,7 +130,7 @@ export const AdsPopup = () => {
   const isEmoji = currentAd.thumbnail?.type === "emoji";
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto z-50 sm:max-w-xs animate-in fade-in slide-in-from-bottom-4 duration-1000">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-6 sm:right-auto z-50 sm:max-w-xs animate-in fade-in slide-in-from-bottom-4 duration-1000">
       <div
         className={`group bg-primary text-white border-2 border-secondary rounded-lg shadow 
         hover:shadow-xl transition-all cursor-pointer w-full sm:w-[280px] ${
