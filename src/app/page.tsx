@@ -2,7 +2,7 @@ import { DesktopIcons } from "@/presentation/components/shared/app-icons/Desktop
 import { Taskbar } from "@/presentation/components/shared/taskbar";
 import { DesktopBackground } from "@/presentation/components/shared/desktop-background/desktop-background";
 import { Window } from "@/presentation/components/shared/window/Window";
-
+import { AdsPopup } from "@/presentation/components/shared/ads/AdsPopup";
 export default function Page() {
   return (
     <div className="h-screen w-screen overflow-hidden">
@@ -14,6 +14,7 @@ export default function Page() {
           <DesktopIcons />
         </div>
       </div>
+      <AdsPopup />
     </div>
   );
 }
