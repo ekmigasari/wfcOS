@@ -138,7 +138,7 @@ export const WindowUI = memo(
           top: isMobile ? "10px" : `${position.y}px`,
           left: isMobile ? "10px" : `${position.x}px`,
           width: isMobile ? "calc(100vw - 20px)" : `${size.width}px`,
-          height: isMobile ? "calc(100vh - 20px)" : `${size.height}px`,
+          height: isMobile ? "calc(90vh - 20px)" : `${size.height}px`,
           minWidth: "150px",
           minHeight: "100px",
           zIndex: zIndex,
