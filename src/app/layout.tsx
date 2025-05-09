@@ -13,10 +13,28 @@ export const metadata: Metadata = {
     "A minimal virtual desktop on the web, built for productive & vibey work sessions.",
   openGraph: {
     images: "/metadata/wfc-og.png",
+    title: "Work from Coffee",
+    description:
+      "A minimal virtual desktop on the web, built for productive & vibey work sessions.",
+    url: "https://workfromcoffee.com",
+    siteName: "Work from Coffee",
+    locale: "en_US",
+    type: "website",
   },
   twitter: {
     card: "summary_large_image",
     images: "/metadata/wfc-og.png",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

@@ -53,6 +53,7 @@
     "react-resizable": "^3.0.5",
     "react-youtube": "^10.1.0",
     "recharts": "^2.15.3",
+    "sugar-high": "^0.9.3",
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.4",
     "tw-animate-css": "^1.2.8",
