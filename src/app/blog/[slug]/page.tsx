@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import { CustomMDX } from "@/presentation/components/blog/mdx";
+// import { CustomMDX } from "@/presentation/components/blog/mdx"; // We'll render HTML directly
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
 import { baseUrl } from "@/app/sitemap";
 
 export async function generateStaticParams() {
-  const posts = getBlogPosts();
+  const posts = await getBlogPosts(); // Updated to await
 
   return posts.map((post) => ({
     slug: post.slug,
@@ -17,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getBlogPosts().find((post) => post.slug === slug);
+  const post = (await getBlogPosts()).find((post) => post.slug === slug);
   if (!post) {
     return;
   }
@@ -62,7 +62,7 @@ export default async function Blog({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getBlogPosts().find((post) => post.slug === slug);
+  const post = (await getBlogPosts()).find((post) => post.slug === slug);
 
   if (!post) {
     notFound();
@@ -87,22 +87,24 @@ export default async function Blog({
             url: `${baseUrl}/blog/${post.slug}`,
             author: {
               "@type": "Person",
-              name: "My Portfolio",
+              name: "My Portfolio", // Consider making this dynamic or configurable
             },
           }),
         }}
       />
-      <h1 className="title font-semibold text-2xl tracking-tighter">
+      <h1 className="title font-semibold text-3xl tracking-tighter mb-1">
         {post.metadata.title}
       </h1>
-      <div className="flex justify-between items-center mt-2 mb-8 text-sm">
+      <div className="flex justify-between items-center mt-2 mb-10 text-sm">
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
           {formatDate(post.metadata.publishedAt)}
         </p>
       </div>
-      <article className="prose">
-        <CustomMDX source={post.content} />
-      </article>
+      {/* Updated to render HTML content using dangerouslySetInnerHTML */}
+      <article
+        className="prose dark:prose-invert prose-lg prose-neutral prose-headings:font-semibold prose-headings:tracking-tighter prose-a:text-blue-600 dark:prose-a:text-blue-400 hover:prose-a:underline"
+        dangerouslySetInnerHTML={{ __html: post.content }}
+      />
     </section>
   );
 }

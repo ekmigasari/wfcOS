@@ -1,5 +1,10 @@
 import fs from "fs";
 import path from "path";
+import matter from "gray-matter";
+import { remark } from "remark";
+import html from "remark-html";
+import remarkGfm from "remark-gfm";
+import remarkMdxImages from "remark-mdx-images";
 
 type Metadata = {
   title: string;
@@ -9,21 +14,8 @@ type Metadata = {
 };
 
 function parseFrontmatter(fileContent: string) {
-  const frontmatterRegex = /---\s*([\s\S]*?)\s*---/;
-  const match = frontmatterRegex.exec(fileContent);
-  const frontMatterBlock = match![1];
-  const content = fileContent.replace(frontmatterRegex, "").trim();
-  const frontMatterLines = frontMatterBlock.trim().split("\n");
-  const metadata: Partial<Metadata> = {};
-
-  frontMatterLines.forEach((line) => {
-    const [key, ...valueArr] = line.split(": ");
-    let value = valueArr.join(": ").trim();
-    value = value.replace(/^['"](.*)['"]$/, "$1"); // Remove quotes
-    metadata[key.trim() as keyof Metadata] = value;
-  });
-
-  return { metadata: metadata as Metadata, content };
+  const { data, content } = matter(fileContent);
+  return { metadata: data as Metadata, content };
 }
 
 function getMDXFiles(dir: string) {
@@ -35,21 +27,31 @@ function readMDXFile(filePath: string) {
   return parseFrontmatter(rawContent);
 }
 
-function getMDXData(dir: string) {
+async function getMDXData(dir: string) {
   const mdxFiles = getMDXFiles(dir);
-  return mdxFiles.map((file) => {
-    const { metadata, content } = readMDXFile(path.join(dir, file));
-    const slug = path.basename(file, path.extname(file));
+  const processedFiles = await Promise.all(
+    mdxFiles.map(async (file) => {
+      const { metadata, content } = readMDXFile(path.join(dir, file));
+      const slug = path.basename(file, path.extname(file));
 
-    return {
-      metadata,
-      slug,
-      content,
-    };
-  });
+      const processedContent = await remark()
+        .use(remarkGfm)
+        .use(remarkMdxImages)
+        .use(html, { sanitize: false })
+        .process(content);
+      const contentHtml = processedContent.toString();
+
+      return {
+        metadata,
+        slug,
+        content: contentHtml,
+      };
+    })
+  );
+  return processedFiles;
 }
 
-export function getBlogPosts() {
+export async function getBlogPosts() {
   return getMDXData(path.join(process.cwd(), "src", "app", "blog", "post"));
 }
 

@@ -1,8 +1,22 @@
 import Link from "next/link";
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
 
-export function BlogPosts() {
-  const allBlogs = getBlogPosts();
+// Define the types based on src/app/blog/utils.ts
+type Metadata = {
+  title: string;
+  publishedAt: string;
+  summary: string;
+  image?: string;
+};
+
+type Post = {
+  metadata: Metadata;
+  slug: string;
+  content: string; // HTML content
+};
+
+export async function BlogPosts() {
+  const allBlogs: Post[] = await getBlogPosts();
 
   return (
     <div>
@@ -18,16 +32,21 @@ export function BlogPosts() {
         .map((post) => (
           <Link
             key={post.slug}
-            className="flex flex-col space-y-1 mb-4"
+            className="block py-6 border-b border-neutral-200 dark:border-neutral-800 last:border-b-0 group"
             href={`/blog/${post.slug}`}
           >
-            <div className="w-full flex flex-col md:flex-row space-x-0 md:space-x-2">
-              <p className="text-neutral-600 dark:text-neutral-400 w-[100px] tabular-nums">
+            <div className="w-full">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
                 {formatDate(post.metadata.publishedAt, false)}
               </p>
-              <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
+              <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-500 tracking-tight mb-2">
                 {post.metadata.title}
-              </p>
+              </h2>
+              {post.metadata.summary && (
+                <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                  {post.metadata.summary}
+                </p>
+              )}
             </div>
           </Link>
         ))}
