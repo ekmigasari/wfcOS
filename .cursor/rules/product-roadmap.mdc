@@ -3,57 +3,173 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Product Roadmap
+# Feature: User Authentication, Paid Subscriptions, and Cloud Sync
 
-This document outlines the planned development roadmap for the wfcOS platform, serving as a checkpoint and to-do list for implementation. Features are organized by priority and development phase.
+This document outlines the plan to implement user authentication (Google), paid user checks, and data synchronization between local storage and a PostgreSQL database using Prisma ORM and Better Auth.
 
-## Current Sprint (FIXING ERROR V2.1)
-These features should be prioritized for immediate implementation:
+## Core Technologies
+- Authentication: Better Auth (Google OAuth)
+- ORM: Prisma
+- Database: PostgreSQL
+- Data Access: Layered architecture (`/application/service`, `/infrastructure/repo`)
 
-- [x] Fix Window rerender
-- [x] Fix Timer
-- [x] Fix Ambience
-- [x] to-do list check
-- [x] Notepad check
-- [x] Fix Music Player
-- [ ] Add global mute
-- [x] Add Change log v 2.1
+## Phase 1: Setup and Authentication (User Login with Google)
+- [ ] **Task 1.1: Setup Prisma and PostgreSQL**
+    - [ ] Install Prisma CLI and Client (`bun add -D prisma && bun add @prisma/client`)
+    - [ ] Initialize Prisma (`bunx prisma init --datasource-provider postgresql`)
+    - [ ] Configure `DATABASE_URL` in `.env` for PostgreSQL.
+    - [ ] Define `User` schema in `prisma/schema.prisma`:
+        ```prisma
+        model User {
+          id        String   @id @default(cuid())
+          email     String   @unique
+          name      String?
+          googleId  String   @unique // To store Google's unique user ID
+          isPaid    Boolean  @default(false)
+          createdAt DateTime @default(now())
+          updatedAt DateTime @updatedAt
 
+          // Relationships to synced data models will be added here
+          // e.g., todos Todo[]
+        }
+        ```
+    - [ ] Run initial migration (`bunx prisma migrate dev --name init_user`) to create the User table.
+- [ ] **Task 1.2: Integrate Better Auth for Google Authentication**
+    - [ ] Install your chosen "Better Auth" library (e.g., `bun add [better-auth-package-name]`). Please specify the exact package if you have one in mind.
+    - [ ] Configure Google OAuth provider:
+        - [ ] Set up OAuth 2.0 credentials in Google Cloud Console.
+        - [ ] Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to your `.env` file.
+        - [ ] Configure redirect URIs.
+    - [ ] Implement auth routes/API endpoints using Better Auth:
+        - [ ] `/api/auth/google` (to initiate login)
+        - [ ] `/api/auth/google/callback` (to handle Google's response)
+        - [ ] `/api/auth/logout`
+    - [ ] Create `/src/infrastructure/repo/userRepository.ts`:
+        - [ ] `findUserByGoogleId(googleId: string): Promise<User | null>`
+        - [ ] `findUserByEmail(email: string): Promise<User | null>`
+        - [ ] `createUser(data: { email: string, name?: string, googleId: string }): Promise<User>`
+        - [ ] `updateUser(userId: string, data: Partial<User>): Promise<User>`
+    - [ ] Create `/src/application/service/authService.ts`:
+        - [ ] `handleGoogleLoginCallback(googleProfile: { id: string, email: string, name?: string }): Promise<{ user: User, isNewUser: boolean }>`:
+            - Checks if user exists by `googleId`.
+            - If not, checks by `email` (to link accounts if a user previously existed without Google ID).
+            - If still not found, calls `userRepository.createUser`.
+            - Updates user record with `googleId` if necessary.
+            - Manages session creation (e.g., using JWTs or Better Auth's session management).
+            - Returns user object and a flag indicating if it's a new registration.
+    - [ ] Implement UI components for "Login with Google" button and integrate them with the `/api/auth/google` endpoint.
+    - [ ] Update global state (e.g., Jotai atoms for `currentUser`, `isAuthenticated`) upon successful login/logout.
 
-## Near-Term Roadmap
-These features are planned for the next development cycle:
+## Phase 2: Paid User Subscription & Management
+- [ ] **Task 2.1: Implement Payment Gateway Integration (Polar SH)**
+    - [ ] **Decision**: Payment provider selected: Polar SH.
+    - [ ] (Future Task) Implement the full subscription flow with Polar SH, including checkout pages, webhooks for payment success/failure, and subscription management UI.
+    - [ ] For now, extend `/src/infrastructure/repo/userRepository.ts`:
+        - [ ] `updateUserPaidStatus(userId: string, isPaid: boolean): Promise<User>`
+    - [ ] (For Testing) Create a simple admin tool or a temporary API endpoint to manually toggle the `isPaid` status for a user.
+- [ ] **Task 2.2: Gate Features/Access based on `isPaid` Status**
+    - [ ] In `/src/application/service/authService.ts` or a new `/src/application/service/subscriptionService.ts`:
+        - [ ] `isUserSubscribed(userId: string): Promise<boolean>` (fetches user from DB and checks `isPaid`).
+    - [ ] Protect data sync functionality: only allow for users where `isUserSubscribed` is true.
+    - [ ] Update UI to reflect subscription status (e.g., show "Upgrade" prompts, disable sync features for free users).
 
-- [ ] Add About section/page
-- [ ] Add Login and Cloud Storage
+## Phase 3: Data Layer for Sync (Services and Repositories)
+- [ ] **Task 3.1: Define Data Schemas for Sync in `prisma/schema.prisma`**
+    - [ ] Identify all data currently stored in local storage that needs to be synced (e.g., todos, notepad content, application settings, theme preferences, window positions, etc.).
+    - [ ] For each distinct data entity, define a Prisma model. Ensure it's linked to the `User` model via a `userId` foreign key and a relation.
+        Example for `NotepadContent`:
+        ```prisma
+        model NotepadContent {
+          id        String   @id @default(cuid())
+          content   String
+          userId    String
+          user      User     @relation(fields: [userId], references: [id])
+          createdAt DateTime @default(now())
+          updatedAt DateTime @updatedAt
 
-## Future Roadmap
-These features are planned for future implementation:
+          @@unique([userId]) // If each user has only one notepad content
+          // Or remove unique if a user can have multiple notes
+        }
+        ```
+    - [ ] Add corresponding relation fields to the `User` model (e.g., `notepads NotepadContent[]`).
+    - [ ] Run Prisma migrations (`bunx prisma migrate dev --name add_sync_tables`) to create the new tables.
+- [ ] **Task 3.2: Create Data Repositories in `/src/infrastructure/repo/`**
+    - [ ] For each synced data model (e.g., `NotepadContent`), create a repository file (e.g., `/src/infrastructure/repo/notepadRepository.ts`).
+    - [ ] Implement functions for creating, reading, updating, and deleting data, always scoped by `userId`.
+        Example for `notepadRepository.ts`:
+        - [ ] `getNotepadByUserId(userId: string): Promise<NotepadContent | null>`
+        - [ ] `upsertNotepad(userId: string, content: string): Promise<NotepadContent>` (creates or updates)
+- [ ] **Task 3.3: Create Data Sync Service (`/src/application/service/dataSyncService.ts`)**
+    - [ ] **`syncToRemote(userId: string, localData: SyncedDataPayload): Promise<void>`**
+        - `SyncedDataPayload` type would be `{ todos?: LocalTodo[], notepad?: LocalNotepadContent, ... }`.
+        - For each data type in `localData`:
+            - Fetch the corresponding remote data using its repository.
+            - Implement a conflict resolution strategy (e.g., "last write wins" using `updatedAt` timestamps if available locally and remotely; or simply "local overwrites remote" as a first pass).
+            - Use repository methods to create/update remote data.
+    - [ ] **`syncFromRemote(userId: string): Promise<SyncedDataPayload>`**
+        - Fetches all user-specific data from all relevant repositories.
+        - Returns data structured for easy updating of local storage and application state.
+    - [ ] Consider adding `lastSyncedAt` timestamps to local storage and potentially to user records/synced items to optimize syncs (delta syncs).
 
+## Phase 4: Integrating Sync with Application
+- [ ] **Task 4.1: Refactor Local Storage Usage**
+    - [ ] Review `src/infrastructure/utils/storage.ts` and any components directly using `localStorage`.
+    - [ ] The primary source of truth for synced data should become the server. Local storage acts as a cache.
+    - [ ] Jotai atoms should be hydrated initially from local storage (for offline startup), then updated from `syncFromRemote`.
+- [ ] **Task 4.2: Implement Sync Triggers and UI**
+    - [ ] **On Application Load/Login:**
+        - [ ] If user is logged in and `isPaid`, call `dataSyncService.syncFromRemote(user.id)`.
+        - [ ] Update local storage and Jotai atoms with the fetched data. Merge with local data if necessary (e.g., if local changes were made offline).
+    - [ ] **On Data Change (Client-side):**
+        - [ ] When data managed by Jotai atoms (that should be synced) changes:
+            - Debounce/throttle calls to `dataSyncService.syncToRemote(user.id, { changedDataType: currentData })`.
+            - Ensure local changes also update an `updatedAt` field if using "last write wins".
+    - [ ] **Manual Sync Button:**
+        - [ ] Add a "Sync Data" button in the UI (e.g., in settings or user menu).
+        - [ ] On click:
+            1. Show loading state.
+            2. Call `dataSyncService.syncToRemote(user.id, currentLocalDataToSync)` to push local changes first.
+            3. Then call `dataSyncService.syncFromRemote(user.id)` to pull remote changes.
+            4. Update local storage and Jotai atoms.
+            5. Hide loading state, show success/error.
+    - [ ] **Periodic Background Sync (Optional):**
+        - [ ] If user is logged in, paid, and active, consider a timer to trigger sync periodically.
+- [ ] **Task 4.3: UI/UX for Syncing**
+    - [ ] Display clear loading indicators during sync operations.
+    - [ ] Show "Last synced: [timestamp/status]" information.
+    - [ ] Provide user feedback for successful syncs and clear error messages for failures (e.g., "Sync failed. Please check your internet connection.").
+    - [ ] If a user is not paid, relevant UI sections for syncable features could be disabled or show an "Upgrade to Sync" message.
 
-- [ ] Add mute only to click
-- [ ] Add sound typing functionality to Notepad
-- [ ] Information board
-- [ ] Bookmark functionality
-- [ ] Add logging functionality to Pomodoro timer
-- [ ] Chat application/system
+## Phase 5: Testing, Refinement, and Deployment
+- [ ] **Task 5.1: Unit and Integration Testing**
+    - [ ] Write unit tests for all new repository methods (mock Prisma Client).
+    - [ ] Write unit/integration tests for `authService`, `dataSyncService`, ensuring business logic is covered. Mock external dependencies.
+- [ ] **Task 5.2: End-to-End Testing**
+    - [ ] Manually test the full user lifecycle:
+        - [ ] Google Sign-up (new user).
+        - [ ] Google Login (existing user).
+        - [ ] (Simulate) User becomes paid.
+        - [ ] Create data locally (e.g., add a todo, type in notepad).
+        - [ ] Trigger sync (manual or automatic). Verify data appears in the database.
+        - [ ] Log out.
+        - [ ] Log in on a "different browser" (e.g., incognito or after clearing local storage).
+        - [ ] Verify data is synced back from the server.
+        - [ ] Test data modification on one client, sync, and verify updates on another client after sync.
+        - [ ] Test behavior for non-paid users (sync should not occur).
+- [ ] **Task 5.3: Code Review and Refactoring**
+    - [ ] Ensure all new code adheres to `code-organization`, `component-guidelines`, `naming-conventions`, and `project-structure` rules.
+    - [ ] Review for security considerations (e.g., proper authorization checks in API routes and services).
+    - [ ] Optimize database queries and sync logic.
+- [ ] **Task 5.4: Documentation Updates**
+    - [ ] Update any relevant READMEs or internal developer documentation.
+    - [ ] Prepare notes for a changelog regarding these new features.
+- [ ] **Task 5.5: Deployment Preparations**
+    - [ ] Ensure all required environment variables are documented and configured for production (e.g., `DATABASE_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, session secrets).
+    - [ ] Plan and test the database migration process for the production environment.
 
-
-## Guidelines for Feature Implementation
-
-### Feature Prioritization
-- Focus on completing Current Sprint items before starting Near-Term Roadmap
-- Document any blockers or dependencies that affect implementation
-- Update this roadmap as features are completed or priorities change
-
-### Implementation Standards
-- Follow all existing coding standards and architectural guidelines
-- Create appropriate tests for each new feature
-- Update documentation when adding new functionality
-- Ensure all new features maintain compatibility with existing system
-
-### Feature Completion Checklist
-- Implementation meets all functional requirements
-- Code passes all lint and test requirements
-- Documentation is updated
-- Feature is reviewed and approved
-- User feedback is collected when applicable
+## Future Considerations / Enhancements
+- [ ] Real-time sync (e.g., using WebSockets with a library like Socket.io or a service like Ably/Pusher).
+- [ ] More sophisticated conflict resolution (e.g., three-way merge, operational transformation, or user-prompted resolution).
+- [ ] Selective sync (allowing users to choose which data categories to sync).
+- [ ] Robust offline support: queue changes made offline and sync them when the connection is restored.
+- [ ] Data version history and rollback capabilities.
