@@ -2,7 +2,7 @@ import { baseUrl } from "../sitemap";
 import { getBlogPosts } from "../blog/utils";
 
 export async function GET() {
-  let allBlogs = await getBlogPosts();
+  const allBlogs = await getBlogPosts();
 
   const itemsXml = allBlogs
     .sort((a, b) => {

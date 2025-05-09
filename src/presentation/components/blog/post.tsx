@@ -39,7 +39,7 @@ export async function BlogPosts() {
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">
                 {formatDate(post.metadata.publishedAt, false)}
               </p>
-              <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-500 tracking-tight mb-2">
+              <h2 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 group-hover:text-accent dark:group-hover:text-accent tracking-tight mb-2">
                 {post.metadata.title}
               </h2>
               {post.metadata.summary && (
