@@ -16,7 +16,7 @@ type BlogPost = {
 };
 
 export default async function sitemap() {
-  const blogs = getBlogPosts().map((post: BlogPost) => ({
+  const blogs = (await getBlogPosts()).map((post: BlogPost) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: post.metadata.publishedAt,
   }));
