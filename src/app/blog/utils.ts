@@ -27,6 +27,36 @@ function readMDXFile(filePath: string) {
   return parseFrontmatter(rawContent);
 }
 
+// Function to process image components
+function processImageComponents(content: string): string {
+  return content.replace(
+    /<Image\s+src="([^"]+)"\s+alt="([^"]*)"\s+width=\{(\d+)\}\s+height=\{(\d+)\}\s*\/>/g,
+    `<div class="my-8 flex justify-center">
+      <img src="$1" alt="$2" width="$3" height="$4" class="rounded-lg shadow-md" />
+    </div>`
+  );
+}
+
+// Function to ensure list HTML has proper markup
+function enhanceListMarkup(html: string): string {
+  // Enhance unordered lists
+  let enhancedHtml = html.replace(
+    /<ul>/g,
+    '<ul class="list-disc pl-5 space-y-2 my-4">'
+  );
+
+  // Enhance ordered lists
+  enhancedHtml = enhancedHtml.replace(
+    /<ol>/g,
+    '<ol class="list-decimal pl-5 space-y-2 my-4">'
+  );
+
+  // Enhance list items
+  enhancedHtml = enhancedHtml.replace(/<li>/g, '<li class="ml-2">');
+
+  return enhancedHtml;
+}
+
 async function getMDXData(dir: string) {
   const mdxFiles = getMDXFiles(dir);
   const processedFiles = await Promise.all(
@@ -34,12 +64,19 @@ async function getMDXData(dir: string) {
       const { metadata, content } = readMDXFile(path.join(dir, file));
       const slug = path.basename(file, path.extname(file));
 
+      // Process and extract Image components first
+      const processedImageContent = processImageComponents(content);
+
+      // Process the markdown content
       const processedContent = await remark()
         .use(remarkGfm)
         .use(remarkMdxImages)
         .use(html, { sanitize: false })
-        .process(content);
-      const contentHtml = processedContent.toString();
+        .process(processedImageContent);
+
+      // Get the processed HTML and enhance list markup
+      let contentHtml = processedContent.toString();
+      contentHtml = enhanceListMarkup(contentHtml);
 
       return {
         metadata,
