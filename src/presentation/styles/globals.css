@@ -119,3 +119,106 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Blog post styling */
+.prose {
+  @apply max-w-none text-lg leading-relaxed;
+
+  /* Headings */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans font-bold text-primary tracking-tight mt-12 mb-6;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl mb-8 mt-0;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl border-b border-muted pb-2;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  /* Paragraphs and spacing */
+  p {
+    @apply mb-6 text-lg;
+  }
+
+  /* Lists */
+  ul,
+  ol {
+    @apply mb-6 pl-8;
+  }
+
+  li {
+    @apply mb-2;
+  }
+
+  /* Images */
+  img {
+    @apply rounded-lg shadow-md my-8 w-full object-cover;
+    max-height: 500px;
+  }
+
+  /* Blockquotes */
+  blockquote {
+    @apply border-l-4 border-primary pl-4 italic my-8 py-1 text-xl;
+  }
+
+  /* Code blocks */
+  pre {
+    @apply rounded-lg p-4 my-6 overflow-x-auto text-sm leading-relaxed bg-muted;
+  }
+
+  code {
+    @apply font-mono text-sm px-1 py-0.5 rounded bg-muted;
+  }
+
+  pre code {
+    @apply bg-transparent p-0;
+  }
+
+  /* Iframe (e.g., YouTube embeds) */
+  iframe {
+    @apply w-full rounded-lg shadow-md my-8;
+  }
+
+  /* Links */
+  a {
+    @apply text-accent underline decoration-accent/30 underline-offset-2 font-medium hover:decoration-accent/100 transition-all;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .prose {
+    @apply text-base;
+
+    h1 {
+      @apply text-3xl;
+    }
+
+    h2 {
+      @apply text-2xl;
+    }
+
+    h3 {
+      @apply text-xl;
+    }
+
+    p {
+      @apply text-base;
+    }
+
+    blockquote {
+      @apply text-lg;
+    }
+  }
+}

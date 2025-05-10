@@ -19,7 +19,7 @@ const adData = [
     id: 1,
     title: "NextJS Global Hackathon",
     description: "WFC OS is the winner of the Highest Quality App category",
-    url: "https://www.youtube.com/live/KDRwgbwq0_c?si=yTanWv4dMNNV3FhA&t=471",
+    url: "https://workfromcoffee.com/blog/wfcos-hackathon-award-announcement",
     thumbnail: {
       type: "emoji",
       content: "🏆",

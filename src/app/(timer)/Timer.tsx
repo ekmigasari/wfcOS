@@ -39,8 +39,10 @@ export const Timer = () => {
     timerSetting,
     customDurationMinutes,
     customTitle,
+    workCycleDuration,
     startPause,
     reset,
+    restart,
     setSetting,
     setCustomDuration,
     setCustomTitle,
@@ -101,8 +103,11 @@ export const Timer = () => {
         {/* Timer controls */}
         <TimerControls
           isRunning={isRunning}
+          timeRemaining={timeRemaining}
+          workCycleDuration={workCycleDuration}
           onStartPause={startPause}
           onReset={reset}
+          onRestartAndGo={restart}
         />
 
         {/* Task Selector */}

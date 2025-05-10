@@ -120,6 +120,27 @@ export const timerAtom = atom(
   }
 );
 
+// Atom to reset the timer and then immediately start it
+export const restartAndGoAtom = atom(null, (get, set) => {
+  const currentState = get(timerAtom);
+  const resetDuration = getDurationForSetting(
+    currentState.timerSetting,
+    currentState.customDurationMinutes
+  );
+
+  // The new state is: reset and running
+  // This applies to all timer settings (work, short break, long break, custom)
+  // sessionStartTime is set, which is primarily used for logging work/custom sessions.
+  // For breaks, it will be set but not used for logging.
+  set(timerAtom, {
+    ...currentState, // Preserve settings like customTitle, timerSetting, windowId, isMinimized, isActive etc.
+    timeRemaining: resetDuration,
+    isRunning: true, // Timer starts immediately
+    sessionStartTime: Date.now(), // Mark the start of the new session/cycle
+    workCycleDuration: resetDuration, // Reflects the duration of this new cycle
+  });
+});
+
 // --- Action Helpers / Derived Atoms ---
 
 // Toggle timer start/pause
