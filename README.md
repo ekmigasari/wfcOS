@@ -79,53 +79,29 @@ Ideal for remote workers, developers, and anyone seeking a consistent and person
 
 ## 🛠️ Tech Stack
 
-### Framework
+- **Framework:** [Next.js](https://nextjs.org/) v15.3.1 with App Router
 
-- [Next.js](https://nextjs.org/) v15.3.1 with App Router
+- **UI Library:** [React](https://react.dev/) v19.1.0
 
-### UI Library
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) v4.1.4
 
-- [React](https://react.dev/) v19.1.0
+- **State Management:** [Jotai](https://jotai.org/) v2.12.3
 
-### Styling
+- **Component Library:** [Shadcn/UI](https://ui.shadcn.com/) with [Radix UI](https://www.radix-ui.com/)
 
-- [Tailwind CSS](https://tailwindcss.com/) v4.1.4
+- **Icons:** [Lucide React](https://lucide.dev/) v0.507.0
 
-### State Management
+- **Drag and Drop:** [dnd-kit](https://dndkit.com/) v6.3.1
 
-- [Jotai](https://jotai.org/) v2.12.3
+- **Charts:** [Recharts](https://recharts.org/) v2.15.3
 
-### Component Library
+- **Linting:** [ESLint](https://eslint.org/) v9.25.1
 
-- [Shadcn/UI](https://ui.shadcn.com/) with [Radix UI](https://www.radix-ui.com/)
+- **Git Hooks:** [Husky](https://typicode.github.io/husky/) v9.1.7
 
-### Icons
+- **Language:** [TypeScript](https://www.typescriptlang.org/) v5.8.3
 
-- [Lucide React](https://lucide.dev/) v0.507.0
-
-### Drag and Drop
-
-- [dnd-kit](https://dndkit.com/) v6.3.1
-
-### Charts
-
-- [Recharts](https://recharts.org/) v2.15.3
-
-### Linting
-
-- [ESLint](https://eslint.org/) v9.25.1
-
-### Git Hooks
-
-- [Husky](https://typicode.github.io/husky/) v9.1.7
-
-### Language
-
-- [TypeScript](https://www.typescriptlang.org/) v5.8.3
-
-### Package Manager
-
-- [Bun](https://bun.sh/)
+- **Package Manager:** [Bun](https://bun.sh/)
 
 ## 🚀 Getting Started
 
