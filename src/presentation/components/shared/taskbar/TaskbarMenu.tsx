@@ -16,6 +16,7 @@ import { useAtom } from "jotai";
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
 import { ResetDialog } from "./ResetDialog";
 import { useOpenChangelog } from "./ChangelogWindow";
+import { Lock } from "lucide-react";
 
 export const TaskbarMenu = () => {
   const openWindow = useAtom(openWindowAtom)[1];
@@ -70,6 +71,30 @@ export const TaskbarMenu = () => {
           Menu
         </MenubarTrigger>
         <MenubarContent>
+          <MenubarItem inset onSelect={() => openUrl("/blog")}>
+            Blog
+          </MenubarItem>
+          <MenubarItem
+            inset
+            onSelect={() => openUrl("https://workfromcoffee.featurebase.app")}
+          >
+            Feedback
+          </MenubarItem>
+          <MenubarItem disabled inset>
+            User Settings
+          </MenubarItem>
+          <MenubarSeparator />
+          <MenubarItem disabled>
+            <Lock className="w-4 h-4 mr-2" />
+            Login
+          </MenubarItem>
+        </MenubarContent>
+      </MenubarMenu>
+      <MenubarMenu>
+        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
+          Apps
+        </MenubarTrigger>
+        <MenubarContent>
           {Object.entries(appRegistry).map(
             ([appId, app]) =>
               // Skip hidden apps in the menu
@@ -100,16 +125,10 @@ export const TaskbarMenu = () => {
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem disabled>
-            WFC OS<MenubarShortcut>v 2.1</MenubarShortcut>
+            WFC OS<MenubarShortcut>v 2.3.1</MenubarShortcut>
           </MenubarItem>
           <MenubarItem inset onSelect={openChangelogWindow}>
             Changelog<MenubarShortcut>history</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem
-            inset
-            onSelect={() => openUrl("https://workfromcoffee.featurebase.app")}
-          >
-            Give us feedback
           </MenubarItem>
           <MenubarItem
             inset

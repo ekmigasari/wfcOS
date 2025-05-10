@@ -34,6 +34,8 @@ export async function BlogPosts() {
             key={post.slug}
             className="block py-6 border-b border-neutral-200 dark:border-neutral-800 last:border-b-0 group"
             href={`/blog/${post.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <div className="w-full">
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">

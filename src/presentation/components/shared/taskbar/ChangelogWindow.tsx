@@ -17,6 +17,11 @@ export const ChangelogContent = () => {
 
       <div className="space-y-4 mt-4">
         <div>
+          <h3 className="text-lg font-semibold">Version 2.3.1</h3>
+          <ul className="list-disc pl-5 space-y-1 text-sm">
+            <p className="font-bold underline">Blogs</p>
+            <li>Add blogs section and blog pages</li>
+          </ul>
           <h3 className="text-lg font-semibold">Version 2.3</h3>
           <ul className="list-disc pl-5 space-y-1 text-sm">
             <p className="font-bold underline">Timer</p>
