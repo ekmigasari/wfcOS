@@ -4,26 +4,52 @@ import { RotateCcwIcon } from "lucide-react";
 
 interface TimerControlsProps {
   isRunning: boolean;
+  timeRemaining: number;
+  workCycleDuration: number;
   onStartPause: () => void;
   onReset: () => void;
+  onRestartAndGo: () => void;
 }
 
 export const TimerControls = ({
   isRunning,
+  timeRemaining,
+  workCycleDuration,
   onStartPause,
   onReset,
+  onRestartAndGo,
 }: TimerControlsProps) => {
+  let buttonLabel = "Start";
+  let buttonAction = onStartPause;
+
+  if (timeRemaining <= 0 && !isRunning) {
+    buttonLabel = "Restart";
+    buttonAction = onRestartAndGo;
+  } else if (isRunning) {
+    buttonLabel = "Pause";
+    buttonAction = onStartPause;
+  } else {
+    if (timeRemaining < workCycleDuration) {
+      buttonLabel = "Resume";
+    } else {
+      buttonLabel = "Start";
+    }
+    buttonAction = onStartPause;
+  }
+
   return (
     <div className="flex space-x-2">
       <button
-        onClick={onStartPause}
-        className={`px-12 py-2 rounded text-white transition ${
+        onClick={buttonAction}
+        className={`px-12 py-2 rounded text-white transition min-w-[120px] ${
           isRunning
             ? "bg-orange-500 hover:bg-orange-600"
+            : buttonLabel === "Restart"
+            ? "bg-green-500 hover:bg-green-600"
             : "bg-primary hover:bg-secondary"
         }`}
       >
-        {isRunning ? "Pause" : "Start"}
+        {buttonLabel}
       </button>
       <button
         onClick={onReset}
