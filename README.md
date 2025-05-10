@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="./public/images/blog/wfcos-cover.png" alt="Work from Coffee OS" width="100%">
+  <img src="https://workfromcoffee.com/metadata/wfcos.png" alt="Work from Coffee OS" width="100%">
 </p>
 
 <h1 align="center">Work from Coffee OS</h1>
 
 <p align="center">
-  <a href="https://github.com/YOUR-USERNAME/wfcOS/releases/latest">
-    <img src="https://img.shields.io/github/v2.3.1/YOUR-USERNAME/wfcOS" alt="GitHub release">
+ <a href="https://nextjs.org/">
+    <img src="https://img.shields.io/badge/Next.js-15.3.1-000000?logo=next.js&logoColor=white" alt="Next.js">
   </a>
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
+  <a href="https://reactjs.org/">
+    <img src="https://img.shields.io/badge/React-19.1.0-61DAFB?logo=react&logoColor=white" alt="React">
   </a>
   <a href="https://nodejs.org/">
     <img src="https://img.shields.io/badge/Node.js-18.x+-43853D?logo=node.js&logoColor=white" alt="Node.js Version">
@@ -17,14 +17,14 @@
   <a href="https://www.typescriptlang.org/">
     <img src="https://img.shields.io/badge/TypeScript-5.8.3-3178C6?logo=typescript&logoColor=white" alt="TypeScript">
   </a>
-  <a href="https://nextjs.org/">
-    <img src="https://img.shields.io/badge/Next.js-15.3.1-000000?logo=next.js&logoColor=white" alt="Next.js">
-  </a>
-  <a href="https://reactjs.org/">
-    <img src="https://img.shields.io/badge/React-19.1.0-61DAFB?logo=react&logoColor=white" alt="React">
-  </a>
   <a href="https://tailwindcss.com/">
     <img src="https://img.shields.io/badge/Tailwind_CSS-4.1.4-38B2AC?logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+  </a>
+  <a href="https://shadcn.com/">
+    <img src="https://img.shields.io/badge/Shadcn-0.1.14-000000?logo=shadcn&logoColor=white" alt="Shadcn">
+  </a>
+  <a href="https://bun.sh/">
+    <img src="https://img.shields.io/badge/Bun-1.0.0-000000?logo=bun&logoColor=white" alt="Bun">
   </a>
   <a href="https://deepwiki.com/ekmigasari/wfcOS"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </p>
@@ -58,60 +58,74 @@ Ideal for remote workers, developers, and anyone seeking a consistent and person
 
 ### Version 2.3.1 - Latest Release
 
-<table>
-  <tr>
-    <td valign="top">
-      <h4>💼 Blog</h4>
-      <ul>
-        <li>Added blogs section and blog pages</li>
-      </ul>
-      <h4>⏱️ Timer</h4>
-      <ul>
-        <li>Track work sessions and productivity</li>
-        <li>Link tasks to work sessions</li>
-      </ul>
-    </td>
-    <td valign="top">
-      <h4>📊 Session Log</h4>
-      <ul>
-        <li>View sessions as charts and tables</li>
-        <li>Charts show weekly, monthly, yearly data</li>
-        <li>Tables display all session data</li>
-      </ul>
-      <h4>✅ To-do List</h4>
-      <ul>
-        <li>Session count in task items</li>
-      </ul>
-    </td>
-  </tr>
-</table>
+### 💼 Blog
+
+- Added blogs section and blog pages
+
+### ⏱️ Timer
+
+- Track work sessions and productivity
+- Link tasks to work sessions
+
+### 📊 Session Log
+
+- View sessions as charts and tables
+- Charts show weekly, monthly, yearly data
+- Tables display all session data
+
+### ✅ To-do List
+
+- Session count in task items
 
 ## 🛠️ Tech Stack
 
-<table>
-  <tr>
-    <td valign="top">
-      <ul>
-        <li><b>Framework:</b> <a href="https://nextjs.org/">Next.js</a> v15.3.1 with App Router</li>
-        <li><b>UI Library:</b> <a href="https://react.dev/">React</a> v19.1.0</li>
-        <li><b>Styling:</b> <a href="https://tailwindcss.com/">Tailwind CSS</a> v4.1.4</li>
-        <li><b>State Management:</b> <a href="https://jotai.org/">Jotai</a> v2.12.3</li>
-        <li><b>Component Library:</b> <a href="https://ui.shadcn.com/">Shadcn/UI</a> with <a href="https://www.radix-ui.com/">Radix UI</a></li>
-        <li><b>Icons:</b> <a href="https://lucide.dev/">Lucide React</a> v0.507.0</li>
-      </ul>
-    </td>
-    <td valign="top">
-      <ul>
-        <li><b>Drag and Drop:</b> <a href="https://dndkit.com/">dnd-kit</a> v6.3.1</li>
-        <li><b>Charts:</b> <a href="https://recharts.org/">Recharts</a> v2.15.3</li>
-        <li><b>Linting:</b> <a href="https://eslint.org/">ESLint</a> v9.25.1</li>
-        <li><b>Git Hooks:</b> <a href="https://typicode.github.io/husky/">Husky</a> v9.1.7</li>
-        <li><b>Language:</b> <a href="https://www.typescriptlang.org/">TypeScript</a> v5.8.3</li>
-        <li><b>Package Manager:</b> <a href="https://bun.sh/">Bun</a></li>
-      </ul>
-    </td>
-  </tr>
-</table>
+### Framework
+
+- [Next.js](https://nextjs.org/) v15.3.1 with App Router
+
+### UI Library
+
+- [React](https://react.dev/) v19.1.0
+
+### Styling
+
+- [Tailwind CSS](https://tailwindcss.com/) v4.1.4
+
+### State Management
+
+- [Jotai](https://jotai.org/) v2.12.3
+
+### Component Library
+
+- [Shadcn/UI](https://ui.shadcn.com/) with [Radix UI](https://www.radix-ui.com/)
+
+### Icons
+
+- [Lucide React](https://lucide.dev/) v0.507.0
+
+### Drag and Drop
+
+- [dnd-kit](https://dndkit.com/) v6.3.1
+
+### Charts
+
+- [Recharts](https://recharts.org/) v2.15.3
+
+### Linting
+
+- [ESLint](https://eslint.org/) v9.25.1
+
+### Git Hooks
+
+- [Husky](https://typicode.github.io/husky/) v9.1.7
+
+### Language
+
+- [TypeScript](https://www.typescriptlang.org/) v5.8.3
+
+### Package Manager
+
+- [Bun](https://bun.sh/)
 
 ## 🚀 Getting Started
 

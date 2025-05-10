@@ -8,14 +8,14 @@ const font = Itim({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://workfromcoffee.com"),
-  title: "Work from Coffee",
+  title: "Work from Coffee | Award-Winning app for Focus & Productivity",
   description:
-    "A minimal virtual desktop on the web, built for productive & vibey work sessions.",
+    "Virtual desktop designed for deep focus and remote work productivity. All-in-one workspace with integrated to-do lists, timers, notepads, music, and ambience for distraction-free work.",
   openGraph: {
     images: "/metadata/wfc-og.png",
     title: "Work from Coffee",
     description:
-      "A minimal virtual desktop on the web, built for productive & vibey work sessions.",
+      "Virtual desktop designed for deep focus and remote work productivity. All-in-one workspace with integrated to-do lists, timers, notepads, music, and ambience for distraction-free work.",
     url: "https://workfromcoffee.com",
     siteName: "Work from Coffee",
     locale: "en_US",
