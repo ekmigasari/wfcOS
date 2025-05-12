@@ -6,6 +6,7 @@ import {
   setTimerSettingAtom,
   setCustomDurationAtom,
   setCustomTitleAtom,
+  restartAndGoAtom,
 } from "@/application/atoms/timerAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 
@@ -15,11 +16,12 @@ import { playSound } from "@/infrastructure/lib/utils";
  */
 export const useTimer = () => {
   const [timerState] = useAtom(timerAtom);
-  const startPause = useAtom(startPauseTimerAtom)[1];
-  const reset = useAtom(resetTimerAtom)[1];
-  const setSetting = useAtom(setTimerSettingAtom)[1];
-  const setCustomDuration = useAtom(setCustomDurationAtom)[1];
-  const setCustomTitle = useAtom(setCustomTitleAtom)[1];
+  const [, doStartPause] = useAtom(startPauseTimerAtom);
+  const [, doReset] = useAtom(resetTimerAtom);
+  const [, doSetSetting] = useAtom(setTimerSettingAtom);
+  const [, doSetCustomDuration] = useAtom(setCustomDurationAtom);
+  const [, doSetCustomTitle] = useAtom(setCustomTitleAtom);
+  const [, doRestartAndGo] = useAtom(restartAndGoAtom);
 
   // Wrap actions with UI sound feedback
   const playSoundAnd = <Args extends unknown[], Res>(
@@ -38,12 +40,14 @@ export const useTimer = () => {
     timerSetting: timerState.timerSetting,
     customDurationMinutes: timerState.customDurationMinutes,
     customTitle: timerState.customTitle,
+    workCycleDuration: timerState.workCycleDuration ?? 0,
 
     // Actions (wrapped with sound)
-    startPause: playSoundAnd(startPause),
-    reset: playSoundAnd(reset),
-    setSetting: playSoundAnd(setSetting),
-    setCustomDuration: playSoundAnd(setCustomDuration),
-    setCustomTitle: playSoundAnd(setCustomTitle),
+    startPause: playSoundAnd(doStartPause),
+    reset: playSoundAnd(doReset),
+    setSetting: playSoundAnd(doSetSetting),
+    setCustomDuration: playSoundAnd(doSetCustomDuration),
+    setCustomTitle: playSoundAnd(doSetCustomTitle),
+    restart: playSoundAnd(doRestartAndGo),
   };
 };
