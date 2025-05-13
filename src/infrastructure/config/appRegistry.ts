@@ -11,6 +11,7 @@ import { ChangelogWindow } from "@/presentation/components/shared/taskbar/Change
 import Bookmark from "@/app/(bookmark)/Bookmark";
 import { SettingsPanel } from "@/app/(settings)/SettingsPanel";
 import SessionLogApp from "@/app/(session-log)/SessionLogApp";
+import { UserSettingsApp } from "@/app/(user-settings)/UserSettingsApp";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -99,6 +100,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 500, height: 550 },
     minSize: { width: 300, height: 300 },
     component: SettingsPanel,
+  },
+  "user-settings": {
+    name: "User Settings",
+    src: "/icons/user.svg",
+    defaultSize: { width: 700, height: 650 },
+    minSize: { width: 500, height: 400 },
+    component: UserSettingsApp,
   },
   changelog: {
     name: "Changelog",

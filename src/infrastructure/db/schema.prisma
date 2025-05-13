@@ -18,6 +18,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Subscription-related fields
+  isPaid        Boolean        @default(false)
   subscriptions Subscription[]
 
   Session Session[]
