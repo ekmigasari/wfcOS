@@ -9,6 +9,9 @@
     "lint": "next lint --fix",
     "prepare": "husky"
   },
+  "prisma": {
+    "schema": "./src/infrastructure/db/schema.prisma"
+  },
   "dependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
@@ -21,6 +24,8 @@
     "@lexical/react": "^0.31.0",
     "@lexical/rich-text": "^0.31.0",
     "@next/third-parties": "^15.3.1",
+    "@polar-sh/better-auth": "^0.1.2",
+    "@polar-sh/sdk": "^0.32.13",
     "@radix-ui/react-dialog": "^1.1.11",
     "@radix-ui/react-label": "^2.1.6",
     "@radix-ui/react-menubar": "^1.1.12",
