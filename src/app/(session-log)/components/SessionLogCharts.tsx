@@ -1,22 +1,23 @@
 "use client";
 
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import React from "react";
 import * as Recharts from "recharts";
+
+import { playSound } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/presentation/components/ui/chart";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/presentation/components/ui/tabs";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/presentation/components/ui/chart";
-import { Button } from "@/presentation/components/ui/button";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { playSound } from "@/infrastructure/lib/utils";
 
 interface ChartDataPoint {
   name: string;

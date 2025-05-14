@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
 import { useAtomValue } from "jotai";
-import { activeBackgroundAtom } from "@/application/atoms/backgroundAtom";
 import Image from "next/image";
+import React from "react";
+
+import { activeBackgroundAtom } from "@/application/atoms/backgroundAtom";
 
 export const DesktopBackground = () => {
   const settings = useAtomValue(activeBackgroundAtom);

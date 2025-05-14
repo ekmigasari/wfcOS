@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import { timerAtom } from "@/application/atoms/timerAtom";
+import { useEffect, useRef } from "react";
+
 import {
   addSessionAtom,
   selectedTaskForTimerAtom,
 } from "@/application/atoms/sessionAtoms";
+import { timerAtom } from "@/application/atoms/timerAtom";
+
 import { formatTime, getDisplayTitle } from "./utils/timerUtils";
 
 /**

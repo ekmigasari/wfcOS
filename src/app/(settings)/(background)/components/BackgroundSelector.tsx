@@ -1,5 +1,6 @@
-import React from "react";
 import Image from "next/image";
+import React from "react";
+
 import { BackgroundSettings } from "@/application/atoms/backgroundAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 

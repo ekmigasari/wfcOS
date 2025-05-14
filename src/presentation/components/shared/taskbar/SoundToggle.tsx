@@ -1,13 +1,14 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { Volume2, VolumeX, Volume1, Volume } from "lucide-react";
-import { Button } from "@/presentation/components/ui/button";
+import { Volume,Volume1, Volume2, VolumeX } from "lucide-react";
+
 import {
-  soundVolumeLevelAtom,
   SoundVolumeLevel,
+  soundVolumeLevelAtom,
 } from "@/application/atoms/soundAtoms";
 import { playSound, setSoundVolumeLevel } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
 
 // Define the order of volume levels for cycling
 const volumeCycle: SoundVolumeLevel[] = ["mute", "low", "medium", "full"];

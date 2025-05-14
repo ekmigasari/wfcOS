@@ -1,18 +1,19 @@
 import { atom } from "jotai";
+import { v4 as uuidv4 } from "uuid";
+
 import {
   loadFeatureState,
   saveFeatureState,
 } from "../../infrastructure/utils/storage";
-import { v4 as uuidv4 } from "uuid";
 
 const FEATURE_KEY = "bookmarks";
 
 // Define bookmark item type
-export type BookmarkItem = {
+export interface BookmarkItem {
   id: string;
   name: string;
   url: string;
-};
+}
 
 // Define the shape of the state
 export type BookmarkState = BookmarkItem[];

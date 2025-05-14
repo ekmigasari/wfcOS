@@ -1,7 +1,8 @@
-import React, { useState, useRef } from "react";
-import { SoundControl } from "@/presentation/components/shared/sound-control/SoundControl";
-import { SettingsActionButtons } from "@/presentation/components/shared/settings/SettingsActionButtons";
+import React, { useRef,useState } from "react";
+
 import { playSound } from "@/infrastructure/lib/utils";
+import { SettingsActionButtons } from "@/presentation/components/shared/settings/SettingsActionButtons";
+import { SoundControl } from "@/presentation/components/shared/sound-control/SoundControl";
 
 interface SoundChangerProps {
   onClose?: () => void;

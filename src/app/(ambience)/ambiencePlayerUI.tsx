@@ -1,17 +1,18 @@
 "use client";
 
-import React from "react";
-import { AmbienceSound } from "@/application/hooks/useAmbienceAudio";
-import { Slider } from "@/presentation/components/ui/slider";
-import { Button } from "@/presentation/components/ui/button";
 import {
-  Play,
   Pause,
+  Play,
   SkipBack,
   SkipForward,
   Volume2,
   VolumeX,
 } from "lucide-react";
+import React from "react";
+
+import { AmbienceSound } from "@/application/hooks/useAmbienceAudio";
+import { Button } from "@/presentation/components/ui/button";
+import { Slider } from "@/presentation/components/ui/slider";
 
 interface TrackInfoProps {
   currentSound: AmbienceSound;

@@ -1,4 +1,5 @@
 import React from "react";
+
 import { playSound } from "@/infrastructure/lib/utils";
 
 interface NoImageOptionProps {

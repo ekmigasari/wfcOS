@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
-import { AmbiencePlayerUI } from "./ambiencePlayerUI";
-import { playSound } from "@/infrastructure/lib/utils";
+
 import { useAmbienceAudio } from "@/application/hooks";
+import { playSound } from "@/infrastructure/lib/utils";
+
+import { AmbiencePlayerUI } from "./ambiencePlayerUI";
 
 /**
  * AmbiencePlayer

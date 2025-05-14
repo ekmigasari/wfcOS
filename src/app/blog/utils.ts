@@ -1,17 +1,17 @@
 import fs from "fs";
-import path from "path";
 import matter from "gray-matter";
+import path from "path";
 import { remark } from "remark";
-import html from "remark-html";
 import remarkGfm from "remark-gfm";
+import html from "remark-html";
 import remarkMdxImages from "remark-mdx-images";
 
-type Metadata = {
+interface Metadata {
   title: string;
   publishedAt: string;
   summary: string;
   image?: string;
-};
+}
 
 function parseFrontmatter(fileContent: string) {
   const { data, content } = matter(fileContent);

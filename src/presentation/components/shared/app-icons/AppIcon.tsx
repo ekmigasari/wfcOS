@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
+import React from "react";
+
 import { useDeviceDetect } from "@/application/hooks";
 import { playSound } from "@/infrastructure/lib/utils";
 

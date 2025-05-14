@@ -1,23 +1,24 @@
-import React from "react";
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragOverlay,
 } from "@dnd-kit/core";
 import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useAtom } from "jotai";
+import React from "react";
+
+import { editTaskAtom } from "../../application/atoms/todoListAtom";
 import { useTodoList } from "../../application/hooks/useTodoList";
 import { SortableCategorySection } from "./components/CategorySection";
 import { TaskItemForOverlay } from "./components/TaskItem";
-import { useAtom } from "jotai";
-import { editTaskAtom } from "../../application/atoms/todoListAtom";
 
 const TodoList = () => {
   const {

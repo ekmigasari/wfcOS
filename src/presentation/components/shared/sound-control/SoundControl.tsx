@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { useAtom } from "jotai";
+import { useCallback,useEffect, useState } from "react";
+
 import {
-  soundVolumeLevelAtom,
   SoundVolumeLevel,
+  soundVolumeLevelAtom,
   volumeLevelPercentages,
 } from "@/application/atoms/soundAtoms";
+import { playSound,setSoundVolumeLevel } from "@/infrastructure/lib/utils";
+
 import { SoundVolumeSelector } from "./SoundVolumeSelector";
-import { setSoundVolumeLevel, playSound } from "@/infrastructure/lib/utils";
 
 interface SoundControlProps {
   onSettingsChange: () => void;

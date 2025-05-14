@@ -7,35 +7,19 @@ alwaysApply: false
 
 This document outlines the planned development roadmap for the wfcOS platform, serving as a checkpoint and to-do list for implementation. Features are organized by priority and development phase.
 
-## Current Sprint (FIXING ERROR V2.1)
-These features should be prioritized for immediate implementation:
+## AUTH & PAID USERS
 
-- [x] Fix Window rerender
-- [x] Fix Timer
-- [x] Fix Ambience
-- [x] to-do list check
-- [x] Notepad check
-- [x] Fix Music Player
-- [ ] Add global mute
-- [x] Add Change log v 2.1
+### Setup Auth
+- [x] install better auth
+- [x] env : better auth + next public api
+- [x] lib/auth.ts
+- [x] setup prisma + git ignorre
+- [x] prisma client
+- [x] add prisma adapter to auth.ts
+- [x] better auth cli  generate
+- [x] Create api nextjs
+- [] add auth-client.ts
 
-
-## Near-Term Roadmap
-These features are planned for the next development cycle:
-
-- [ ] Add About section/page
-- [ ] Add Login and Cloud Storage
-
-## Future Roadmap
-These features are planned for future implementation:
-
-
-- [ ] Add mute only to click
-- [ ] Add sound typing functionality to Notepad
-- [ ] Information board
-- [ ] Bookmark functionality
-- [ ] Add logging functionality to Pomodoro timer
-- [ ] Chat application/system
 
 
 ## Guidelines for Feature Implementation

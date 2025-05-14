@@ -1,16 +1,18 @@
-import { GripVertical, Trash2, Pencil, Timer } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, Pencil, Timer,Trash2 } from "lucide-react";
+import { useEffect,useRef, useState } from "react";
+
 import { TaskItem } from "@/application/atoms/todoListAtom";
-import { useState, useRef, useEffect } from "react";
 import { playSound } from "@/infrastructure/lib/utils";
-type TaskItemProps = {
+
+interface TaskItemProps {
   task: TaskItem;
   sessionCount: number;
   onRemove: (id: string) => void;
   onMove: (id: string, category: TaskItem["category"]) => void;
   onEdit: (id: string, content: string) => void;
-};
+}
 
 export const SortableTaskItem = ({
   task,

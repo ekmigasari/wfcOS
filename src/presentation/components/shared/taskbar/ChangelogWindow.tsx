@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
 import { useAtom } from "jotai";
+import React from "react";
+
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
 
 export const CHANGELOG_WINDOW_ID = "changelog-window";

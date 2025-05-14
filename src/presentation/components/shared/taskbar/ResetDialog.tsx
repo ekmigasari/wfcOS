@@ -1,6 +1,9 @@
 "use client";
 
 import React from "react";
+
+import { playSound } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,8 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/presentation/components/ui/dialog";
-import { Button } from "@/presentation/components/ui/button";
-import { playSound } from "@/infrastructure/lib/utils";
 
 interface ResetDialogProps {
   open: boolean;

@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   Select,
   SelectContent,
@@ -6,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/presentation/components/ui/select";
+
 import type { BlockTypeDropdownValue } from "../../types/richTextTypes";
 
 interface ToolbarBlockTypeSelectProps {

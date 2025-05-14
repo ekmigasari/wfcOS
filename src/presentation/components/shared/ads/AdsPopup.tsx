@@ -1,11 +1,10 @@
 "use client";
 
-import type React from "react";
-
-import { useState, useEffect, useCallback, useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
 // import { Button } from "@/presentation/components/ui/button";
 import Image from "next/image";
+import type React from "react";
+import { useCallback, useEffect, useRef,useState } from "react";
 
 // Easily configurable time settings (all in milliseconds)
 const adSettings = {
@@ -127,7 +126,7 @@ export const AdsPopup = () => {
   if (!isVisible) return null;
 
   const currentAd = adData[currentAdIndex];
-  const isEmoji = currentAd.thumbnail?.type === "emoji";
+  const isEmoji = currentAd.thumbnail.type === "emoji";
 
   return (
     <div className="fixed bottom-4 left-4 right-4 sm:left-6 sm:right-auto z-50 sm:max-w-xs animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -148,7 +147,7 @@ export const AdsPopup = () => {
           ) : (
             <div className="relative flex-shrink-0 w-8 h-8 rounded-full overflow-hidden">
               <Image
-                src={currentAd.thumbnail?.content || "/placeholder.svg"}
+                src={currentAd.thumbnail.content || "/placeholder.svg"}
                 alt=""
                 fill
                 sizes="32px"

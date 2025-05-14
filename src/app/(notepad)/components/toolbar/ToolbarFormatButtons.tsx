@@ -1,8 +1,9 @@
-import React from "react";
-import { Button } from "@/presentation/components/ui/button";
-import { cn } from "@/infrastructure/lib/utils";
-import { Bold, Italic, Underline } from "lucide-react";
 import { TextFormatType } from "lexical";
+import { Bold, Italic, Underline } from "lucide-react";
+import React from "react";
+
+import { cn } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
 
 interface ToolbarFormatButtonsProps {
   formatText: (format: TextFormatType) => void;

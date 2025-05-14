@@ -1,11 +1,12 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { Play, Pause, SkipBack, SkipForward, Video } from "lucide-react";
+import { Pause, Play, SkipBack, SkipForward, Video } from "lucide-react";
+
 import {
   musicPlayerAtom,
-  playPauseAtom,
   nextSongAtom,
+  playPauseAtom,
   prevSongAtom,
   toggleVideoAtom,
 } from "@/application/atoms/musicPlayerAtom";

@@ -2,8 +2,8 @@
 
 import React from "react";
 
-import { SessionLogHeader } from "./components/SessionLogHeader";
 import { ChartsSection } from "./components/ChartsSection";
+import { SessionLogHeader } from "./components/SessionLogHeader";
 import { TableSection } from "./components/TableSection";
 
 const SessionLogApp = () => {

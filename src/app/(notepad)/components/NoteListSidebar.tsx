@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useAtom } from "jotai";
+import { FilePlus, Pencil,Trash2 } from "lucide-react";
+import React, { useCallback,useEffect, useRef, useState } from "react";
+
 import {
-  notesAtom,
   activeNoteIdAtom,
   createNewNote,
   deleteNote,
+  notesAtom,
   updateNoteName,
 } from "@/application/atoms/notepadAtom";
+import { cn , playSound } from "@/infrastructure/lib/utils";
 import { Button } from "@/presentation/components/ui/button";
-import { ScrollArea } from "@/presentation/components/ui/scroll-area";
 import { Input } from "@/presentation/components/ui/input";
-import { cn } from "@/infrastructure/lib/utils";
-import { Trash2, FilePlus, Pencil } from "lucide-react";
-import { playSound } from "@/infrastructure/lib/utils";
+import { ScrollArea } from "@/presentation/components/ui/scroll-area";
 
 // Constants for resizing
 const MIN_WIDTH = 150; // Minimum sidebar width in pixels

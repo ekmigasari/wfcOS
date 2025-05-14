@@ -1,9 +1,10 @@
 import { atom } from "jotai";
+import { LexicalEditor } from "lexical";
+
 import {
   loadFeatureState,
   saveFeatureState,
 } from "@/infrastructure/utils/storage";
-import { LexicalEditor } from "lexical";
 
 // Define the structure for a single note
 export interface Note {

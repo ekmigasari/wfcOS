@@ -1,13 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useAtom } from "jotai";
-import { BookmarkList } from "./components/BookmarkList";
-import { BookmarkForm } from "./components/BookmarkForm";
-import { bookmarksAtom } from "@/application/atoms/bookmarkAtom";
+import type { DragEndEvent } from "@dnd-kit/core";
 import {
-  DndContext,
   closestCenter,
+  DndContext,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -18,10 +14,15 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import type { DragEndEvent } from "@dnd-kit/core";
-import { reorderBookmarksAtom } from "@/application/atoms/bookmarkAtom";
-import { Button } from "@/presentation/components/ui/button";
+import { useAtom } from "jotai";
+import { useState } from "react";
+
+import { bookmarksAtom , reorderBookmarksAtom } from "@/application/atoms/bookmarkAtom";
 import { playSound } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
+
+import { BookmarkForm } from "./components/BookmarkForm";
+import { BookmarkList } from "./components/BookmarkList";
 
 export const Bookmark = () => {
   const [bookmarks] = useAtom(bookmarksAtom);

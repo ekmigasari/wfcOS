@@ -1,7 +1,9 @@
-import React from "react";
-import { Button } from "@/presentation/components/ui/button";
-import { cn } from "@/infrastructure/lib/utils";
 import { List, ListOrdered } from "lucide-react";
+import React from "react";
+
+import { cn } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
+
 import type { BlockTypeDropdownValue } from "../../types/richTextTypes";
 
 interface ToolbarListButtonsProps {

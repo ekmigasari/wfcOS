@@ -1,15 +1,17 @@
 "use client";
 
-import React from "react";
 import { useAtomValue } from "jotai";
+import React from "react";
+
 import { sortedSessionsAtom } from "@/application/atoms/sessionAtoms";
+import { type ChartConfig } from "@/presentation/components/ui/chart";
+
 import {
   getMonthlyChartData,
   getWeeklyChartData,
   getYearlyChartData,
 } from "../sessionLogUtils"; // Path relative to this new file (components/ -> (session-log)/)
 import { SessionLogCharts } from "./SessionLogCharts"; // Assuming SessionLogCharts.tsx is in the same directory
-import { type ChartConfig } from "@/presentation/components/ui/chart";
 
 const chartConfig = {
   sessions: {

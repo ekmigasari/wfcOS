@@ -1,12 +1,14 @@
 "use client";
 
+import { useAtom } from "jotai";
 import React from "react";
+
+import { minimizedWindowsAtom } from "@/application/atoms/windowAtoms";
 import { Menubar } from "@/presentation/components/ui/menubar";
-import { TaskbarMenu } from "./TaskbarMenu";
+
 import { MinimizedIcons } from "./MinimizedIcons";
 import { TaskbarClock } from "./TaskbarClock";
-import { useAtom } from "jotai";
-import { minimizedWindowsAtom } from "@/application/atoms/windowAtoms";
+import { TaskbarMenu } from "./TaskbarMenu";
 
 export const Taskbar = () => {
   // Get minimized windows from state to check if we need to show icons

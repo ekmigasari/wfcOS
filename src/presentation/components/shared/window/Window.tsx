@@ -1,16 +1,18 @@
 "use client";
 
+import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useAtom } from "jotai";
+
 import {
-  windowRegistryAtom,
   closeWindowAtom,
   focusWindowAtom,
+  windowRegistryAtom,
 } from "@/application/atoms/windowAtoms";
-import { WindowBase } from "./WindowBase";
 import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { playSound } from "@/infrastructure/lib/utils";
+
+import { WindowBase } from "./WindowBase";
 
 // Sound type constants
 const CLOSE_SOUND = "window-close";
@@ -71,7 +73,7 @@ export const Window = () => {
     <>
       {allWindows.map((window) => {
         // Skip invalid window data
-        if (!window || !window.appId) {
+        if (!window.appId) {
           console.error("Window data is incomplete:", window);
           return null;
         }

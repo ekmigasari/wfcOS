@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { useAtom } from "jotai";
-import { appRegistry } from "@/infrastructure/config/appRegistry";
-import { AppIcon } from "./AppIcon";
-import { playSound } from "@/infrastructure/lib/utils";
+import { useState } from "react";
+
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
+import { appRegistry } from "@/infrastructure/config/appRegistry";
+import { playSound } from "@/infrastructure/lib/utils";
+
+import { AppIcon } from "./AppIcon";
 
 export const DesktopIcons = () => {
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);

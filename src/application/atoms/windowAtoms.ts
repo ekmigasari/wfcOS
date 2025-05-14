@@ -1,9 +1,11 @@
 import { atom } from "jotai";
+
+import { Position, Size } from "@/application/types/window"; // Assuming types are defined here
+
 import {
   loadFeatureState,
   saveFeatureState,
 } from "../../infrastructure/utils/storage";
-import { Position, Size } from "@/application/types/window"; // Assuming types are defined here
 
 const FEATURE_KEY = "windows";
 
@@ -21,9 +23,7 @@ export interface WindowState {
 }
 
 // Define the shape of the overall window management state
-export type WindowRegistryState = {
-  [id: string]: WindowState; // Store windows in an object for easier access by ID
-};
+export type WindowRegistryState = Record<string, WindowState>;
 
 // Helper function to get the next highest zIndex
 function getNextZIndex(registry: WindowRegistryState): number {
@@ -81,16 +81,16 @@ export const windowRegistryAtom = atom(
 export const openWindowsAtom = atom(
   (get) =>
     Object.values(get(windowRegistryAtom))
-      .filter((win) => win?.isOpen) // Add null check for win
-      .sort((a, b) => (a?.zIndex ?? 0) - (b?.zIndex ?? 0)) // Add null checks
+      .filter((win) => win.isOpen) // Add null check for win
+      .sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0)) // Add null checks
 );
 
 // Atom to get minimized windows for the taskbar
 export const minimizedWindowsAtom = atom(
   (get) =>
     Object.values(get(windowRegistryAtom))
-      .filter((win) => win?.isMinimized) // Add null check
-      .sort((a, b) => (a?.appId ?? "").localeCompare(b?.appId ?? "")) // Add null checks
+      .filter((win) => win.isMinimized) // Add null check
+      .sort((a, b) => (a.appId ?? "").localeCompare(b.appId ?? "")) // Add null checks
 );
 
 // --- Window Management Action Atoms (Write-only) ---
@@ -108,7 +108,7 @@ export const openWindowAtom = atom(
   ) => {
     const currentRegistry = get(windowRegistryAtom);
     const existingWindow = Object.values(currentRegistry).find(
-      (win) => win?.id === windowConfig.id // Use the specific instance ID
+      (win) => win.id === windowConfig.id // Use the specific instance ID
     );
 
     let windowIdToUpdate: string;

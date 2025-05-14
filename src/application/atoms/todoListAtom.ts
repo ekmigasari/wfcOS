@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+
 import {
   loadFeatureState,
   saveFeatureState,
@@ -7,11 +8,11 @@ import {
 const FEATURE_KEY = "todoList";
 
 // Define task item type
-export type TaskItem = {
+export interface TaskItem {
   id: string;
   content: string;
   category: "todo" | "inProgress" | "done";
-};
+}
 
 // Define the shape of the state
 export type TodoListState = TaskItem[];

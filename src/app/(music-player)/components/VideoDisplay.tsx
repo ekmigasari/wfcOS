@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useAtom, useSetAtom } from "jotai";
+import { useEffect, useRef } from "react";
 import ReactPlayer, { YouTubeConfig } from "react-player/youtube";
+
 import {
   musicPlayerAtom,
-  playPauseAtom,
   nextSongAtom,
+  playPauseAtom,
   setLoadingAtom,
-  updatePlayerInternalsAtom,
   setPlayerProgressAtom,
+  updatePlayerInternalsAtom,
 } from "@/application/atoms/musicPlayerAtom";
 
 // Keep a global reference to the YouTube player

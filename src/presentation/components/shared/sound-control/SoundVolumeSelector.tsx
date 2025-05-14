@@ -1,13 +1,14 @@
 "use client";
 
+import { Volume, Volume1, Volume2, VolumeX } from "lucide-react";
 import React from "react";
+
+import { SoundVolumeLevel } from "@/application/atoms/soundAtoms";
+import { Label } from "@/presentation/components/ui/label";
 import {
   RadioGroup,
   RadioGroupItem,
 } from "@/presentation/components/ui/radio-group";
-import { Label } from "@/presentation/components/ui/label";
-import { SoundVolumeLevel } from "@/application/atoms/soundAtoms";
-import { Volume, Volume1, Volume2, VolumeX } from "lucide-react";
 
 interface SoundVolumeSelectorProps {
   selectedLevel: SoundVolumeLevel;

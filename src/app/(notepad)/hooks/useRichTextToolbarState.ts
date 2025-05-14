@@ -1,37 +1,38 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import {
+  $isListNode,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  REMOVE_LIST_COMMAND,
+} from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
-  $getSelection,
-  $isRangeSelection,
-  FORMAT_TEXT_COMMAND,
-  FORMAT_ELEMENT_COMMAND,
-  SELECTION_CHANGE_COMMAND,
-  COMMAND_PRIORITY_CRITICAL,
-  TextFormatType,
-  ElementFormatType,
-  $createParagraphNode,
-  $isParagraphNode,
-  $getRoot,
-} from "lexical";
+  $createHeadingNode,
+  $isHeadingNode,
+  HeadingTagType,
+} from "@lexical/rich-text";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
   $setBlocksType,
 } from "@lexical/selection";
-import { $isListNode, ListNode } from "@lexical/list";
 import { $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-  REMOVE_LIST_COMMAND,
-} from "@lexical/list";
-import {
-  $isHeadingNode,
-  HeadingTagType,
-  $createHeadingNode,
-} from "@lexical/rich-text";
+  $createParagraphNode,
+  $getRoot,
+  $getSelection,
+  $isParagraphNode,
+  $isRangeSelection,
+  COMMAND_PRIORITY_CRITICAL,
+  ElementFormatType,
+  FORMAT_ELEMENT_COMMAND,
+  FORMAT_TEXT_COMMAND,
+  SELECTION_CHANGE_COMMAND,
+  TextFormatType,
+} from "lexical";
+import { useCallback, useEffect, useState } from "react";
+
 import type { BlockTypeDropdownValue } from "../types/richTextTypes";
 
 export const useRichTextToolbarState = () => {
@@ -157,7 +158,7 @@ export const useRichTextToolbarState = () => {
           const anchorNode = selection.anchor.getNode();
           const element = $findMatchingParent(anchorNode, (node) =>
             $isListNode(node)
-          ) as ListNode | null;
+          );
           if (element) {
             // If inside a list, replace it with a paragraph
             const paragraph = $createParagraphNode();
@@ -185,7 +186,7 @@ export const useRichTextToolbarState = () => {
           const anchorNode = selection.anchor.getNode();
           const element = $findMatchingParent(anchorNode, (node) =>
             $isListNode(node)
-          ) as ListNode | null;
+          );
           if (element) {
             // If inside a list, replace it with a paragraph
             const paragraph = $createParagraphNode();

@@ -1,5 +1,6 @@
-import React, { useRef } from "react";
 import Image from "next/image";
+import React, { useRef } from "react";
+
 import { BackgroundSettings } from "@/application/atoms/backgroundAtom";
 
 interface BackgroundUploaderProps {

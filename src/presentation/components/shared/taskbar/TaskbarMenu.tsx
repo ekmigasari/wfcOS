@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import { useAtom } from "jotai";
+import { Lock } from "lucide-react";
 import Image from "next/image";
+import React, { useState } from "react";
+
+import { openWindowAtom } from "@/application/atoms/windowAtoms";
+import { appRegistry } from "@/infrastructure/config/appRegistry";
+import { playSound } from "@/infrastructure/lib/utils";
 import {
   MenubarContent,
   MenubarItem,
@@ -10,13 +16,9 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/presentation/components/ui/menubar";
-import { playSound } from "@/infrastructure/lib/utils";
-import { appRegistry } from "@/infrastructure/config/appRegistry";
-import { useAtom } from "jotai";
-import { openWindowAtom } from "@/application/atoms/windowAtoms";
-import { ResetDialog } from "./ResetDialog";
+
 import { useOpenChangelog } from "./ChangelogWindow";
-import { Lock } from "lucide-react";
+import { ResetDialog } from "./ResetDialog";
 
 export const TaskbarMenu = () => {
   const openWindow = useAtom(openWindowAtom)[1];

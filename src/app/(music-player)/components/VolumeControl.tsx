@@ -2,13 +2,14 @@
 
 import { useAtom } from "jotai";
 import { Volume2, VolumeX } from "lucide-react";
-import { Button } from "@/presentation/components/ui/button";
-import { Slider } from "@/presentation/components/ui/slider";
+
 import {
   musicPlayerAtom,
   setVolumeAtom,
   toggleMuteAtom,
 } from "@/application/atoms/musicPlayerAtom";
+import { Button } from "@/presentation/components/ui/button";
+import { Slider } from "@/presentation/components/ui/slider";
 
 const VolumeControl = () => {
   const [playerState] = useAtom(musicPlayerAtom);

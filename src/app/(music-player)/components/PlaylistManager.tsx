@@ -1,44 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useAtom, useSetAtom } from "jotai";
 import {
-  Check,
-  Pencil,
-  Play,
-  Pause,
-  Trash2,
-  X,
-  GripVertical,
-  ArrowUpDown,
-  ArrowDown,
-  ArrowUp,
-  Plus,
-} from "lucide-react";
-import {
-  musicPlayerAtom,
-  getYoutubeId,
-  addSongAtom,
-  removeSongAtom,
-  updateSongTitleAtom,
-  playPauseAtom,
-  persistedMusicPlayerAtom,
-  playerTimeAtom,
-  volatileMusicPlayerAtom,
-  reorderPlaylistAtom,
-  sortPlaylistAtom,
-  type PersistedMusicPlayerState,
-  type VolatileMusicPlayerState,
-} from "@/application/atoms/musicPlayerAtom";
-import { Song } from "@/application/atoms/musicPlayerAtom";
-import {
-  DndContext,
   closestCenter,
+  DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -47,6 +16,38 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useAtom, useSetAtom } from "jotai";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  GripVertical,
+  Pause,
+  Pencil,
+  Play,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useState } from "react";
+
+import {
+  addSongAtom,
+  getYoutubeId,
+  musicPlayerAtom,
+  persistedMusicPlayerAtom,
+  type PersistedMusicPlayerState,
+  playerTimeAtom,
+  playPauseAtom,
+  removeSongAtom,
+  reorderPlaylistAtom,
+  sortPlaylistAtom,
+  updateSongTitleAtom,
+  volatileMusicPlayerAtom,
+  type VolatileMusicPlayerState,
+} from "@/application/atoms/musicPlayerAtom";
+import { Song } from "@/application/atoms/musicPlayerAtom";
 
 // Sortable Song Item Component Props
 interface SortableSongItemProps {

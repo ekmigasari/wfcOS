@@ -1,8 +1,12 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import React from "react";
-import { Session } from "@/application/types/session.types";
+
 import { TaskItem } from "@/application/atoms/todoListAtom";
+import { Session } from "@/application/types/session.types";
+import { playSound } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
 import {
   Table,
   TableBody,
@@ -11,10 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/presentation/components/ui/table";
-import { Button } from "@/presentation/components/ui/button";
-import { Trash2 } from "lucide-react";
+
 import { formatTime, getTaskName } from "../sessionLogUtils";
-import { playSound } from "@/infrastructure/lib/utils";
 
 interface SessionLogTableProps {
   sessions: Session[];

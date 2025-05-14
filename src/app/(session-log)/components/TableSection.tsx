@@ -1,17 +1,18 @@
 "use client";
 
-import React from "react";
 import { useAtom, useAtomValue } from "jotai";
+import { ChevronLeft , ChevronRight } from "lucide-react";
+import React from "react";
+
 import {
   deleteSessionAtom,
   sortedSessionsAtom,
 } from "@/application/atoms/sessionAtoms";
 import { tasksAtom } from "@/application/atoms/todoListAtom";
-import { SessionLogTable } from "./SessionLogTable"; // Assuming SessionLogTable.tsx is in the same directory
-import { Button } from "@/presentation/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import { ChevronRight } from "lucide-react";
 import { playSound } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
+
+import { SessionLogTable } from "./SessionLogTable"; // Assuming SessionLogTable.tsx is in the same directory
 
 const ITEMS_PER_PAGE = 10;
 

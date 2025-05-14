@@ -1,16 +1,18 @@
 "use client";
 
+import { ElementFormatType,TextFormatType } from "lexical";
 import React from "react";
+
+import { playSound } from "@/infrastructure/lib/utils";
+
 import { useRichTextToolbarState } from "../hooks/useRichTextToolbarState";
+import type { BlockTypeDropdownValue } from "../types/richTextTypes";
 import { ToolbarActionButtons } from "./toolbar/ToolbarActionButtons";
+import { ToolbarAlignButtons } from "./toolbar/ToolbarAlignButtons";
 import { ToolbarBlockTypeSelect } from "./toolbar/ToolbarBlockTypeSelect";
 import { ToolbarFontSelect } from "./toolbar/ToolbarFontSelect";
 import { ToolbarFormatButtons } from "./toolbar/ToolbarFormatButtons";
-import { ToolbarAlignButtons } from "./toolbar/ToolbarAlignButtons";
 import { ToolbarListButtons } from "./toolbar/ToolbarListButtons";
-import { playSound } from "@/infrastructure/lib/utils";
-import { TextFormatType, ElementFormatType } from "lexical";
-import type { BlockTypeDropdownValue } from "../types/richTextTypes";
 
 export const RichTextToolbar: React.FC = () => {
   const {

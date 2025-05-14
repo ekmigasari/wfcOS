@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+
 // import { CustomMDX } from "@/presentation/components/blog/mdx"; // We'll render HTML directly
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
 import { baseUrl } from "@/app/sitemap";

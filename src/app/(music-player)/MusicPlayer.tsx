@@ -1,12 +1,14 @@
 "use client";
 
 import { useAtom } from "jotai";
+
 import { musicPlayerAtom } from "@/application/atoms/musicPlayerAtom";
+
 import PlayerControls from "./components/PlayerControls";
 import PlaylistManager from "./components/PlaylistManager";
+import ProgressBar from "./components/ProgressBar";
 import VideoDisplay from "./components/VideoDisplay";
 import VolumeControl from "./components/VolumeControl";
-import ProgressBar from "./components/ProgressBar";
 
 export const MusicPlayer = () => {
   const [playerState] = useAtom(musicPlayerAtom);

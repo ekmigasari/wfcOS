@@ -1,9 +1,10 @@
 "use client";
 
 import { Coffee } from "lucide-react";
-import React, { useState, useEffect } from "react";
-import { SoundToggle } from "./SoundToggle";
+import React, { useEffect,useState } from "react";
+
 import { Button } from "../../ui/button";
+import { SoundToggle } from "./SoundToggle";
 
 export const TaskbarClock = () => {
   const [time, setTime] = useState<Date | null>(null);

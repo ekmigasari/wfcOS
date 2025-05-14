@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
+
 import {
   minimizedWindowsAtom,
   setWindowMinimizedStateAtom,
 } from "@/application/atoms/windowAtoms";
 import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { playSound } from "@/infrastructure/lib/utils";
+
 import { Button } from "../../ui/button";
 
 export const MinimizedIcons = () => {
@@ -53,7 +55,7 @@ export const MinimizedIcons = () => {
             size="icon"
             className="size-7"
           >
-            {appInfo?.src ? (
+            {appInfo.src ? (
               <Image
                 src={appInfo.src}
                 alt={window.title}

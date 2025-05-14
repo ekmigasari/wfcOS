@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect,useState } from 'react';
 
 /**
  * Hook to detect whether the current device is a mobile/tablet or desktop

@@ -1,19 +1,20 @@
 import Link from "next/link";
+
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
 
 // Define the types based on src/app/blog/utils.ts
-type Metadata = {
+interface Metadata {
   title: string;
   publishedAt: string;
   summary: string;
   image?: string;
-};
+}
 
-type Post = {
+interface Post {
   metadata: Metadata;
   slug: string;
   content: string; // HTML content
-};
+}
 
 export async function BlogPosts() {
   const allBlogs: Post[] = await getBlogPosts();

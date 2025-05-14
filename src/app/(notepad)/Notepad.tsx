@@ -1,39 +1,40 @@
 "use client";
 
+import { CodeHighlightNode, CodeNode } from "@lexical/code";
+import { AutoLinkNode, LinkNode } from "@lexical/link";
+import { ListItemNode, ListNode } from "@lexical/list";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { EditorState, LexicalEditor } from "lexical";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import React, {
+  Component,
+  ReactElement,
   useCallback,
   useEffect,
   useRef,
-  Component,
-  ReactElement,
   useState,
 } from "react";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { ListItemNode, ListNode } from "@lexical/list";
-import { CodeHighlightNode, CodeNode } from "@lexical/code";
-import { AutoLinkNode, LinkNode } from "@lexical/link";
-import { EditorState, LexicalEditor } from "lexical";
-import { playSound } from "@/infrastructure/lib/utils";
+import { useDebouncedCallback } from "use-debounce";
 
 import {
-  notesAtom,
+  activeNoteContentAtom,
   activeNoteIdAtom,
   createNewNote,
+  notesAtom,
   saveActiveNoteAtom,
-  activeNoteContentAtom,
 } from "@/application/atoms/notepadAtom";
+import { playSound } from "@/infrastructure/lib/utils";
+
 import { NoteListSidebar } from "./components/NoteListSidebar";
 import { RichTextToolbar } from "./components/RichTextToolbar";
-import { useDebouncedCallback } from "use-debounce";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 const editorTheme = {
   ltr: "ltr",

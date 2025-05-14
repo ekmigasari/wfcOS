@@ -1,5 +1,6 @@
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue,clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+
 import {
   SoundVolumeLevel,
   volumeLevelPercentages,
@@ -25,7 +26,7 @@ if (typeof window !== "undefined") {
         soundVolume = volumeLevelPercentages[soundVolumeLevel] / 100;
       } else {
         // Fallback to default if stored value is invalid
-        soundVolume = volumeLevelPercentages["medium"] / 100;
+        soundVolume = volumeLevelPercentages.medium / 100;
         localStorage.setItem("soundVolumeLevel", JSON.stringify("medium"));
       }
     }
@@ -67,7 +68,7 @@ const audioLoadingStates: Record<string, boolean> = {};
 // Play a sound with type identification and optional volume override
 export const playSound = (
   soundPath: string,
-  soundType: string = "default",
+  soundType = "default",
   volumeOverride?: number // Optional volume override (0.0 to 1.0)
 ): HTMLAudioElement | null => {
   try {
@@ -130,7 +131,7 @@ export const playSound = (
 };
 
 // Stop a sound by type, with safe pause handling
-export const stopSound = (soundType: string = "default"): void => {
+export const stopSound = (soundType = "default"): void => {
   const audio = activeSounds[soundType];
 
   if (!audio) return;

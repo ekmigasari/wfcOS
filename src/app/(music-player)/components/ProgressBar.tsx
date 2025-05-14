@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { useAtom, useSetAtom } from "jotai";
+import { useEffect, useRef,useState } from "react";
+
 import {
   playerTimeAtom,
   setSeekPositionAtom,
   updatePlayerInternalsAtom,
 } from "@/application/atoms/musicPlayerAtom";
-import { Slider } from "@/presentation/components/ui/slider";
 import { cn } from "@/infrastructure/lib/utils";
+import { Slider } from "@/presentation/components/ui/slider";
 
 // Helper to format time (MM:SS)
 const formatTime = (seconds: number): string => {

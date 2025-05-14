@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
+
+import { settingsRegistry } from "@/infrastructure/config/appRegistry";
+import { playSound } from "@/infrastructure/lib/utils";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/presentation/components/ui/tabs";
-import { settingsRegistry } from "@/infrastructure/config/appRegistry";
-import { playSound } from "@/infrastructure/lib/utils";
 
 interface SettingsPanelProps {
   initialTab?: string;

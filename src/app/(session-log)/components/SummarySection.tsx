@@ -1,14 +1,16 @@
 "use client";
 
-import React from "react";
 import { useAtomValue } from "jotai";
+import React from "react";
+
 import { sortedSessionsAtom } from "@/application/atoms/sessionAtoms";
-import { SessionLogSummary } from "./SessionLogSummary";
+
 import {
-  calculateCurrentWeekSessions,
   calculateCurrentMonthSessions,
+  calculateCurrentWeekSessions,
   calculateCurrentYearSessions,
 } from "../sessionLogUtils";
+import { SessionLogSummary } from "./SessionLogSummary";
 
 export const SummarySection = () => {
   const sessions = useAtomValue(sortedSessionsAtom);

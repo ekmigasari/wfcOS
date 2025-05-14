@@ -1,8 +1,8 @@
 import { useSortable } from "@dnd-kit/sortable";
 
-type EmptyDropAreaProps = {
+interface EmptyDropAreaProps {
   categoryId: string;
-};
+}
 
 export const EmptyDropArea = ({ categoryId }: EmptyDropAreaProps) => {
   const { setNodeRef } = useSortable({

@@ -1,8 +1,9 @@
-import React from "react";
-import { Button } from "@/presentation/components/ui/button";
-import { cn } from "@/infrastructure/lib/utils";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react";
 import { ElementFormatType } from "lexical";
+import { AlignCenter, AlignJustify,AlignLeft, AlignRight } from "lucide-react";
+import React from "react";
+
+import { cn } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
 
 interface ToolbarAlignButtonsProps {
   formatElement: (align: ElementFormatType) => void;

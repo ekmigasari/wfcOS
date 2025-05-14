@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+
 import { Session } from "@/application/types/session.types";
 import {
   loadFeatureState,
