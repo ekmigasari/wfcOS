@@ -49,7 +49,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={font.className}>
         <JotaiProvider>{children}</JotaiProvider>
-        <Toaster />
+        <Toaster richColors position="top-center" />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>

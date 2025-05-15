@@ -2,6 +2,7 @@
 
 import { signIn } from "@/infrastructure/lib/auth-client";
 import { Button } from "@/presentation/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 const GoogleLogo = () => (
@@ -37,31 +38,45 @@ interface GoogleButtonProps {
 
 export const GoogleButton = ({ signUp }: GoogleButtonProps) => {
   const [isPending, setIsPending] = useState(false);
-
   const handleClick = async () => {
-    await signIn.social({
-      provider: "google",
-      callbackURL: "/",
-      errorCallbackURL: "/login",
-      fetchOptions: {
-        onRequest: () => {
-          setIsPending(true);
+    try {
+      await signIn.social({
+        provider: "google",
+        callbackURL: "/",
+        errorCallbackURL: "/login",
+        fetchOptions: {
+          onRequest: () => {
+            setIsPending(true);
+          },
+          onResponse: () => {
+            setIsPending(false);
+          },
+          onError: (ctx) => {
+            setIsPending(false);
+            toast.error(ctx.error.message);
+          },
         },
-        onResponse: () => {
-          setIsPending(false);
-        },
-        onError: (ctx) => {
-          toast.error(ctx.error.message);
-        },
-      },
-    });
+      });
+    } catch (error) {
+      console.error(error);
+      setIsPending(false);
+      toast.error("Authentication failed. Please try again.");
+    }
   };
 
   const action = signUp ? "Sign up with Google" : "Continue with Google";
   return (
     <Button onClick={handleClick} disabled={isPending}>
-      <GoogleLogo />
-      {action}
+      {isPending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...
+        </>
+      ) : (
+        <>
+          <GoogleLogo />
+          {action}
+        </>
+      )}
     </Button>
   );
 };
