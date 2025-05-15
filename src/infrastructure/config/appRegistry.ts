@@ -12,6 +12,7 @@ import { Timer } from "@/app/(timer)/Timer";
 import TodoList from "@/app/(to-do-list)/todoList";
 import { Size } from "@/application/types/window";
 import { ChangelogWindow } from "@/presentation/components/shared/taskbar/ChangelogWindow";
+import { UserSettingsApp } from "@/app/(user-settings)/UserSettingsApp";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -100,6 +101,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 500, height: 550 },
     minSize: { width: 300, height: 300 },
     component: SettingsPanel,
+  },
+  "user-settings": {
+    name: "User Settings",
+    src: "/icons/user.png",
+    defaultSize: { width: 700, height: 650 },
+    minSize: { width: 500, height: 400 },
+    component: UserSettingsApp,
   },
   changelog: {
     name: "Changelog",

@@ -66,7 +66,7 @@ export const GoogleButton = ({ signUp }: GoogleButtonProps) => {
 
   const action = signUp ? "Sign up with Google" : "Continue with Google";
   return (
-    <Button onClick={handleClick} disabled={isPending}>
+    <Button onClick={handleClick} disabled={isPending} size="lg">
       {isPending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...

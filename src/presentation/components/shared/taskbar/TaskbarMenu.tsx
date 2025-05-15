@@ -1,13 +1,7 @@
 "use client";
 
-import { useAtom } from "jotai";
-import { Lock } from "lucide-react";
-import Image from "next/image";
 import React, { useState } from "react";
-
-import { openWindowAtom } from "@/application/atoms/windowAtoms";
-import { appRegistry } from "@/infrastructure/config/appRegistry";
-import { playSound } from "@/infrastructure/lib/utils";
+import Image from "next/image";
 import {
   MenubarContent,
   MenubarItem,
@@ -16,13 +10,19 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/presentation/components/ui/menubar";
-
-import { useOpenChangelog } from "./ChangelogWindow";
+import { playSound } from "@/infrastructure/lib/utils";
+import { appRegistry } from "@/infrastructure/config/appRegistry";
+import { useAtom } from "jotai";
+import { openWindowAtom } from "@/application/atoms/windowAtoms";
 import { ResetDialog } from "./ResetDialog";
+import { useOpenChangelog } from "./ChangelogWindow";
+import { LogIn } from "lucide-react";
+import { LoginDialog } from "@/presentation/components/shared/auth/LoginDialog";
 
 export const TaskbarMenu = () => {
   const openWindow = useAtom(openWindowAtom)[1];
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const openChangelog = useOpenChangelog();
 
   // Function to open an app
@@ -61,6 +61,12 @@ export const TaskbarMenu = () => {
     openChangelog();
   };
 
+  // Function to open login dialog
+  const openLoginDialog = () => {
+    playSound("/sounds/click.mp3");
+    setLoginDialogOpen(true);
+  };
+
   return (
     <>
       <MenubarMenu>
@@ -82,12 +88,12 @@ export const TaskbarMenu = () => {
           >
             Feedback
           </MenubarItem>
-          <MenubarItem disabled inset>
+          <MenubarItem inset onSelect={() => openApp("user-settings")}>
             User Settings
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarItem disabled>
-            <Lock className="w-4 h-4 mr-2" />
+          <MenubarItem onSelect={openLoginDialog}>
+            <LogIn className="w-4 h-4 mr-2" />
             Login
           </MenubarItem>
         </MenubarContent>
@@ -150,6 +156,9 @@ export const TaskbarMenu = () => {
 
       {/* Reset Dialog */}
       <ResetDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen} />
+
+      {/* Login Dialog */}
+      <LoginDialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen} />
     </>
   );
 };
