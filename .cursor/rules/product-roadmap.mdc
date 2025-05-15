@@ -7,7 +7,7 @@ alwaysApply: false
 
 This document outlines the planned development roadmap for the wfcOS platform, serving as a checkpoint and to-do list for implementation. Features are organized by priority and development phase.
 
-## AUTH & PAID USERS
+## AUTH 
 
 ### Setup Auth
 - [x] install better auth
@@ -18,8 +18,26 @@ This document outlines the planned development roadmap for the wfcOS platform, s
 - [x] add prisma adapter to auth.ts
 - [x] better auth cli  generate
 - [x] Create api nextjs
-- [] add auth-client.ts
+- [x] add auth-client.ts
 
+### Google login
+- [] Google Button
+- [] Sign up, sign in, sign out, and toast
+- [] User settings to check
+- [] Sessions and test
+
+### Taskbar login 
+- [] Taskbar Login/Logout
+- [] User settings page
+- [] Update user name
+
+## PAID USER
+- [] Install Polar
+- [] Add paid user schema
+- [] Implement payment flow
+- [] Testing
+
+## Implement Data sync
 
 
 ## Guidelines for Feature Implementation
