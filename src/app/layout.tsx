@@ -3,7 +3,7 @@ import "@/presentation/styles/globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import { Itim } from "next/font/google";
-
+import { Toaster } from "@/presentation/components/ui/sonner";
 import JotaiProvider from "@/providers/JotaiProvider";
 
 const font = Itim({ weight: "400", subsets: ["latin"] });
@@ -49,6 +49,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={font.className}>
         <JotaiProvider>{children}</JotaiProvider>
+        <Toaster />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>
