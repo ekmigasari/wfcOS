@@ -16,9 +16,9 @@ import { useAtom } from "jotai";
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
 import { ResetDialog } from "./ResetDialog";
 import { useOpenChangelog } from "./ChangelogWindow";
-import { LogIn } from "lucide-react";
+// import { LogIn } from "lucide-react";
 import { LoginDialog } from "@/presentation/components/shared/auth/LoginDialog";
-
+import { AuthMenu } from "@/presentation/components/shared/auth/AuthMenu";
 export const TaskbarMenu = () => {
   const openWindow = useAtom(openWindowAtom)[1];
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
@@ -61,11 +61,11 @@ export const TaskbarMenu = () => {
     openChangelog();
   };
 
-  // Function to open login dialog
-  const openLoginDialog = () => {
-    playSound("/sounds/click.mp3");
-    setLoginDialogOpen(true);
-  };
+  // // Function to open login dialog
+  // const openLoginDialog = () => {
+  //   playSound("/sounds/click.mp3");
+  //   setLoginDialogOpen(true);
+  // };
 
   return (
     <>
@@ -74,30 +74,8 @@ export const TaskbarMenu = () => {
           <Image src="/icons/coffee.png" alt="coffee" width={20} height={20} />
         </div>
       </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
-          Menu
-        </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem inset onSelect={() => openUrl("/blog")}>
-            Blog
-          </MenubarItem>
-          <MenubarItem
-            inset
-            onSelect={() => openUrl("https://workfromcoffee.featurebase.app")}
-          >
-            Feedback
-          </MenubarItem>
-          <MenubarItem inset onSelect={() => openApp("user-settings")}>
-            User Settings
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem onSelect={openLoginDialog}>
-            <LogIn className="w-4 h-4 mr-2" />
-            Login
-          </MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
+
+      <AuthMenu />
       <MenubarMenu>
         <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
           Apps

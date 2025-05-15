@@ -1,7 +1,6 @@
-import React from "react";
 import { auth } from "@/infrastructure/utils/auth";
-import { headers } from "next/headers";
 import { SignOutButton } from "@/presentation/components/ui/sign-out-button";
+import { headers } from "next/headers";
 export default async function Page() {
   const session = await auth.api.getSession({
     headers: await headers(),

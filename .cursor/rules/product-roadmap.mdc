@@ -21,13 +21,13 @@ This document outlines the planned development roadmap for the wfcOS platform, s
 - [x] add auth-client.ts
 
 ### Google login
-- [] Google Button
-- [] Sign up, sign in, sign out, and toast
-- [] User settings to check
-- [] Sessions and test
+- [x] Google Button
+- [x] Sign up, sign in, sign out, and toast
+- [x] User settings to check
+- [x] Sessions and test
 
 ### Taskbar login 
-- [] Taskbar Login/Logout
+- [] Taskbar Login/Logout 
 - [] User settings page
 - [] Update user name
 
