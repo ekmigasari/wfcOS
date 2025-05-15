@@ -27,7 +27,7 @@ This document outlines the planned development roadmap for the wfcOS platform, s
 - [x] Sessions and test
 
 ### Taskbar login 
-- [] Taskbar Login/Logout 
+- [x] Taskbar Login/Logout 
 - [] User settings page
 - [] Update user name
 

@@ -15,7 +15,7 @@ import {
   TabsTrigger,
 } from "@/presentation/components/ui/tabs";
 import { GoogleButton } from "../../ui/google-button";
-
+import { playSound } from "@/infrastructure/lib/utils";
 interface LoginDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -36,8 +36,8 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
 
         <Tabs defaultValue="login" className="w-full mt-4">
           <TabsList className="grid w-full grid-cols-2 mb-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Register</TabsTrigger>
+            <TabsTrigger value="login" onPointerDown={() => playSound("/sounds/click.mp3")}>Login</TabsTrigger>
+            <TabsTrigger value="signup" onPointerDown={() => playSound("/sounds/click.mp3")}>Register</TabsTrigger>
           </TabsList>
 
           <TabsContent value="login" className="py-2">

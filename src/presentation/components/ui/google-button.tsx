@@ -5,6 +5,7 @@ import { Button } from "@/presentation/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { playSound } from "@/infrastructure/lib/utils";
 const GoogleLogo = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -39,6 +40,7 @@ interface GoogleButtonProps {
 export const GoogleButton = ({ signUp }: GoogleButtonProps) => {
   const [isPending, setIsPending] = useState(false);
   const handleClick = async () => {
+    playSound("/sounds/click.mp3");
     try {
       await signIn.social({
         provider: "google",
@@ -58,9 +60,13 @@ export const GoogleButton = ({ signUp }: GoogleButtonProps) => {
         },
       });
     } catch (error) {
-      console.error(error);
-      setIsPending(false);
-      toast.error("Authentication failed. Please try again.");
+      if (error instanceof Error) {
+        setIsPending(false);
+        toast.error(error.message);
+      } else {
+        setIsPending(false);
+        toast.error("Authentication failed. Please try again.");
+      }
     }
   };
 
