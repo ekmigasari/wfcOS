@@ -61,11 +61,7 @@ export const TaskbarMenu = () => {
     openChangelog();
   };
 
-  // // Function to open login dialog
-  // const openLoginDialog = () => {
-  //   playSound("/sounds/click.mp3");
-  //   setLoginDialogOpen(true);
-  // };
+ 
 
   return (
     <>
