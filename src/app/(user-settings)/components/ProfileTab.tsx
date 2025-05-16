@@ -11,24 +11,31 @@ import {
 import { Input } from "@/presentation/components/ui/input";
 import { Label } from "@/presentation/components/ui/label";
 import { Button } from "@/presentation/components/ui/button";
-
-import { useSession } from "@/infrastructure/lib/auth-client";
+import { updateUser } from "@/infrastructure/lib/auth-client";
 import Image from "next/image";
-import { updateUserAction } from "../action.userSettings";
-import { useActionState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { ProfileTabProps } from "@/application/types/auth.types";
 
-export const ProfileTab = () => {
-  const { data: session } = useSession();
-  const [state, formAction, pending] = useActionState(updateUserAction, {
-    success: false,
-  });
+export const ProfileTab = ({ data: session }: ProfileTabProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [name, setName] = useState(session?.user?.name || "");
 
-  useEffect(() => {
-    if (state.success) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      await updateUser({ name });
       toast.success("User updated successfully");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update profile"
+      );
+    } finally {
+      setIsLoading(false);
     }
-  }, [state.success]);
+  };
 
   return (
     <Card>
@@ -36,7 +43,7 @@ export const ProfileTab = () => {
         <CardTitle>Profile Information</CardTitle>
         <CardDescription>Manage your personal information</CardDescription>
       </CardHeader>
-      <form action={formAction}>
+      <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-4 mb-6">
             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -61,7 +68,8 @@ export const ProfileTab = () => {
                 id="name"
                 name="name"
                 placeholder="Your name"
-                defaultValue={session?.user?.name || ""}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 
@@ -95,8 +103,8 @@ export const ProfileTab = () => {
           </div>
         </CardContent>
         <CardFooter className="flex justify-end">
-          <Button type="submit" disabled={pending}>
-            {pending ? "Saving..." : "Save Changes"}
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save Changes"}
           </Button>
         </CardFooter>
       </form>

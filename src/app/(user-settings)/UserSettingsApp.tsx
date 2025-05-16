@@ -12,6 +12,7 @@ import { SubscriptionTab } from "./components/SubscriptionTab";
 
 import { useSession } from "@/infrastructure/lib/auth-client";
 import { playSound } from "@/infrastructure/lib/utils";
+import { UserSession } from "@/application/types/auth.types";
 
 export const UserSettingsApp = () => {
   const { data: session } = useSession();
@@ -40,7 +41,7 @@ export const UserSettingsApp = () => {
 
         {/* Profile Tab */}
         <TabsContent value="profile">
-          <ProfileTab />
+          <ProfileTab data={session as UserSession} />
         </TabsContent>
 
         {/* Subscription Tab */}
