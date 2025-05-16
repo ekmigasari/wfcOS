@@ -209,50 +209,40 @@ export const calculateDayStreak = (
     return 0;
   }
 
-  const uniqueSortedDates = [...new Set(sessions.map((s) => s.date))].sort(
-    (a, b) => b.localeCompare(a)
-  ); // Sorts YYYY-MM-DD strings descending
+  const referenceDate = new Date(currentDate);
+  referenceDate.setHours(0, 0, 0, 0);
+
+  const uniqueSessionDates = Array.from(new Set(sessions.map((s) => s.date)))
+    .map((dateStr) => {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      // Month is 0-based
+      return new Date(y, m - 1, d, 0, 0, 0, 0);
+    })
+    .sort((a, b) => b.getTime() - a.getTime());
+  if (uniqueSessionDates.length === 0) {
+    return 0;
+  }
 
   let dayStreak = 0;
-  const currentDateToMatch = new Date(currentDate); // Use a copy of the passed current date
-  currentDateToMatch.setHours(0, 0, 0, 0);
+  let dateToMatchValue = new Date(referenceDate); // Use a different variable name for the Date object
 
-  for (const dateStr of uniqueSortedDates) {
-    const expectedDate = new Date(currentDateToMatch);
-    expectedDate.setHours(0, 0, 0, 0);
-    // const expectedDateStr = `${expectedDate.getFullYear()}-${String(
-    //   expectedDate.getMonth() + 1
-    // ).padStart(2, "0")}-${String(expectedDate.getDate()).padStart(2, "0")}`;
+  const latestSessionDate = uniqueSessionDates[0];
 
-    const sessionDate = new Date(dateStr + "T00:00:00"); // Normalize session date for comparison
-
-    if (sessionDate.getTime() === expectedDate.getTime()) {
-      dayStreak++;
-      currentDateToMatch.setDate(currentDateToMatch.getDate() - 1); // Move to previous day
-    } else if (sessionDate.getTime() < expectedDate.getTime()) {
-      // If the session date is older than the expected date for the streak, the streak is broken.
-      // This also handles the case where the most recent session is not today or yesterday.
-      break;
-    }
-    // If sessionDate > expectedDate, it implies a future date, which shouldn't happen with sorted dates.
+  if (latestSessionDate < referenceDate) {
+    dateToMatchValue.setDate(dateToMatchValue.getDate() - 1);
   }
-  // Special case: if no session today, but there was one yesterday, streak is 1.
-  // The loop above handles this if today is `currentDate`.
-  // If the latest session is not today, but currentDate is today, and the latest session was yesterday,
-  // the streak calculated above will be 0. We need to check this explicitly if dayStreak is 0 after the loop.
-  if (dayStreak === 0 && uniqueSortedDates.length > 0) {
-    const latestSessionDate = new Date(uniqueSortedDates[0] + "T00:00:00");
-    const yesterday = new Date(currentDate);
-    yesterday.setDate(currentDate.getDate() - 1);
-    yesterday.setHours(0, 0, 0, 0);
-    if (latestSessionDate.getTime() === yesterday.getTime()) {
-      const todayFormatted = `${currentDate.getFullYear()}-${String(
-        currentDate.getMonth() + 1
-      ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
-      if (uniqueSortedDates[0] !== todayFormatted) {
-        // ensure latest session is not today
-        return 1;
-      }
+
+  for (const sessionDate of uniqueSessionDates) {
+    if (sessionDate.getTime() === dateToMatchValue.getTime()) {
+      dayStreak++;
+      // Create a new Date object for the previous day
+      dateToMatchValue = new Date(
+        dateToMatchValue.getFullYear(),
+        dateToMatchValue.getMonth(),
+        dateToMatchValue.getDate() - 1
+      );
+    } else if (sessionDate.getTime() < dateToMatchValue.getTime()) {
+      break;
     }
   }
 
