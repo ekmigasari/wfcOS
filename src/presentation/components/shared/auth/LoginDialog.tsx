@@ -24,7 +24,7 @@ interface LoginDialogProps {
 export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-white border-secondary border-4">
+      <DialogContent className="sm:max-w-md bg-white border-secondary border-4 z-[2500]">
         <DialogHeader>
           <DialogTitle className="text-center text-xl">
             Welcome to WFC OS ☕
@@ -36,8 +36,18 @@ export const LoginDialog = ({ open, onOpenChange }: LoginDialogProps) => {
 
         <Tabs defaultValue="login" className="w-full mt-4">
           <TabsList className="grid w-full grid-cols-2 mb-2">
-            <TabsTrigger value="login" onPointerDown={() => playSound("/sounds/click.mp3")}>Login</TabsTrigger>
-            <TabsTrigger value="signup" onPointerDown={() => playSound("/sounds/click.mp3")}>Register</TabsTrigger>
+            <TabsTrigger
+              value="login"
+              onPointerDown={() => playSound("/sounds/click.mp3")}
+            >
+              Login
+            </TabsTrigger>
+            <TabsTrigger
+              value="signup"
+              onPointerDown={() => playSound("/sounds/click.mp3")}
+            >
+              Register
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="login" className="py-2">

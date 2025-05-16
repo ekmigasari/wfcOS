@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MenubarContent,
   MenubarItem,
@@ -15,12 +15,37 @@ import { useSession } from "@/infrastructure/lib/auth-client";
 import Image from "next/image";
 import { SignOutButton } from "@/presentation/components/ui/sign-out-button";
 import { useOpenUserSettings } from "@/app/(user-settings)/openUserSettings";
+import { toast } from "sonner";
 
 export const AuthMenu = () => {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const openUserSettings = useOpenUserSettings();
+  const { data: session, isPending } = useSession();
+  const [hasShownWelcomeToast, setHasShownWelcomeToast] = useState(false);
 
-  const { data: session } = useSession();
+  useEffect(() => {
+    const hasShownToast =
+      sessionStorage.getItem("hasShownWelcomeToast") === "true";
+    if (session && !isPending && !hasShownWelcomeToast && !hasShownToast) {
+      toast(
+        <span className="font-bold text-md">
+          Welcome {session.user?.name || "User"}
+        </span>,
+        {
+          description:
+            "Hope you're having a productive day and enjoying your coffee ☕",
+          className: "bg-white border-secondary border-2 w-fit",
+          style: {
+            background: "white",
+            border: "2px solid var(--secondary)",
+            borderRadius: "8px",
+          },
+        }
+      );
+      setHasShownWelcomeToast(true);
+      sessionStorage.setItem("hasShownWelcomeToast", "true");
+    }
+  }, [session, isPending, hasShownWelcomeToast]);
 
   const openLoginDialog = () => {
     playSound("/sounds/click.mp3");
