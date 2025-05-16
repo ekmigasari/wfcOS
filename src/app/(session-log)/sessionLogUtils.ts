@@ -203,21 +203,22 @@ export const calculateCurrentYearSessions = (
 
 export const calculateDayStreak = (
   sessions: Session[],
-  currentDateParam: Date = new Date()
+  currentDate: Date = new Date()
 ): number => {
   if (sessions.length === 0) {
     return 0;
   }
 
-  const referenceDate = new Date(currentDateParam);
+  const referenceDate = new Date(currentDate);
   referenceDate.setHours(0, 0, 0, 0);
 
   const uniqueSessionDates = Array.from(new Set(sessions.map((s) => s.date)))
     .map((dateStr) => {
-      return new Date(dateStr + "T00:00:00");
+      const [y, m, d] = dateStr.split("-").map(Number);
+      // Month is 0-based
+      return new Date(y, m - 1, d, 0, 0, 0, 0);
     })
     .sort((a, b) => b.getTime() - a.getTime());
-
   if (uniqueSessionDates.length === 0) {
     return 0;
   }
@@ -227,13 +228,8 @@ export const calculateDayStreak = (
 
   const latestSessionDate = uniqueSessionDates[0];
 
-  if (latestSessionDate.getTime() < referenceDate.getTime()) {
-    // Create a new Date object for yesterday relative to referenceDate
-    dateToMatchValue = new Date(
-      referenceDate.getFullYear(),
-      referenceDate.getMonth(),
-      referenceDate.getDate() - 1
-    );
+  if (latestSessionDate < referenceDate) {
+    dateToMatchValue.setDate(dateToMatchValue.getDate() - 1);
   }
 
   for (const sessionDate of uniqueSessionDates) {
