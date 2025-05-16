@@ -14,8 +14,11 @@ import { LogIn, User } from "lucide-react";
 import { useSession } from "@/infrastructure/lib/auth-client";
 import Image from "next/image";
 import { SignOutButton } from "@/presentation/components/ui/sign-out-button";
+import { useOpenUserSettings } from "@/app/(user-settings)/openUserSettings";
+
 export const AuthMenu = () => {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const openUserSettings = useOpenUserSettings();
 
   const { data: session } = useSession();
 
@@ -27,6 +30,12 @@ export const AuthMenu = () => {
   const openUrl = (url: string) => {
     playSound("/sounds/click.mp3");
     window.open(url, "_blank");
+  };
+
+  // Function to open changelog window
+  const openUserSettingsWindow = () => {
+    playSound("/sounds/open.mp3");
+    openUserSettings();
   };
 
   return (
@@ -66,10 +75,7 @@ export const AuthMenu = () => {
           </MenubarItem>
           {session ? (
             <>
-              <MenubarItem
-                inset
-                onPointerDown={() => playSound("/sounds/click.mp3")}
-              >
+              <MenubarItem inset onSelect={openUserSettingsWindow}>
                 User Settings
               </MenubarItem>
               <MenubarSeparator />

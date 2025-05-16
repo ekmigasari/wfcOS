@@ -90,7 +90,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   },
   bookmark: {
     name: "Bookmark",
-    src: "/icons/bookmark.png", // We'll need to ensure this icon exists
+    src: "/icons/bookmark.png",
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 320, height: 400 },
     component: Bookmark,
@@ -102,13 +102,7 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 300, height: 300 },
     component: SettingsPanel,
   },
-  "user-settings": {
-    name: "User Settings",
-    src: "/icons/default.png",
-    defaultSize: { width: 700, height: 650 },
-    minSize: { width: 500, height: 400 },
-    component: UserSettingsApp,
-  },
+
   changelog: {
     name: "Changelog",
     src: "/icons/default.png",
@@ -123,6 +117,14 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 700, height: 500 },
     minSize: { width: 450, height: 300 },
     component: SessionLogApp,
+    hidden: true,
+  },
+  usersettings: {
+    name: "User Settings",
+    src: "/icons/default.png",
+    defaultSize: { width: 700, height: 650 },
+    minSize: { width: 500, height: 400 },
+    component: UserSettingsApp,
     hidden: true,
   },
 };
