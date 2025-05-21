@@ -17,9 +17,10 @@ model User {
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
+  planType      PlanType @default(FREE)
   sessions      Session[]
   accounts      Account[]
-
+  subscriptions Subscription[]
   @@unique([email])
   @@map("user")
 }
@@ -67,4 +68,30 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Subscription {
+  id           String   @id @default(cuid())
+  userId       String
+  productId    String
+  status       SubscriptionStatus @default(ACTIVE)
+  startDate    DateTime           @default(now())
+  endDate      DateTime?
+  canceledAt   DateTime?
+
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+enum PlanType {
+  FREE
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+  PAST_DUE
 }

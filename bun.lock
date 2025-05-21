@@ -9,7 +9,7 @@
         "@dnd-kit/core": "^6.3.1",
         "@dnd-kit/sortable": "^10.0.0",
         "@dnd-kit/utilities": "^3.2.2",
-        "@eslint/js": "^9.26.0",
+        "@eslint/js": "^9.27.0",
         "@lexical/list": "^0.31.1",
         "@lexical/plain-text": "^0.31.1",
         "@lexical/react": "^0.31.1",
@@ -17,7 +17,7 @@
         "@next/third-parties": "^15.3.2",
         "@polar-sh/better-auth": "^1.0.0",
         "@polar-sh/sdk": "^0.32.15",
-        "@prisma/client": "^6.7.0",
+        "@prisma/client": "^6.8.2",
         "@radix-ui/react-dialog": "^1.1.13",
         "@radix-ui/react-label": "^2.1.6",
         "@radix-ui/react-menubar": "^1.1.14",
@@ -30,7 +30,7 @@
         "@radix-ui/react-switch": "^1.2.4",
         "@radix-ui/react-tabs": "^1.1.11",
         "@radix-ui/react-tooltip": "^1.2.6",
-        "@tailwindcss/postcss": "^4.1.6",
+        "@tailwindcss/postcss": "^4.1.7",
         "@tailwindcss/typography": "^0.5.16",
         "@types/uuid": "^10.0.0",
         "@typescript-eslint/eslint-plugin": "^8.32.1",
@@ -48,7 +48,7 @@
         "next-mdx-remote": "^5.0.0",
         "next-themes": "^0.4.6",
         "postcss": "^8.5.3",
-        "prisma": "^6.7.0",
+        "prisma": "^6.8.2",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "react-draggable": "^4.4.6",
@@ -63,8 +63,8 @@
         "sonner": "^2.0.3",
         "sugar-high": "^0.9.3",
         "tailwind-merge": "^3.3.0",
-        "tailwindcss": "^4.1.6",
-        "tw-animate-css": "^1.2.9",
+        "tailwindcss": "^4.1.7",
+        "tw-animate-css": "^1.3.0",
         "typescript-eslint": "^8.32.1",
         "use-debounce": "^10.0.4",
         "uuid": "^11.1.0",
@@ -76,7 +76,7 @@
         "@types/react": "^19.1.4",
         "@types/react-dom": "^19.1.5",
         "@types/recharts": "^2.0.1",
-        "eslint": "^9.26.0",
+        "eslint": "^9.27.0",
         "eslint-config-next": "15.2.4",
         "husky": "^9.1.7",
         "typescript": "^5.8.3",
@@ -327,7 +327,7 @@
 
     "@peculiar/asn1-x509": ["@peculiar/asn1-x509@2.3.15", "", { "dependencies": { "@peculiar/asn1-schema": "^2.3.15", "asn1js": "^3.0.5", "pvtsutils": "^1.3.6", "tslib": "^2.8.1" } }, "sha512-0dK5xqTqSLaxv1FHXIcd4Q/BZNuopg+u1l23hT9rOmQ1g4dNtw0g/RnEi+TboB0gOwGtrWn269v27cMgchFIIg=="],
 
-    "@polar-sh/better-auth": ["@polar-sh/better-auth@1.0.0", "", { "dependencies": { "zod": "^3.24.2" }, "peerDependencies": { "@polar-sh/sdk": "^0.32.15", "better-auth": "^1.2.7" } }, "sha512-fvMTBcV9WXVJjdCkBF1gYeqDnILbKzy+LZ4ZFyMZ/pQVXS7RvwhV4xtWjmSbXI7Ffw3LLRm2mYv1fUwaW6GpYA=="],
+    "@polar-sh/better-auth": ["@polar-sh/better-auth@1.0.1", "", { "dependencies": { "zod": "^3.24.2" }, "peerDependencies": { "@polar-sh/sdk": "^0.32.15", "better-auth": "^1.2.7" } }, "sha512-2wT/zaBqy6LsCkEEBLDzKF4QT8kE5iwFqZAo4RSkB+AtUn4VEZwUwfjQdxUvEfJ535yIIg8eFEWhG8DvdZZVOQ=="],
 
     "@polar-sh/sdk": ["@polar-sh/sdk@0.32.15", "", { "dependencies": { "standardwebhooks": "^1.0.0" }, "peerDependencies": { "@modelcontextprotocol/sdk": ">=1.5.0 <1.10.0", "zod": ">= 3" }, "optionalPeers": ["@modelcontextprotocol/sdk"], "bin": { "mcp": "bin/mcp-server.js" } }, "sha512-LUpV5z8+8QYiZ8kSYYhq8mtdr97l0NVHQhw8y4b+2ajW8halYQ761lLJ1bRMgmemWyHqpKuBnnfIqgCKv10jwg=="],
 
@@ -509,7 +509,7 @@
 
     "@types/ms": ["@types/ms@2.1.0", "", {}, "sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA=="],
 
-    "@types/node": ["@types/node@22.15.18", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-v1DKRfUdyW+jJhZNEI1PYy29S2YRxMV5AOO/x/SjKmW0acCIOqmbj6Haf9eHAhsPmrhlHSxEhv/1WszcLWV4cg=="],
+    "@types/node": ["@types/node@22.15.19", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-3vMNr4TzNQyjHcRZadojpRaD9Ofr6LsonZAoQ+HMUa/9ORTPoxVIw0e0mpqWpdjj8xybyCM+oKOUH2vwFu/oEw=="],
 
     "@types/react": ["@types/react@19.1.4", "", { "dependencies": { "csstype": "^3.0.2" } }, "sha512-EB1yiiYdvySuIITtD5lhW4yPyJ31RkJkkDw794LaQYrxCSaQV/47y5o1FMC4zF9ZyjUjzJMZwbovEnT5yHTW6g=="],
 
@@ -1756,6 +1756,8 @@
     "@typescript-eslint/typescript-estree/minimatch": ["minimatch@9.0.5", "", { "dependencies": { "brace-expansion": "^2.0.1" } }, "sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow=="],
 
     "@typescript-eslint/typescript-estree/semver": ["semver@7.7.1", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA=="],
+
+    "bun-types/@types/node": ["@types/node@22.15.18", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-v1DKRfUdyW+jJhZNEI1PYy29S2YRxMV5AOO/x/SjKmW0acCIOqmbj6Haf9eHAhsPmrhlHSxEhv/1WszcLWV4cg=="],
 
     "eslint-config-next/@typescript-eslint/eslint-plugin": ["@typescript-eslint/eslint-plugin@8.28.0", "", { "dependencies": { "@eslint-community/regexpp": "^4.10.0", "@typescript-eslint/scope-manager": "8.28.0", "@typescript-eslint/type-utils": "8.28.0", "@typescript-eslint/utils": "8.28.0", "@typescript-eslint/visitor-keys": "8.28.0", "graphemer": "^1.4.0", "ignore": "^5.3.1", "natural-compare": "^1.4.0", "ts-api-utils": "^2.0.1" }, "peerDependencies": { "@typescript-eslint/parser": "^8.0.0 || ^8.0.0-alpha.0", "eslint": "^8.57.0 || ^9.0.0", "typescript": ">=4.8.4 <5.9.0" } }, "sha512-lvFK3TCGAHsItNdWZ/1FkvpzCxTHUVuFrdnOGLMa0GGCFIbCgQWVk3CzCGdA7kM3qGVc+dfW9tr0Z/sHnGDFyg=="],
 

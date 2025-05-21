@@ -29,11 +29,17 @@ This document outlines the planned development roadmap for the wfcOS platform, s
 ### Taskbar login 
 - [x] Taskbar Login/Logout 
 - [x] User settings page
-- [] Update user name
+- [x] Update user name
 
 ## PAID USER
-- [] Install Polar
-- [] Add paid user schema
+- [x] Install Polar
+- [x] Add paid user schema
+
+- [] Api Route
+- [] Webhook
+- [] Handle subcription -> check session before checkout
+- [] Sucessful page
+
 - [] Implement payment flow
 - [] Testing
 
