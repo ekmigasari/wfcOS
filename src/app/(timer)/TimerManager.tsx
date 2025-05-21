@@ -33,7 +33,9 @@ export const TimerManager = () => {
     originalTitle.current = document.title;
 
     // Create worker with the new path
-    const worker = new Worker("/lib/timerWorker.js");
+    const worker = new Worker(
+      new URL("@/infrastructure/lib/timerWorker.js", import.meta.url)
+    );
     workerRef.current = worker;
 
     // Handle messages from worker
