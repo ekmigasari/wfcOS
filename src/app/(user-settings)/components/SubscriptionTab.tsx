@@ -9,30 +9,9 @@ import {
   CardTitle,
 } from "@/presentation/components/ui/card";
 import { Button } from "@/presentation/components/ui/button";
+import { PRODUCT_PLANS, PlanType } from "@/infrastructure/config/productsPlan";
 
 export const SubscriptionTab = () => {
-  // These would be from props or a data fetching hook in real implementation
-  const subscriptionPlans = [
-    {
-      id: "MONTHLY",
-      name: "Monthly",
-      price: "$9.99/month",
-      description: "Billed monthly",
-    },
-    {
-      id: "YEARLY",
-      name: "Yearly",
-      price: "$99.99/year",
-      description: "Save 16% compared to monthly",
-    },
-    {
-      id: "LIFETIME",
-      name: "Lifetime",
-      price: "$299",
-      description: "One-time payment",
-    },
-  ];
-
   return (
     <Card>
       <CardHeader>
@@ -49,7 +28,7 @@ export const SubscriptionTab = () => {
               ACTIVE
             </div>
           </div>
-          <p className="text-2xl font-bold mb-1">Premium Plan</p>
+          <p className="text-2xl font-bold mb-1">Espresso Pass</p>
           <p className="text-sm text-gray-500 mb-4">Monthly subscription</p>
 
           <div className="space-y-2 text-sm">
@@ -72,20 +51,24 @@ export const SubscriptionTab = () => {
 
         <div>
           <h3 className="font-medium mb-4">Available Plans</h3>
-          <div className="grid gap-4 md:grid-cols-3">
-            {subscriptionPlans.map((plan) => (
+          <div className="flex flex-wrap gap-4">
+            {PRODUCT_PLANS.map((plan) => (
               <div
-                key={plan.id}
+                key={plan.planType}
                 className="border rounded-lg p-4 flex flex-col"
               >
                 <h4 className="font-medium">{plan.name}</h4>
                 <p className="text-xl font-bold">{plan.price}</p>
                 <p className="text-sm text-gray-500 mb-4">{plan.description}</p>
                 <Button
-                  variant={plan.id === "MONTHLY" ? "default" : "outline"}
+                  variant={
+                    plan.planType === PlanType.MONTHLY ? "default" : "outline"
+                  }
                   className="mt-auto"
                 >
-                  {plan.id === "MONTHLY" ? "Current Plan" : "Switch Plan"}
+                  {plan.planType === PlanType.MONTHLY
+                    ? "Current Plan"
+                    : "Switch Plan"}
                 </Button>
               </div>
             ))}
