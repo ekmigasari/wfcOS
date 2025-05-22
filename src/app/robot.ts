@@ -5,6 +5,9 @@ export default function robots() {
     rules: [
       {
         userAgent: "*",
+        allow: "/",
+        // Add any disallow paths if needed
+        // disallow: ["/admin/", "/private/"]
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
