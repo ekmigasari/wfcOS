@@ -1,3 +1,4 @@
+import { CreateAccountInput, UpdateAccountInput } from "@/application/types";
 import { Account } from "@/infrastructure/db/prisma/generated";
 import { prisma } from "@/infrastructure/utils/prisma";
 
@@ -14,19 +15,7 @@ export class AccountRepository {
     });
   }
 
-  async create(data: {
-    id: string;
-    userId: string;
-    providerId: string;
-    accountId: string;
-    accessToken?: string;
-    refreshToken?: string;
-    idToken?: string;
-    accessTokenExpiresAt?: Date;
-    refreshTokenExpiresAt?: Date;
-    scope?: string;
-    password?: string;
-  }): Promise<Account> {
+  async create(data: CreateAccountInput): Promise<Account> {
     return prisma.account.create({
       data: {
         ...data,
@@ -36,10 +25,7 @@ export class AccountRepository {
     });
   }
 
-  async update(
-    id: string,
-    data: Partial<Omit<Account, "id" | "createdAt">>
-  ): Promise<Account> {
+  async update(id: string, data: UpdateAccountInput): Promise<Account> {
     return prisma.account.update({
       where: { id },
       data: {

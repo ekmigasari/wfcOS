@@ -1,3 +1,4 @@
+import { CreateUserInput, UpdateUserInput } from "@/application/types";
 import { User, PlanType } from "@/infrastructure/db/prisma/generated";
 import { prisma } from "@/infrastructure/utils/prisma";
 
@@ -18,14 +19,7 @@ export class UserRepository {
     return prisma.user.findMany();
   }
 
-  async create(data: {
-    id: string;
-    name: string;
-    email: string;
-    emailVerified: boolean;
-    image?: string;
-    planType?: PlanType;
-  }): Promise<User> {
+  async create(data: CreateUserInput): Promise<User> {
     return prisma.user.create({
       data: {
         ...data,
@@ -36,10 +30,7 @@ export class UserRepository {
     });
   }
 
-  async update(
-    id: string,
-    data: Partial<Omit<User, "id" | "createdAt">>
-  ): Promise<User> {
+  async update(id: string, data: UpdateUserInput): Promise<User> {
     return prisma.user.update({
       where: { id },
       data: {

@@ -1,3 +1,7 @@
+import {
+  CreateVerificationInput,
+  UpdateVerificationInput,
+} from "@/application/types";
 import { Verification } from "@/infrastructure/db/prisma/generated";
 import { prisma } from "@/infrastructure/utils/prisma";
 
@@ -20,12 +24,7 @@ export class VerificationRepository {
     });
   }
 
-  async create(data: {
-    id: string;
-    identifier: string;
-    value: string;
-    expiresAt: Date;
-  }): Promise<Verification> {
+  async create(data: CreateVerificationInput): Promise<Verification> {
     return prisma.verification.create({
       data: {
         ...data,
@@ -37,7 +36,7 @@ export class VerificationRepository {
 
   async update(
     id: string,
-    data: Partial<Omit<Verification, "id" | "createdAt">>
+    data: UpdateVerificationInput
   ): Promise<Verification> {
     return prisma.verification.update({
       where: { id },

@@ -1,4 +1,8 @@
 import {
+  CreateSubscriptionInput,
+  UpdateSubscriptionInput,
+} from "@/application/types";
+import {
   Subscription,
   SubscriptionStatus,
 } from "@/infrastructure/db/prisma/generated";
@@ -27,13 +31,7 @@ export class SubscriptionRepository {
     });
   }
 
-  async create(data: {
-    userId: string;
-    productId: string;
-    status?: SubscriptionStatus;
-    startDate?: Date;
-    endDate?: Date;
-  }): Promise<Subscription> {
+  async create(data: CreateSubscriptionInput): Promise<Subscription> {
     return prisma.subscription.create({
       data: {
         ...data,
@@ -45,7 +43,7 @@ export class SubscriptionRepository {
 
   async update(
     id: string,
-    data: Partial<Omit<Subscription, "id">>
+    data: UpdateSubscriptionInput
   ): Promise<Subscription> {
     return prisma.subscription.update({
       where: { id },

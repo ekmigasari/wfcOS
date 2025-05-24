@@ -34,8 +34,12 @@ This document outlines the planned development roadmap for the wfcOS platform, s
 ## PAID USER
 - [x] Install Polar
 - [x] Add paid user schema
-- [x] Setup ngrok for webhook
+- [x] Setup tunnel for webhook
 - [x] Add product options
+
+- [] repositories  
+- [] services
+
 - [] User Subscriptions page
 - [] Check login before subscribe
 - [] New paid subcription

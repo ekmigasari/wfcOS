@@ -1,4 +1,3 @@
-// Account creation input (without auto-generated fields)
 export interface CreateAccountInput {
   id: string;
   accountId: string;
@@ -13,7 +12,6 @@ export interface CreateAccountInput {
   password?: string | null;
 }
 
-// Account update input (all fields optional except id)
 export interface UpdateAccountInput {
   id: string;
   accountId?: string;

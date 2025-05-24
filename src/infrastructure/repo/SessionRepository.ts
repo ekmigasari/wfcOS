@@ -1,3 +1,4 @@
+import { CreateSessionInput, UpdateSessionInput } from "@/application/types";
 import { Session } from "@/infrastructure/db/prisma/generated";
 import { prisma } from "@/infrastructure/utils/prisma";
 
@@ -20,14 +21,7 @@ export class SessionRepository {
     });
   }
 
-  async create(data: {
-    id: string;
-    token: string;
-    expiresAt: Date;
-    userId: string;
-    ipAddress?: string;
-    userAgent?: string;
-  }): Promise<Session> {
+  async create(data: CreateSessionInput): Promise<Session> {
     return prisma.session.create({
       data: {
         ...data,
@@ -37,10 +31,7 @@ export class SessionRepository {
     });
   }
 
-  async update(
-    id: string,
-    data: Partial<Omit<Session, "id" | "createdAt">>
-  ): Promise<Session> {
+  async update(id: string, data: UpdateSessionInput): Promise<Session> {
     return prisma.session.update({
       where: { id },
       data: {
