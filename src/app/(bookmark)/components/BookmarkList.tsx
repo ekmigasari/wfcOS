@@ -4,7 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useAtom } from "jotai";
 import { GripVertical, MoreVertical } from "lucide-react";
-import { useRef,useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   BookmarkItem,
@@ -53,7 +53,7 @@ const SortableBookmarkItem = ({
 
   const handleOpenLink = () => {
     playSound("/sounds/click.mp3");
-    window.open(bookmark.url, "_blank");
+    window.open(bookmark.url, "_blank", "noopener,noreferrer");
   };
 
   // --- Updated toggleOptions to call parent callback ---

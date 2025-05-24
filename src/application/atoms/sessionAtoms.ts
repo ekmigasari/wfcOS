@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 
-import { Session } from "@/application/types/session.types";
+import { TimerSession } from "@/application/types";
 import {
   loadFeatureState,
   saveFeatureState,
@@ -9,10 +9,10 @@ import {
 const FEATURE_KEY = "work_sessions";
 
 // Load initial state from localStorage or use default (empty array)
-const initialSessions = loadFeatureState<Session[]>(FEATURE_KEY) ?? [];
+const initialSessions = loadFeatureState<TimerSession[]>(FEATURE_KEY) ?? [];
 
 // Create the base atom for sessions
-const baseSessionsAtom = atom<Session[]>(initialSessions);
+const baseSessionsAtom = atom<TimerSession[]>(initialSessions);
 
 // Create a derived atom that saves to localStorage on change
 export const sessionsAtom = atom(
@@ -20,7 +20,9 @@ export const sessionsAtom = atom(
   (
     get,
     set,
-    newSessions: Session[] | ((prevSessions: Session[]) => Session[])
+    newSessions:
+      | TimerSession[]
+      | ((prevSessions: TimerSession[]) => TimerSession[])
   ) => {
     const updatedSessions =
       typeof newSessions === "function"
@@ -38,13 +40,13 @@ export const selectedTaskForTimerAtom = atom<string | null>(null);
 // Expects duration in minutes
 export const addSessionAtom = atom(
   null,
-  (get, set, sessionData: Omit<Session, "id" | "date">) => {
+  (get, set, sessionData: Omit<TimerSession, "id" | "date">) => {
     const startDate = new Date(sessionData.startTime);
     const localDateString = `${startDate.getFullYear()}-${String(
       startDate.getMonth() + 1
     ).padStart(2, "0")}-${String(startDate.getDate()).padStart(2, "0")}`;
 
-    const newSession: Session = {
+    const newSession: TimerSession = {
       ...sessionData,
       id: crypto.randomUUID(),
       date: localDateString, // Store local date string

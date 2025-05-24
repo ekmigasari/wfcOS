@@ -17,7 +17,7 @@ import {
   TaskItem,
 } from "@/application/atoms/todoListAtom";
 import { useTimer } from "@/application/hooks/useTimer";
-import { Session } from "@/application/types/session.types";
+import { TimerSession } from "@/application/types";
 import { playSound } from "@/infrastructure/lib/utils";
 import {
   Select,
@@ -69,11 +69,11 @@ export const Timer = () => {
   ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
 
   const todaySessions = sessions.filter(
-    (s: Session) => s.date === localTodayDateString
+    (s: TimerSession) => s.date === localTodayDateString
   );
   const todaySessionCount = todaySessions.length;
   const todayTotalMinutes = todaySessions.reduce(
-    (acc: number, s: Session) => acc + (s.duration || 25),
+    (acc: number, s: TimerSession) => acc + (s.duration || 25),
     0
   );
 

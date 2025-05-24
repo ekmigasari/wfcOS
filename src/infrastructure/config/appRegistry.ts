@@ -12,7 +12,7 @@ import { Timer } from "@/app/(timer)/Timer";
 import TodoList from "@/app/(to-do-list)/todoList";
 import { Size } from "@/application/types/window";
 import { ChangelogWindow } from "@/presentation/components/shared/taskbar/ChangelogWindow";
-import { UserSettingsApp } from "@/app/(user-settings)/UserSettingsApp";
+import UserSettingsApp from "@/app/(user-settings)/UserSettingsApp";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app

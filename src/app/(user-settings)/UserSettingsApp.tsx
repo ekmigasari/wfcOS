@@ -1,54 +1,34 @@
-"use client";
+import { UserSettingsTabs } from "./components/UserSettingsTabs";
+import { auth } from "@/infrastructure/utils/auth";
+import { headers } from "next/headers";
+import { Suspense } from "react";
+import { SubscriptionService } from "@/application/services";
 
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/presentation/components/ui/tabs";
+const subscriptionService = new SubscriptionService();
 
-import { ProfileTab } from "./components/ProfileTab";
-import { SubscriptionTab } from "./components/SubscriptionTab";
+export default async function UserSettingsApp() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-import { useSession } from "@/infrastructure/lib/auth-client";
-import { playSound } from "@/infrastructure/lib/utils";
-import { UserSession } from "@/application/types/auth.types";
-
-export const UserSettingsApp = () => {
-  const { data: session } = useSession();
-
+  // Early return if no session - this should match the logic in getSubscriptionData
   if (!session) {
-    return <div>User Unauthorized</div>;
+    return <div>Please login to access this page</div>;
   }
+
+  // Fetch subscription data on the server
+  const subscriptionData = subscriptionService.getActiveUserSubscriptions(
+    session.user.id
+  );
 
   return (
     <div className="container mx-auto py-4">
-      <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger
-            value="profile"
-            onPointerDown={() => playSound("/sounds/click.mp3")}
-          >
-            Profile
-          </TabsTrigger>
-          <TabsTrigger
-            value="subscription"
-            onPointerDown={() => playSound("/sounds/click.mp3")}
-          >
-            Subscription
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Profile Tab */}
-        <TabsContent value="profile">
-          <ProfileTab data={session as UserSession} />
-        </TabsContent>
-
-        {/* Subscription Tab */}
-        <TabsContent value="subscription">
-          <SubscriptionTab />
-        </TabsContent>
-      </Tabs>
+      <Suspense fallback={<div>Loading...</div>}>
+        <UserSettingsTabs
+          session={session}
+          subscriptionData={subscriptionData}
+        />
+      </Suspense>
     </div>
   );
-};
+}

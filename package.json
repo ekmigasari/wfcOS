@@ -25,7 +25,8 @@
     "@lexical/rich-text": "^0.31.1",
     "@next/third-parties": "^15.3.2",
     "@polar-sh/better-auth": "^1.0.1",
-    "@polar-sh/sdk": "^0.32.15",
+    "@polar-sh/nextjs": "0.4.0",
+    "@polar-sh/sdk": "0.32.16",
     "@prisma/client": "^6.8.2",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-label": "^2.1.6",
@@ -41,9 +42,11 @@
     "@radix-ui/react-tooltip": "^1.2.6",
     "@tailwindcss/postcss": "^4.1.7",
     "@tailwindcss/typography": "^0.5.16",
+    "@types/bcryptjs": "^3.0.0",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
+    "bcryptjs": "^3.0.2",
     "better-auth": "^1.2.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -76,7 +79,9 @@
     "tw-animate-css": "^1.3.0",
     "typescript-eslint": "^8.32.1",
     "use-debounce": "^10.0.4",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0",
+    "zod": "3.25.23"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

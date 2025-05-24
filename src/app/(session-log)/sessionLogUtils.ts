@@ -1,5 +1,5 @@
 import { TaskItem } from "@/application/atoms/todoListAtom";
-import { Session } from "@/application/types/session.types";
+import { TimerSession } from "@/application/types/timer.types";
 
 // Helper function to format duration from minutes to hours and minutes
 export const formatDurationFromMinutes = (totalMinutes: number): string => {
@@ -15,7 +15,7 @@ export const formatDurationFromMinutes = (totalMinutes: number): string => {
 
 // Helper functions for chart data
 export const getWeeklyChartData = (
-  currentSessions: Session[],
+  currentSessions: TimerSession[],
   offset: number
 ): { name: string; sessions: number }[] => {
   const data: { name: string; sessions: number }[] = [];
@@ -49,7 +49,7 @@ export const getWeeklyChartData = (
 };
 
 export const getMonthlyChartData = (
-  currentSessions: Session[],
+  currentSessions: TimerSession[],
   offset: number
 ): { name: string; sessions: number }[] => {
   const targetDate = new Date();
@@ -85,7 +85,7 @@ export const getMonthlyChartData = (
 };
 
 export const getYearlyChartData = (
-  currentSessions: Session[],
+  currentSessions: TimerSession[],
   offset: number
 ): { name: string; sessions: number }[] => {
   const targetYear = new Date().getFullYear() + offset;
@@ -144,7 +144,7 @@ export const formatTime = (timestamp: number): string => {
 const DEFAULT_SESSION_DURATION_MINUTES = 25; // Assuming a default, adjust if actual duration is in Session object
 
 export const calculateCurrentWeekSessions = (
-  sessions: Session[],
+  sessions: TimerSession[],
   currentDate: Date = new Date()
 ): { count: number; totalMinutes: number } => {
   const firstDayOfWeek = new Date(currentDate);
@@ -166,7 +166,7 @@ export const calculateCurrentWeekSessions = (
 };
 
 export const calculateCurrentMonthSessions = (
-  sessions: Session[],
+  sessions: TimerSession[],
   currentDate: Date = new Date()
 ): { count: number; totalMinutes: number } => {
   const currentMonth = currentDate.getMonth();
@@ -186,7 +186,7 @@ export const calculateCurrentMonthSessions = (
 };
 
 export const calculateCurrentYearSessions = (
-  sessions: Session[],
+  sessions: TimerSession[],
   currentDate: Date = new Date()
 ): { count: number; totalMinutes: number } => {
   const currentYear = currentDate.getFullYear();
@@ -202,7 +202,7 @@ export const calculateCurrentYearSessions = (
 };
 
 export const calculateDayStreak = (
-  sessions: Session[],
+  sessions: TimerSession[],
   currentDate: Date = new Date()
 ): number => {
   if (sessions.length === 0) {

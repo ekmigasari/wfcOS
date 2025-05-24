@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 import React from "react";
 
 import { TaskItem } from "@/application/atoms/todoListAtom";
-import { Session } from "@/application/types/session.types";
+import { TimerSession } from "@/application/types/timer.types";
 import { playSound } from "@/infrastructure/lib/utils";
 import { Button } from "@/presentation/components/ui/button";
 import {
@@ -19,7 +19,7 @@ import {
 import { formatTime, getTaskName } from "../sessionLogUtils";
 
 interface SessionLogTableProps {
-  sessions: Session[];
+  sessions: TimerSession[];
   allTasks: TaskItem[];
   deleteSession: (id: string) => void;
 }
@@ -59,7 +59,7 @@ export const SessionLogTable: React.FC<SessionLogTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sessions.map((session: Session) => (
+          {sessions.map((session: TimerSession) => (
             <TableRow key={session.id} className="text-xs">
               <TableCell className="py-1.5 px-2">{session.date}</TableCell>
               <TableCell className="py-1.5 px-2">

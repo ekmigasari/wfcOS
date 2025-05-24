@@ -11,8 +11,12 @@ export interface UserSession {
   session: {
     id: string;
     createdAt: Date;
-    userAgent?: string;
-    // Add other session fields if needed
+    updatedAt: Date;
+    userId: string;
+    expiresAt: Date;
+    token: string;
+    ipAddress?: string | null;
+    userAgent?: string | null;
   };
 }
 
