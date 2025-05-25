@@ -7,7 +7,7 @@ import {
   TabsTrigger,
 } from "@/presentation/components/ui/tabs";
 import { ProfileTab } from "./components/ProfileTab";
-// import { SubscriptionTab } from "./components/SubscriptionTab";
+import { SubscriptionTab } from "./components/SubscriptionTab";
 import { playSound } from "@/infrastructure/lib/utils";
 import { useSessionContext } from "@/providers/SessionProvider";
 
@@ -43,7 +43,7 @@ export default function UserSettingsApp() {
 
         {/* Subscription Tab */}
         <TabsContent value="subscription">
-          {/* <SubscriptionTab initialData={subscriptionData} /> */}
+          <SubscriptionTab userId={session.user.id} />
         </TabsContent>
       </Tabs>
     </div>

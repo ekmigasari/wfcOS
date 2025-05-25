@@ -5,3 +5,6 @@ export * from "./account.service";
 export * from "./session.service";
 export * from "./auth.services";
 export * from "./webhook.service";
+import { UserSettingsService } from "./userSettings.service";
+
+export const userSettingsService = new UserSettingsService();
