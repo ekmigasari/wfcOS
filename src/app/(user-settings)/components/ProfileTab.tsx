@@ -44,7 +44,6 @@ export const ProfileTab = ({ data: session }: ProfileTabProps) => {
     );
   };
 
-
   return (
     <Card>
       <CardHeader>
