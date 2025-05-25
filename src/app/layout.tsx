@@ -4,7 +4,9 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import { Itim } from "next/font/google";
 import { Toaster } from "@/presentation/components/ui/sonner";
-import JotaiProvider from "@/providers/JotaiProvider";
+import Provider from "@/providers/Provider";
+import { auth } from "@/infrastructure/utils/auth";
+import { headers } from "next/headers";
 
 const font = Itim({ weight: "400", subsets: ["latin"] });
 
@@ -40,15 +42,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // For User and Session Check
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   return (
     <html lang="en">
       <body className={font.className}>
-        <JotaiProvider>{children}</JotaiProvider>
+        <Provider session={session}>{children}</Provider>
         <Toaster richColors position="bottom-center" />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>

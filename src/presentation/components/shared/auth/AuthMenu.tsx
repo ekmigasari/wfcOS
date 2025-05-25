@@ -11,22 +11,24 @@ import {
 import { playSound } from "@/infrastructure/lib/utils";
 import { LoginDialog } from "./LoginDialog";
 import { LogIn, User } from "lucide-react";
-import { useSession } from "@/infrastructure/lib/auth-client";
 import Image from "next/image";
 import { SignOutButton } from "@/presentation/components/ui/sign-out-button";
 import { useOpenUserSettings } from "@/app/(user-settings)/openUserSettings";
 import { toast } from "sonner";
+import { useSessionContext } from "@/providers/SessionProvider";
 
 export const AuthMenu = () => {
+
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-  const openUserSettings = useOpenUserSettings();
-  const { data: session, isPending } = useSession();
   const [hasShownWelcomeToast, setHasShownWelcomeToast] = useState(false);
+  const openUserSettings = useOpenUserSettings();
+  const session = useSessionContext();
 
   useEffect(() => {
     const hasShownToast =
       sessionStorage.getItem("hasShownWelcomeToast") === "true";
-    if (session && !isPending && !hasShownWelcomeToast && !hasShownToast) {
+    if (session && !hasShownWelcomeToast && !hasShownToast) {
+      console.log("toast");
       toast(
         <span className="font-bold text-md">
           Welcome {session.user?.name || "User"}
@@ -45,7 +47,7 @@ export const AuthMenu = () => {
       setHasShownWelcomeToast(true);
       sessionStorage.setItem("hasShownWelcomeToast", "true");
     }
-  }, [session, isPending, hasShownWelcomeToast]);
+  }, [session, hasShownWelcomeToast]);
 
   const openLoginDialog = () => {
     playSound("/sounds/click.mp3");

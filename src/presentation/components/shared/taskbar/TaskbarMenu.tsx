@@ -67,7 +67,6 @@ export const TaskbarMenu = () => {
       </MenubarMenu>
       {/* Auth Menu */}
       <AuthMenu />
-      {/* Apps Menu */}
       <MenubarMenu>
         <MenubarTrigger onPointerDown={() => playSound("/sounds/click.mp3")}>
           Apps

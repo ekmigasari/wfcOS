@@ -9,6 +9,7 @@ import {
 } from "@polar-sh/better-auth";
 import { prisma } from "./prisma";
 import { polarClient } from "./polar";
+import { nextCookies } from "better-auth/next-js";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -46,5 +47,6 @@ export const auth = betterAuth({
         // })
       ],
     }),
+    nextCookies(),
   ],
 });
