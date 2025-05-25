@@ -1,5 +1,6 @@
 import { User, PlanType } from "@/infrastructure/db/prisma/generated";
 import { UserRepository } from "@/infrastructure/repo";
+import { CreateUserInput, UpdateUserInput } from "@/application/types";
 
 export class UserService {
   private userRepository: UserRepository;
@@ -20,22 +21,15 @@ export class UserService {
     return this.userRepository.findAll();
   }
 
-  async createUser(data: {
-    id: string;
-    name: string;
-    email: string;
-    emailVerified: boolean;
-    image?: string;
-    planType?: PlanType;
-  }): Promise<User> {
+  async createUser(data: CreateUserInput): Promise<User> {
     return this.userRepository.create(data);
   }
 
   async updateUser(
     id: string,
-    data: Partial<Omit<User, "id" | "createdAt">>
+    data: Partial<Omit<UpdateUserInput, "id">>
   ): Promise<User> {
-    return this.userRepository.update(id, data);
+    return this.userRepository.update(id, { id, ...data });
   }
 
   async deleteUser(id: string): Promise<User> {
@@ -43,6 +37,6 @@ export class UserService {
   }
 
   async upgradePlan(userId: string, planType: PlanType): Promise<User> {
-    return this.userRepository.update(userId, { planType });
+    return this.userRepository.update(userId, { id: userId, planType });
   }
 }

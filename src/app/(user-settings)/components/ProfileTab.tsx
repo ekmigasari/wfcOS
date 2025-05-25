@@ -16,26 +16,34 @@ import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ProfileTabProps } from "@/application/types/auth.types";
+import { useRouter } from "next/navigation";
 
 export const ProfileTab = ({ data: session }: ProfileTabProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(session?.user?.name || "");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      await updateUser({ name });
-      toast.success("User updated successfully");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update profile"
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    await updateUser(
+      { name },
+      {
+        onSuccess: () => {
+          router.refresh();
+          toast.success("User updated successfully");
+          setIsLoading(false);
+        },
+        onError: (error) => {
+          toast.error(
+            error instanceof Error ? error.message : "Failed to update profile"
+          );
+        },
+      }
+    );
   };
+
 
   return (
     <Card>
@@ -102,7 +110,7 @@ export const ProfileTab = ({ data: session }: ProfileTabProps) => {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-end">
+        <CardFooter className="flex justify-end mt-6">
           <Button type="submit" disabled={isLoading}>
             {isLoading ? "Saving..." : "Save Changes"}
           </Button>

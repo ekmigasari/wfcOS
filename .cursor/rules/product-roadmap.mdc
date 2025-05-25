@@ -37,15 +37,20 @@ This document outlines the planned development roadmap for the wfcOS platform, s
 - [x] Setup tunnel for webhook
 - [x] Add product options
 
-- [] repositories  
+- [x] repositories  
 - [] services
 
+- [] User Page
 - [] User Subscriptions page
 - [] Check login before subscribe
 - [] New paid subcription
 - [] Cancel subcription
 - [] Change subcription plan  
 - [] Expired subcription
+
+
+## Others
+- [] Update Polar User when update user name
 
 ## Implement Data sync
 

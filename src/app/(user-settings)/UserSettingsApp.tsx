@@ -1,34 +1,51 @@
-// import { UserSettingsTabs } from "./components/UserSettingsTabs";
-// import { auth } from "@/infrastructure/utils/auth";
-// import { headers } from "next/headers";
-import { Suspense } from "react";
-// import { SubscriptionService } from "@/application/services";
+"use client";
 
-// const subscriptionService = new SubscriptionService();
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/presentation/components/ui/tabs";
+import { ProfileTab } from "./components/ProfileTab";
+// import { SubscriptionTab } from "./components/SubscriptionTab";
+import { playSound } from "@/infrastructure/lib/utils";
+import { useSessionContext } from "@/providers/SessionProvider";
 
 export default function UserSettingsApp() {
-  // const session = await auth.api.getSession({
-  //   headers: await headers(),
-  // });
+  const session = useSessionContext();
 
-  // // Early return if no session - this should match the logic in getSubscriptionData
-  // if (!session) {
-  //   return <div>Please login to access this page</div>;
-  // }
-
-  // // Fetch subscription data on the server
-  // const subscriptionData = subscriptionService.getActiveUserSubscriptions(
-  //   session.user.id
-  // );
+  if (!session) {
+    return <div>Please login to access this page</div>;
+  }
 
   return (
     <div className="container mx-auto py-4">
-      <Suspense fallback={<div>Loading...</div>}>
-        {/* <UserSettingsTabs
-          session={session}
-          subscriptionData={subscriptionData}
-        /> */}
-      </Suspense>
+      <Tabs defaultValue="profile" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger
+            value="profile"
+            onPointerDown={() => playSound("/sounds/click.mp3")}
+          >
+            Profile
+          </TabsTrigger>
+          <TabsTrigger
+            value="subscription"
+            onPointerDown={() => playSound("/sounds/click.mp3")}
+          >
+            Subscription
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Profile Tab */}
+        <TabsContent value="profile">
+          <ProfileTab data={session} />
+        </TabsContent>
+
+        {/* Subscription Tab */}
+        <TabsContent value="subscription">
+          {/* <SubscriptionTab initialData={subscriptionData} /> */}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
