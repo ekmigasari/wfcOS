@@ -56,7 +56,16 @@ export default async function RootLayout({
     <html lang="en">
       <body className={font.className}>
         <Provider session={session}>{children}</Provider>
-        <Toaster richColors position="bottom-center" />
+        <Toaster
+          richColors
+          position="top-center"
+          toastOptions={{
+            style: {
+              top: "64px",
+              position: "fixed",
+            },
+          }}
+        />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>

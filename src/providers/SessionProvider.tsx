@@ -21,6 +21,8 @@ export const SessionProvider = ({
 
 export const useSessionContext = () => {
   const context = useContext(SessionContext);
+  // Only throw error if context is undefined (outside provider)
+  // Allow null values as they represent "no session"
   if (context === undefined) {
     throw new Error("useSessionContext must be used within SessionProvider");
   }

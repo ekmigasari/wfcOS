@@ -18,36 +18,45 @@ import { toast } from "sonner";
 import { useSessionContext } from "@/providers/SessionProvider";
 
 export const AuthMenu = () => {
-
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-  const [hasShownWelcomeToast, setHasShownWelcomeToast] = useState(false);
   const openUserSettings = useOpenUserSettings();
   const session = useSessionContext();
 
   useEffect(() => {
-    const hasShownToast =
-      sessionStorage.getItem("hasShownWelcomeToast") === "true";
-    if (session && !hasShownWelcomeToast && !hasShownToast) {
-      console.log("toast");
-      toast(
-        <span className="font-bold text-md">
-          Welcome {session.user?.name || "User"}
-        </span>,
-        {
-          description:
-            "Hope you're having a productive day and enjoying your coffee ☕",
-          className: "bg-white border-secondary border-2 w-fit",
-          style: {
-            background: "white",
-            border: "2px solid var(--secondary)",
-            borderRadius: "8px",
-          },
-        }
-      );
-      setHasShownWelcomeToast(true);
-      sessionStorage.setItem("hasShownWelcomeToast", "true");
+    // Only show toast if user is logged in
+    if (!session?.user?.id) return;
+
+    // Create a unique key for this user's session to track if we've shown the welcome toast
+    const welcomeToastKey = `hasShownWelcomeToast_${session.user.id}`;
+    const hasShownToast = sessionStorage.getItem(welcomeToastKey) === "true";
+
+    if (!hasShownToast) {
+      // Small delay to ensure the page is fully loaded
+      const timer = setTimeout(() => {
+        // First try a simple success toast to test if toasts work at all
+        toast(
+          <span className="font-bold text-md">
+            Welcome {session.user?.name || "User"}
+          </span>,
+          {
+            description:
+              "Hope you're having a productive day and enjoying your coffee ☕",
+            duration: 5000,
+            className: "bg-white border-secondary border-2 w-fit",
+            style: {
+              background: "white",
+              border: "2px solid var(--secondary)",
+              borderRadius: "8px",
+            },
+          }
+        );
+
+        sessionStorage.setItem(welcomeToastKey, "true");
+      }, 500);
+
+      return () => clearTimeout(timer);
     }
-  }, [session, hasShownWelcomeToast]);
+  }, [session?.user?.id, session?.user?.name]);
 
   const openLoginDialog = () => {
     playSound("/sounds/click.mp3");

@@ -9,14 +9,22 @@ import { LogOut } from "lucide-react";
 
 export const SignOutButton = () => {
   const router = useRouter();
+
   async function handleClick() {
     playSound("/sounds/click.mp3");
+
     await signOut({
       fetchOptions: {
         onError: (ctx) => {
           toast.error(ctx.error?.message || "An error occurred");
         },
         onSuccess: () => {
+          // Clear welcome toast state for all users
+          const keys = Object.keys(sessionStorage).filter((key) =>
+            key.startsWith("hasShownWelcomeToast_")
+          );
+          keys.forEach((key) => sessionStorage.removeItem(key));
+
           toast.success("Signed out successfully");
           router.refresh();
         },
