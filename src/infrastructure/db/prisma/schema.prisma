@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "./generated"
@@ -10,17 +9,18 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String         @id
   name          String
   email         String
   emailVerified Boolean
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
-  planType      PlanType @default(FREE)
+  planType      PlanType       @default(FREE)
   sessions      Session[]
   accounts      Account[]
   subscriptions Subscription[]
+
   @@unique([email])
   @@map("user")
 }
@@ -71,15 +71,17 @@ model Verification {
 }
 
 model Subscription {
-  id           String   @id @default(cuid())
-  userId       String
-  productId    String
-  status       SubscriptionStatus @default(ACTIVE)
-  startDate    DateTime           @default(now())
-  endDate      DateTime?
-  canceledAt   DateTime?
+  id         String             @id @default(cuid())
+  userId     String
+  productId  String
+  status     SubscriptionStatus @default(ACTIVE)
+  startDate  DateTime           @default(now())
+  endDate    DateTime?
+  canceledAt DateTime?
+  amount     Int
+  currency   String             @default("USD")
 
-  user         User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum PlanType {
@@ -94,4 +96,8 @@ enum SubscriptionStatus {
   CANCELED
   EXPIRED
   PAST_DUE
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  UNPAID
 }

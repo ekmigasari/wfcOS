@@ -45,4 +45,17 @@ export class UserRepository {
       where: { id },
     });
   }
+
+  async getUserWithSubscription(userId: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        subscriptions: {
+          orderBy: {
+            startDate: "desc",
+          },
+        },
+      },
+    });
+  }
 }

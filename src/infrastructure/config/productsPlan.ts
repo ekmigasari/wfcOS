@@ -21,7 +21,7 @@ export const PRODUCT_PLANS: ProductPlan[] = [
   {
     name: "Free Drip",
     description: "Try the basics with local-only storage.",
-    price: "Free",
+    price: "$0",
     priceInCents: 0,
     interval: null,
     planType: PlanType.FREE,
