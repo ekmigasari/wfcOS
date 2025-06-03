@@ -122,8 +122,8 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   usersettings: {
     name: "User Settings",
     src: "/icons/default.png",
-    defaultSize: { width: 500, height: 650 },
-    minSize: { width: 350, height: 350 },
+    defaultSize: { width: 568, height: 600 },
+    minSize: { width: 568, height: 400 },
     component: UserSettingsApp,
     hidden: true,
   },

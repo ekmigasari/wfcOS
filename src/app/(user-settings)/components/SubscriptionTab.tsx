@@ -1,19 +1,18 @@
 "use client";
 
-import useSWR from "swr";
-import { PlanType } from "@/infrastructure/config/productsPlan";
+// import useSWR from "swr";
+// import { PlanType } from "@/infrastructure/config/productsPlan";
 
 // Import separated components
-import { CurrentPlanCard } from "./CurrentPlanCard";
-import { AvailablePlansCard } from "./AvailablePlansCard";
-import { PaymentHistoryCard } from "./PaymentHistoryCard";
-import { ErrorState, LoadingState, NoDataState } from "./SubscriptionStates";
+// import { CurrentPlanCard } from "./CurrentPlanCard";
+// import { AvailablePlansCard } from "./AvailablePlansCard";
+// import { PaymentHistoryCard } from "./PaymentHistoryCard";
+// import { ErrorState, LoadingState, NoDataState } from "./SubscriptionStates";
 
 // Import mock data utilities (for testing)
-import {
-  MockUserWithSubscriptions,
-  createMockFetcher,
-} from "./subscription-mock-data";
+import { getUserSubscription } from "./subscription-mock-data";
+import { MyMembership } from "./MyMembership";
+import { NoDataState } from "./SubscriptionStates";
 
 // Production interface (currently using mock data)
 // interface UserWithSubscriptions extends UserProfile {
@@ -29,50 +28,44 @@ export const SubscriptionTab = () => {
   //   fetcher
   // );
 
-  // --- MOCK SWR data for testing ---
-  // Change this to test different plans: null, PlanType.MONTHLY, PlanType.YEARLY, PlanType.LIFETIME
-  const MOCKED_ACTIVE_PLAN = PlanType.MONTHLY; // <--- CHANGE THIS TO TEST DIFFERENT PLANS
-
-  const { data, error, isLoading } = useSWR<MockUserWithSubscriptions>(
-    "/api/v1/user-settings-mock",
-    createMockFetcher(MOCKED_ACTIVE_PLAN)
-  );
-  // --- END MOCK SWR ---
+  const data = getUserSubscription;
 
   // Handle different states
-  if (error) {
-    console.error("Error fetching user settings:", error);
-    return <ErrorState />;
-  }
+  // if (error) {
+  //   console.error("Error fetching user settings:", error);
+  //   return <ErrorState />;
+  // }
 
-  if (isLoading) {
-    return <LoadingState />;
-  }
+  // if (isLoading) {
+  //   return <LoadingState />;
+  // }
 
   if (!data) {
     return <NoDataState />;
   }
 
-  // Extract subscription data
-  const currentSubscription =
-    data.subscriptions?.find((sub) => sub.status === "ACTIVE") ||
-    data.subscriptions?.[0];
-  const hasActiveSubscription = currentSubscription?.status === "ACTIVE";
+  // const isActive = data.user.planType !== PlanType.FREE;
+
+  // // Extract subscription data
+  // const currentSubscription =
+  //   data.subscriptions?.find((sub) => sub.status === "ACTIVE") ||
+  //   data.subscriptions?.[0];
+  // const hasActiveSubscription = currentSubscription?.status === "ACTIVE";
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <div className="mx-auto">
       {/* Current Plan Section */}
-      <CurrentPlanCard
+      {/* <CurrentPlanCard
         planType={data.planType}
         currentSubscription={currentSubscription}
         hasActiveSubscription={hasActiveSubscription}
-      />
-
+      /> */}
+      <MyMembership />
       {/* Available Plans Section */}
-      <AvailablePlansCard userPlanType={data.planType} />
+      {/* <AvailablePlansCard userPlanType={data.planType} /> */}
 
       {/* Payment History Section */}
-      <PaymentHistoryCard subscriptions={data.subscriptions || []} />
+      {/* <PaymentHistoryCard subscriptions={data.subscriptions || []} /> */}
     </div>
   );
 };
