@@ -24,6 +24,7 @@ export interface TimerState {
   isActive: boolean;
   sessionStartTime: number | null; // Timestamp when the current work session started
   workCycleDuration: number | null; // Original duration of the current work cycle in seconds
+  isAlarming: boolean; // True when the timer has completed and the alarm is sounding
 }
 
 // Helper function to get the correct duration in seconds based on the current setting
@@ -65,6 +66,7 @@ export const initialTimerState: TimerState = (() => {
     isActive: false, // Ensure timer starts inactive
     sessionStartTime: null,
     workCycleDuration: DEFAULT_WORK_TIME,
+    isAlarming: false, // Default alarm state
   };
 
   // Merge saved state with defaults, ensuring new fields have defaults
@@ -75,6 +77,7 @@ export const initialTimerState: TimerState = (() => {
     isActive: false, // Ensure timer is inactive on load
     windowId: null, // Ensure no window association on load
     sessionStartTime: null, // Ensure no session start time on load
+    isAlarming: false, // Ensure alarm is not sounding on load
     // workCycleDuration will be set based on timerSetting if not present
   };
 
@@ -120,6 +123,13 @@ export const timerAtom = atom(
   }
 );
 
+export const stopAlarmAtom = atom(null, (get, set) => {
+  set(timerAtom, (prev) => ({
+    ...prev,
+    isAlarming: false,
+  }));
+});
+
 // Atom to reset the timer and then immediately start it
 export const restartAndGoAtom = atom(null, (get, set) => {
   const currentState = get(timerAtom);
@@ -138,6 +148,7 @@ export const restartAndGoAtom = atom(null, (get, set) => {
     isRunning: true, // Timer starts immediately
     sessionStartTime: Date.now(), // Mark the start of the new session/cycle
     workCycleDuration: resetDuration, // Reflects the duration of this new cycle
+    isAlarming: false, // Ensure alarm is off when restarting
   });
 });
 
@@ -203,6 +214,7 @@ export const resetTimerAtom = atom(null, (get, set) => {
       isRunning: false, // Stop timer on reset
       sessionStartTime: null, // Clear session start time on reset
       workCycleDuration: newTimeRemaining, // Update work cycle duration on reset
+      isAlarming: false, // Ensure alarm is off on reset
     };
   });
 });
@@ -223,6 +235,7 @@ export const setTimerSettingAtom = atom(
         isRunning: false, // Stop timer on setting change
         sessionStartTime: null, // Clear session start time on setting change
         workCycleDuration: newTimeRemaining, // Update work cycle duration
+        isAlarming: false, // Ensure alarm is off when changing settings
       };
     });
   }
@@ -247,6 +260,7 @@ export const setCustomDurationAtom = atom(
         newTimeRemaining = getDurationForSetting("custom", validatedMinutes);
         shouldStopTimer = true;
         updatedWorkCycleDuration = newTimeRemaining; // Update for custom setting
+        prev.isAlarming = false; // Turn off alarm when duration changes
       }
       return {
         ...prev,

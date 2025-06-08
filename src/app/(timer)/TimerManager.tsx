@@ -2,7 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import { timerAtom } from "@/application/atoms/timerAtom";
+import {
+  restartAndGoAtom,
+  stopAlarmAtom,
+  timerAtom,
+} from "@/application/atoms/timerAtom";
 import {
   addSessionAtom,
   selectedTaskForTimerAtom,
@@ -17,10 +21,26 @@ import { formatTime, getDisplayTitle } from "./utils/timerUtils";
  */
 export const TimerManager = () => {
   const [timerState, setTimerState] = useAtom(timerAtom);
+  const { isAlarming } = useAtomValue(timerAtom);
   const selectedTaskId = useAtomValue(selectedTaskForTimerAtom);
   const [, addNewSession] = useAtom(addSessionAtom);
+  const [, restart] = useAtom(restartAndGoAtom);
+  const [, stopAlarm] = useAtom(stopAlarmAtom);
   const workerRef = useRef<Worker | null>(null);
+  const alarmAudioRef = useRef<HTMLAudioElement | null>(null);
   const originalTitle = useRef<string>("");
+
+  // Effect to handle manual alarm stop
+  useEffect(() => {
+    // If isAlarming is false and there's an active alarm sound, stop it.
+    if (!isAlarming && alarmAudioRef.current) {
+      alarmAudioRef.current.pause();
+      alarmAudioRef.current.currentTime = 0;
+      // Remove the onended listener to prevent auto-restarting
+      alarmAudioRef.current.onended = null;
+      alarmAudioRef.current = null;
+    }
+  }, [isAlarming]);
 
   // Initialize web worker and handle notifications - runs once on mount
   useEffect(() => {
@@ -50,8 +70,17 @@ export const TimerManager = () => {
         case "complete":
           // Timer completed - play sound directly using Audio API
           const audio = new Audio("/sounds/timeup.mp3");
+          alarmAudioRef.current = audio;
+
+          // When the sound finishes, transition the state to allow restart
+          audio.onended = () => {
+            stopAlarm();
+            alarmAudioRef.current = null;
+          };
+
           audio.play().catch((error) => {
             console.error("Error playing timer completion sound:", error);
+            alarmAudioRef.current = null; // Clean up on error
           });
 
           // Show completion message in browser title
@@ -91,6 +120,7 @@ export const TimerManager = () => {
             ...prev,
             isRunning: false,
             sessionStartTime: null, // Clear session start time after completion
+            isAlarming: true, // Start the alarm
             // workCycleDuration can remain as is, or be reset, depends on desired flow for next timer start
           }));
           break;
@@ -156,6 +186,8 @@ export const TimerManager = () => {
     timerState.timerSetting,
     timerState.sessionStartTime,
     timerState.workCycleDuration,
+    restart,
+    stopAlarm,
   ]); // Only depends on the stable setTimerState function
 
   // Update document title when timer state changes

@@ -40,12 +40,14 @@ export const Timer = () => {
     customDurationMinutes,
     customTitle,
     workCycleDuration,
+    isAlarming,
     startPause,
     reset,
     restart,
     setSetting,
     setCustomDuration,
     setCustomTitle,
+    stopAlarm,
   } = useTimer();
 
   // Direct access to reset atom to avoid sound conflicts
@@ -105,13 +107,15 @@ export const Timer = () => {
           isRunning={isRunning}
           timeRemaining={timeRemaining}
           workCycleDuration={workCycleDuration}
+          isAlarming={isAlarming}
           onStartPause={startPause}
           onReset={reset}
           onRestartAndGo={restart}
+          onStopAlarm={stopAlarm}
         />
 
         {/* Task Selector */}
-        {timerSetting === "work25" && (
+        {timerSetting === "work25" && !isAlarming && (
           <div className="my-4 w-full max-w-xs">
             <Select
               value={selectedTaskId || ""}

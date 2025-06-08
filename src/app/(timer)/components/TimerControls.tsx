@@ -6,19 +6,36 @@ interface TimerControlsProps {
   isRunning: boolean;
   timeRemaining: number;
   workCycleDuration: number;
+  isAlarming: boolean;
   onStartPause: () => void;
   onReset: () => void;
   onRestartAndGo: () => void;
+  onStopAlarm: () => void;
 }
 
 export const TimerControls = ({
   isRunning,
   timeRemaining,
   workCycleDuration,
+  isAlarming,
   onStartPause,
   onReset,
   onRestartAndGo,
+  onStopAlarm,
 }: TimerControlsProps) => {
+  if (isAlarming) {
+    return (
+      <div className="flex my-4 justify-center">
+        <button
+          onClick={onStopAlarm}
+          className="px-12 py-2 rounded text-white transition bg-red-500 hover:bg-red-600"
+        >
+          Stop Alarm
+        </button>
+      </div>
+    );
+  }
+
   let buttonLabel = "Start";
   let buttonAction = onStartPause;
 
