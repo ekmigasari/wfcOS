@@ -7,6 +7,7 @@ import {
   setCustomDurationAtom,
   setCustomTitleAtom,
   restartAndGoAtom,
+  stopAlarmAtom,
 } from "@/application/atoms/timerAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 
@@ -22,6 +23,7 @@ export const useTimer = () => {
   const [, doSetCustomDuration] = useAtom(setCustomDurationAtom);
   const [, doSetCustomTitle] = useAtom(setCustomTitleAtom);
   const [, doRestartAndGo] = useAtom(restartAndGoAtom);
+  const [, doStopAlarm] = useAtom(stopAlarmAtom);
 
   // Wrap actions with UI sound feedback
   const playSoundAnd = <Args extends unknown[], Res>(
@@ -33,6 +35,10 @@ export const useTimer = () => {
     };
   };
 
+  const stopAlarm = () => {
+    doStopAlarm();
+  };
+
   return {
     // State
     timeRemaining: timerState.timeRemaining,
@@ -41,6 +47,7 @@ export const useTimer = () => {
     customDurationMinutes: timerState.customDurationMinutes,
     customTitle: timerState.customTitle,
     workCycleDuration: timerState.workCycleDuration ?? 0,
+    isAlarming: timerState.isAlarming,
 
     // Actions (wrapped with sound)
     startPause: playSoundAnd(doStartPause),
@@ -49,5 +56,6 @@ export const useTimer = () => {
     setCustomDuration: playSoundAnd(doSetCustomDuration),
     setCustomTitle: playSoundAnd(doSetCustomTitle),
     restart: playSoundAnd(doRestartAndGo),
+    stopAlarm,
   };
 };
