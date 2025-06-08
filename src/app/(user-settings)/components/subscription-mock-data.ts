@@ -7,7 +7,7 @@ export const getUserSubscription = {
     image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150",
     createdAt: "2024-01-15T10:30:00.000Z",
     updatedAt: "2024-05-20T14:22:00.000Z",
-    planType: "MONTYLY",
+    planType: "MONTHLY",
   },
   subscriptions: [
     {

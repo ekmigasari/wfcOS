@@ -17,6 +17,16 @@ export type ProductPlan = {
   polarProductId: string; // Match with Polar's product.id
 };
 
+export type MembershipCardData = {
+  planType: PlanType;
+  bgColor: string;
+  title: string;
+  tier: string;
+  price: string;
+  image: string;
+  description: string;
+};
+
 export const PRODUCT_PLANS: ProductPlan[] = [
   {
     name: "Free Drip",
@@ -53,5 +63,99 @@ export const PRODUCT_PLANS: ProductPlan[] = [
     interval: "lifetime",
     planType: PlanType.LIFETIME,
     polarProductId: "1f862cec-9d39-4d06-a17d-38f48aef61aa",
+  },
+];
+
+export const membershipCardConfig: Record<PlanType, MembershipCardData> = {
+  [PlanType.FREE]: {
+    planType: PlanType.FREE,
+    bgColor: "bg-secondary",
+    title: "Free Membership",
+    tier: "BRONZE",
+    price: "$0",
+    image: "/images/membership/free_member.webp",
+    description: "Basic access to coffee shop atmosphere",
+  },
+  [PlanType.MONTHLY]: {
+    planType: PlanType.MONTHLY,
+    bgColor: "bg-gray-700",
+    title: "Monthly Membership",
+    tier: "SILVER",
+    price: "$9/month",
+    image: "/images/membership/silver_member.webp",
+    description: "Premium features with monthly billing",
+  },
+  [PlanType.YEARLY]: {
+    planType: PlanType.YEARLY,
+    bgColor: "bg-amber-500",
+    title: "Annual Membership",
+    tier: "GOLD",
+    price: "$49/year",
+    image: "/images/membership/gold_member.webp",
+    description: "Best value with annual commitment",
+  },
+  [PlanType.LIFETIME]: {
+    planType: PlanType.LIFETIME,
+    bgColor: "bg-emerald-950",
+    title: "Lifetime Membership",
+    tier: "PLATINUM",
+    price: "$99",
+    image: "/images/membership/lifetime_member.webp",
+    description: "Unlimited access forever",
+  },
+};
+
+export const membershipPlan = [
+  {
+    id: PlanType.FREE,
+    image: "/images/membership/free_member.webp",
+    bgColor: "bg-secondary",
+    tier: "BRONZE",
+    title: "Free Membership",
+    description:
+      "Data on local storage only • Have potential to your lose data • Free features only",
+    amount: 0,
+    currency: "USD",
+    interval: "/free",
+    priceInfo: "Free Forever",
+  },
+  {
+    id: PlanType.MONTHLY,
+    image: "/images/membership/silver_member.webp",
+    bgColor: "bg-gray-700",
+    tier: "SILVER",
+    title: "Monthly Membership",
+    description:
+      "Save and sync you data in the cloud • Unlock premium features",
+    amount: 990,
+    currency: "USD",
+    interval: "/month",
+    priceInfo: "Billed monthly",
+  },
+  {
+    id: PlanType.YEARLY,
+    image: "/images/membership/gold_member.webp",
+    bgColor: "bg-amber-500",
+    tier: "GOLD",
+    title: "Annual Membership",
+    description:
+      "Save and sync you data in the cloud • Unlock premium features",
+    amount: 5880,
+    currency: "USD",
+    interval: "/year",
+    priceInfo: "Get 50% off",
+  },
+  {
+    id: PlanType.LIFETIME,
+    image: "/images/membership/lifetime_member.webp",
+    bgColor: "bg-emerald-950",
+    tier: "PLATINUM",
+    title: "Lifetime Membership",
+    description:
+      "Save and sync you data in the cloud • Unlock premium features",
+    amount: 9900,
+    currency: "USD",
+    interval: "/lifetime",
+    priceInfo: "Pay once use forever",
   },
 ];

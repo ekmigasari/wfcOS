@@ -1,7 +1,7 @@
 "use client";
 
 // import useSWR from "swr";
-// import { PlanType } from "@/infrastructure/config/productsPlan";
+import { PlanType } from "@/infrastructure/config/productsPlan";
 
 // Import separated components
 // import { CurrentPlanCard } from "./CurrentPlanCard";
@@ -13,6 +13,7 @@
 import { getUserSubscription } from "./subscription-mock-data";
 import { MyMembership } from "./MyMembership";
 import { NoDataState } from "./SubscriptionStates";
+import { AvailablePlans } from "./AvailablePlans";
 
 // Production interface (currently using mock data)
 // interface UserWithSubscriptions extends UserProfile {
@@ -61,6 +62,7 @@ export const SubscriptionTab = () => {
         hasActiveSubscription={hasActiveSubscription}
       /> */}
       <MyMembership />
+      <AvailablePlans userPlanType={data.user.planType as PlanType} />
       {/* Available Plans Section */}
       {/* <AvailablePlansCard userPlanType={data.planType} /> */}
 
