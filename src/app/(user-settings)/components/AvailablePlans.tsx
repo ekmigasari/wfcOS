@@ -31,14 +31,14 @@ export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
   const getBadge = (planId: PlanType) => {
     if (planId === PlanType.LIFETIME) {
       return (
-        <div className="absolute -top-3 right-40 bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+        <div className="absolute -top-3 md:right-40 right-4  bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
           Limited: First 100
         </div>
       );
     }
     if (planId === PlanType.YEARLY) {
       return (
-        <div className="absolute -top-3 right-46 bg-secondary text-white px-3 py-1 rounded-full text-xs font-semibold">
+        <div className="absolute -top-3 md:right-46 right-4 bg-secondary text-white px-3 py-1 rounded-full text-xs font-semibold">
           Best Value
         </div>
       );
@@ -60,14 +60,14 @@ export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
       return (
         <Button
           size="sm"
-          className="bg-orange-600 hover:bg-orange-700 text-white w-28"
+          className="bg-orange-600 hover:bg-orange-700 text-white md:w-28 w-full"
         >
           Upgrade
         </Button>
       );
     } else {
       return (
-        <Button size="sm" color="secondary" className="w-28">
+        <Button size="sm" color="secondary" className="md:w-28 w-full">
           Downgrade
         </Button>
       );
@@ -79,14 +79,14 @@ export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
       <p className="text-lg font-bold text-gray-900">Available Plans</p>
       {plans.map((plan) => (
         //Container
-        <div key={plan.id} className={`relative h-28 w-fit`}>
+        <div key={plan.id} className={`relative md:h-28 md:w-fit w-xs`}>
           {getBadge(plan.id)}
 
           {/* main container */}
           <div
-            className={`flex h-full rounded-lg border-2 overflow-hidden  ${
+            className={`flex h-full rounded-lg border-2 overflow-hidden flex-col md:flex-row ${
               userPlanType === plan.id
-                ? "border-none bg-background"
+                ? "border-none bg-secondary/10"
                 : plan.id === PlanType.LIFETIME
                 ? "border-orange-400"
                 : "border-secondary bg-white"
@@ -118,7 +118,7 @@ export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
             </div>
 
             {/* Price Container */}
-            <div className="flex flex-shrink-0 flex-col items-end justify-center px-2 w-36">
+            <div className="flex flex-shrink-0 flex-col items-center md:items-end justify-center p-2 md:w-36 ">
               <div className="text-3xl font-bold text-gray-900">
                 {formatPrice(plan.amount)}
                 <span className="text-xs text-gray-600">{plan.interval}</span>
@@ -136,7 +136,7 @@ export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
               )}
             </div>
             {/* Button Container */}
-            <div className=" flex justify-center items-center w-40">
+            <div className=" flex justify-center items-center md:w-40 p-2">
               {getButton(plan.id)}
             </div>
           </div>
