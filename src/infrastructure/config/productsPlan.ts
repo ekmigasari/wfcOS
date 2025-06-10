@@ -117,7 +117,6 @@ export const membershipPlan = [
     amount: 0,
     currency: "USD",
     interval: "/free",
-    priceInfo: "Free Forever",
   },
   {
     id: PlanType.MONTHLY,
@@ -130,7 +129,6 @@ export const membershipPlan = [
     amount: 990,
     currency: "USD",
     interval: "/month",
-    priceInfo: "Billed monthly",
   },
   {
     id: PlanType.YEARLY,
@@ -143,7 +141,6 @@ export const membershipPlan = [
     amount: 5880,
     currency: "USD",
     interval: "/year",
-    priceInfo: "Get 50% off",
   },
   {
     id: PlanType.LIFETIME,
@@ -156,6 +153,5 @@ export const membershipPlan = [
     amount: 9900,
     currency: "USD",
     interval: "/lifetime",
-    priceInfo: "Pay once use forever",
   },
 ];
