@@ -1,13 +1,14 @@
 import React from "react";
 import Image from "next/image";
 import {
-  membershipCardConfig,
+  // membershipCardConfig,
   mockUserData,
+  MembershipCardData,
 } from "@/infrastructure/config/membershipCard";
 
-export const MyMembership = () => {
+export const MyMembership = (membershipData: MembershipCardData) => {
   // Get the membership data based on the mock user's plan type
-  const membershipData = membershipCardConfig[mockUserData.planType];
+  // const membershipData = membershipCardConfig[mockUserData.planType];
 
   return (
     <div

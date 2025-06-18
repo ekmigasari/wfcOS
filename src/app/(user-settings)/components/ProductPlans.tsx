@@ -7,7 +7,7 @@ interface AvailablePlansProps {
   userPlanType: PlanType;
 }
 
-export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
+export const ProductPlans = ({ userPlanType }: AvailablePlansProps) => {
   // 1. Mapping all plan
   // 2. Make Lifetime and Best value different
   // 3. Check Current Plan
@@ -26,24 +26,6 @@ export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
   const formatPrice = (amount: number) => {
     if (amount === 0) return "$0";
     return `$${(amount / 100).toFixed(amount % 100 === 0 ? 0 : 2)}`;
-  };
-
-  const getBadge = (planId: PlanType) => {
-    if (planId === PlanType.LIFETIME) {
-      return (
-        <div className="absolute -top-3 md:right-40 right-4  bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-          Limited: First 100
-        </div>
-      );
-    }
-    if (planId === PlanType.YEARLY) {
-      return (
-        <div className="absolute -top-3 md:right-46 right-4 bg-secondary text-white px-3 py-1 rounded-full text-xs font-semibold">
-          Best Value
-        </div>
-      );
-    }
-    return null;
   };
 
   const getButton = (planId: PlanType) => {
@@ -76,25 +58,29 @@ export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
 
   return (
     <div className="space-y-5 mt-12">
-      <p className="text-lg font-bold text-gray-900">Available Plans</p>
+      <div className="flex justify-between items-center">
+        <p className="text-lg font-bold text-gray-900">Available Plans</p>
+        <a className="text-xs text-blue-500 underline">Detail information</a>
+      </div>
+
       {plans.map((plan) => (
         //Container
-        <div key={plan.id} className={`relative md:h-28 md:w-fit w-xs`}>
-          {getBadge(plan.id)}
+        <div key={plan.id} className="md:h-24">
+          {/* {getBadge(plan.id)} */}
 
           {/* main container */}
           <div
-            className={`flex h-full rounded-lg border-2 overflow-hidden flex-col md:flex-row ${
+            className={`flex h-full rounded-lg border overflow-hidden flex-col md:flex-row justify-between ${
               userPlanType === plan.id
                 ? "border-none bg-secondary/10"
                 : plan.id === PlanType.LIFETIME
-                ? "border-orange-400"
-                : "border-secondary bg-white"
+                ? "bg-orange-50 hover:border-orange-400 hover:bg-orange-100"
+                : " bg-white hover:bg-gray-50 hover:border-secondary"
             }`}
           >
             {/* Image Container */}
             <div
-              className={`min-w-28 h-full flex items-center justify-center ${plan.bgColor}`}
+              className={`min-w-24 h-full flex items-center justify-center ${plan.bgColor}`}
             >
               <Image
                 src={plan.image}
@@ -105,21 +91,32 @@ export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
               />
             </div>
             {/* Content Container */}
-            <div className={`flex-shrink-0 h-full px-3 w-64`}>
-              <div className="flex items-center space-x-2 my-0.5">
-                <h3 className="text-lg font-bold text-gray-900">{plan.tier}</h3>
+            <div
+              className={`flex flex-shrink-0 flex-col justify-center h-full px-3 w-44 `}
+            >
+              <div className="flex gap-2 items-center">
+                <h3 className="text-lg font-bold text-gray-900 ">
+                  {plan.tier}
+                </h3>
+                {plan.id === PlanType.LIFETIME && (
+                  <div className="flex justify-center shrink-0 items-center bg-red-600 text-white text-[10px] leading-none py-1 h-fit px-2 w-fit rounded-full">
+                    Limited Offer
+                  </div>
+                )}
+                {plan.id === PlanType.YEARLY && (
+                  <div className="flex justify-center items-center bg-blue-600 text-[10px] text-white leading-none py-1 h-fit px-2 w-fit rounded-full">
+                    Best Value
+                  </div>
+                )}
               </div>
-              <p className="text-sm text-gray-600 ">{plan.title}</p>
-              <ul className="text-sm text-gray-700 leading-tight">
-                {plan.description.split(" • ").map((feature, index) => (
-                  <li key={index}>• {feature}</li>
-                ))}
-              </ul>
+              <p className="text-sm text-gray-600 capitalize font-light">
+                {plan.title}
+              </p>
             </div>
 
             {/* Price Container */}
-            <div className="flex flex-shrink-0 flex-col items-center md:items-end justify-center p-2 md:w-36 ">
-              <div className="text-3xl font-bold text-gray-900">
+            <div className="flex flex-shrink-0 flex-col items-center md:items-end justify-center p-2 md:w-30">
+              <div className="text-xl font-bold text-gray-900">
                 {formatPrice(plan.amount)}
                 <span className="text-xs text-gray-600">{plan.interval}</span>
               </div>
@@ -128,7 +125,7 @@ export const AvailablePlans = ({ userPlanType }: AvailablePlansProps) => {
               )}
               {plan.id === PlanType.YEARLY && (
                 <p className="text-xs text-gray-600">
-                  <span className=" line-through text-red-600 mr-1 text-xl">
+                  <span className=" line-through text-red-600 mr-1 text-lg">
                     $120
                   </span>
                   Get 50% off{" "}

@@ -1,6 +1,25 @@
-import { User, PlanType } from "@/infrastructure/db/prisma/generated";
+import {
+  User,
+  PlanType,
+  Subscription,
+  SubscriptionStatus,
+} from "@/infrastructure/db/prisma/generated";
 import { UserRepository } from "@/infrastructure/repo";
 import { CreateUserInput, UpdateUserInput } from "@/application/types";
+import { membershipCardConfig } from "@/infrastructure/config/membershipCard";
+import { getUserSubscription } from "@/app/(user-settings)/components/subscription-mock-data";
+
+interface UserWithSubscriptions extends User {
+  subscriptions: Subscription[];
+}
+
+export interface UserMembership {
+  name: string;
+  issuedDate: string;
+  expiresDate: string;
+  planType: PlanType;
+  membershipData: (typeof membershipCardConfig)[PlanType];
+}
 
 export class UserService {
   private userRepository: UserRepository;
@@ -38,5 +57,80 @@ export class UserService {
 
   async upgradePlan(userId: string, planType: PlanType): Promise<User> {
     return this.userRepository.update(userId, { id: userId, planType });
+  }
+
+  async userMembership(): Promise<UserMembership> {
+    // Comment out repository call for now
+    // const user = await this.userRepository.getUserWithSubscription(userId) as UserWithSubscriptions | null;
+
+    // Use mock data instead
+    const mockData = getUserSubscription;
+    const user = {
+      ...mockData.user,
+      planType: mockData.user.planType as PlanType,
+      createdAt: new Date(mockData.user.createdAt),
+      updatedAt: new Date(mockData.user.updatedAt),
+      subscriptions: mockData.subscriptions.map((sub) => ({
+        ...sub,
+        status: sub.status as SubscriptionStatus,
+        startDate: new Date(sub.startDate),
+        endDate: sub.endDate ? new Date(sub.endDate) : null,
+        canceledAt: sub.canceledAt ? new Date(sub.canceledAt) : null,
+      })),
+    } as UserWithSubscriptions;
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Get the membership data based on the user's plan type
+    const membershipData = membershipCardConfig[user.planType];
+
+    // For FREE members, use account creation date as issued date
+    if (user.planType === PlanType.FREE) {
+      return {
+        name: user.name,
+        issuedDate: new Date(user.createdAt).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        expiresDate: "N/A",
+        planType: user.planType,
+        membershipData,
+      };
+    }
+
+    // For paid members, get the active subscription
+    const activeSubscription = user.subscriptions?.find(
+      (sub: Subscription) => sub.status === SubscriptionStatus.ACTIVE
+    );
+
+    // Format dates from subscription
+    const issuedDate = activeSubscription?.startDate
+      ? new Date(activeSubscription.startDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "N/A";
+
+    const expiresDate = activeSubscription?.endDate
+      ? new Date(activeSubscription.endDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : user.planType === PlanType.LIFETIME
+      ? "Never"
+      : "N/A";
+
+    return {
+      name: user.name,
+      issuedDate,
+      expiresDate,
+      planType: user.planType,
+      membershipData,
+    };
   }
 }

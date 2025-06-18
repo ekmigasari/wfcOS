@@ -110,7 +110,7 @@ export const membershipPlan = [
     id: PlanType.FREE,
     image: "/images/membership/free_member.webp",
     bgColor: "bg-secondary",
-    tier: "BRONZE",
+    tier: "Bronze",
     title: "Free Membership",
     description:
       "Data on local storage only • Have potential to your lose data • Free features only",
@@ -122,7 +122,7 @@ export const membershipPlan = [
     id: PlanType.MONTHLY,
     image: "/images/membership/silver_member.webp",
     bgColor: "bg-gray-700",
-    tier: "SILVER",
+    tier: "Silver",
     title: "Monthly Membership",
     description:
       "Save and sync you data in the cloud • Unlock premium features",
@@ -134,7 +134,7 @@ export const membershipPlan = [
     id: PlanType.YEARLY,
     image: "/images/membership/gold_member.webp",
     bgColor: "bg-amber-500",
-    tier: "GOLD",
+    tier: "Gold",
     title: "Annual Membership",
     description:
       "Save and sync you data in the cloud • Unlock premium features",
@@ -146,7 +146,7 @@ export const membershipPlan = [
     id: PlanType.LIFETIME,
     image: "/images/membership/lifetime_member.webp",
     bgColor: "bg-emerald-950",
-    tier: "PLATINUM",
+    tier: "Platinum",
     title: "Lifetime Membership",
     description:
       "Save and sync you data in the cloud • Unlock premium features",
