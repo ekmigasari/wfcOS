@@ -1,33 +1,23 @@
 "use client";
 
 import useSWR from "swr";
-import { userService } from "@/application/services";
-import type { UserMembership } from "@/application/types";
 import { PlanType } from "@/infrastructure/config/productsPlan";
+import type { UserMembership } from "@/application/types";
 
 // Import separated components
 import { PaymentHistoryCard } from "./PaymentHistoryCard";
-import { LoadingState, NoDataState } from "./SubscriptionStates";
+import { NoDataState } from "./SubscriptionStates";
 import { AvailablePlans } from "./AvailablePlans";
 import { ProductPlans } from "./ProductPlans";
 import { MyMembership } from "./MyMembership";
 import { Suspense } from "react";
+import Loading from "@/app/loading";
 
-// Remove mock data import since we'll use real data
-// import { getUserSubscription } from "./subscription-mock-data";
-
-// Production interface (currently using mock data)
-// interface UserWithSubscriptions extends UserProfile {
-//   subscriptions: ISubscription[];
-// }
-
-// const fetcher = (url: string) => fetch(url).then((r) => r.json());
-
-export const SubscriptionTab = () => {
+export const SubscriptionTab = ({ userId }: { userId: string }) => {
   // --- Production SWR fetch ---
   const { data, error, isLoading } = useSWR<UserMembership>(
-    "user-membership",
-    () => userService.userMembership()
+    userId ? `/api/v1/user-membership?userId=${userId}` : null,
+    (url: string) => fetch(url).then((r) => r.json())
   );
 
   // Handle different states
@@ -37,25 +27,23 @@ export const SubscriptionTab = () => {
   }
 
   if (isLoading) {
-    return <NoDataState />;
+    return <Loading />;
   }
 
   if (!data) {
     return <NoDataState />;
   }
-  console.log(data);
 
   return (
     <div className="mx-auto">
-      <Suspense fallback={<LoadingState />}>
+      <Suspense>
         <MyMembership userMembership={data} />
         <ProductPlans userPlanType={data.planType as PlanType} />
         <AvailablePlans userPlanType={data.planType as PlanType} />
-      </Suspense>
-      <Suspense>
         {/* Payment History Section */}
         <PaymentHistoryCard subscriptions={data.subcriptions} />
       </Suspense>
+      <Loading />
     </div>
   );
 };

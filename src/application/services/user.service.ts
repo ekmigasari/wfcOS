@@ -11,7 +11,7 @@ import {
   UserMembership,
   UserWithSubscriptions,
 } from "@/application/types";
-import { getUserSubscription } from "@/app/(user-settings)/components/subscription-mock-data";
+// import { getUserSubscription } from "@/app/(user-settings)/components/subscription-mock-data";
 
 export class UserService {
   private userRepository: UserRepository;
@@ -51,25 +51,27 @@ export class UserService {
     return this.userRepository.update(userId, { id: userId, planType });
   }
 
-  async userMembership(): Promise<UserMembership> {
+  async userMembership(userId: string): Promise<UserMembership> {
     // Comment out repository call for now
-    // const user = await this.userRepository.getUserWithSubscription(userId) as UserWithSubscriptions | null;
+    const user = (await this.userRepository.getUserWithSubscription(
+      userId
+    )) as UserWithSubscriptions | null;
 
     // Use mock data instead
-    const mockData = getUserSubscription;
-    const user = {
-      ...mockData.user,
-      planType: mockData.user.planType as PlanType,
-      createdAt: new Date(mockData.user.createdAt),
-      updatedAt: new Date(mockData.user.updatedAt),
-      subscriptions: mockData.subscriptions.map((sub) => ({
-        ...sub,
-        status: sub.status as SubscriptionStatus,
-        startDate: new Date(sub.startDate),
-        endDate: sub.endDate ? new Date(sub.endDate) : null,
-        canceledAt: sub.canceledAt ? new Date(sub.canceledAt) : null,
-      })),
-    } as UserWithSubscriptions;
+    // const mockData = getUserSubscription;
+    // const user = {
+    //   ...mockData.user,
+    //   planType: mockData.user.planType as PlanType,
+    //   createdAt: new Date(mockData.user.createdAt),
+    //   updatedAt: new Date(mockData.user.updatedAt),
+    //   subscriptions: mockData.subscriptions.map((sub) => ({
+    //     ...sub,
+    //     status: sub.status as SubscriptionStatus,
+    //     startDate: new Date(sub.startDate),
+    //     endDate: sub.endDate ? new Date(sub.endDate) : null,
+    //     canceledAt: sub.canceledAt ? new Date(sub.canceledAt) : null,
+    //   })),
+    // } as UserWithSubscriptions;
 
     if (!user) {
       throw new Error("User not found");

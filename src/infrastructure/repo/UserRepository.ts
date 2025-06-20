@@ -1,4 +1,8 @@
-import { CreateUserInput, UpdateUserInput } from "@/application/types";
+import {
+  CreateUserInput,
+  UpdateUserInput,
+  UserWithSubscriptions,
+} from "@/application/types";
 import { User, PlanType } from "@/infrastructure/db/prisma/generated";
 import { prisma } from "@/infrastructure/utils/prisma";
 
@@ -46,7 +50,9 @@ export class UserRepository {
     });
   }
 
-  async getUserWithSubscription(userId: string): Promise<User | null> {
+  async getUserWithSubscription(
+    userId: string
+  ): Promise<UserWithSubscriptions | null> {
     return prisma.user.findUnique({
       where: { id: userId },
       include: {
