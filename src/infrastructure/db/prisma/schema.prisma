@@ -74,6 +74,7 @@ model Subscription {
   id         String             @id @default(cuid())
   userId     String
   productId  String
+  name       String
   status     SubscriptionStatus @default(ACTIVE)
   startDate  DateTime           @default(now())
   endDate    DateTime?

@@ -1,10 +1,6 @@
 import { Badge } from "@/presentation/components/ui/badge";
 import { ISubscription } from "@/application/types";
-import {
-  formatDate,
-  getStatusBadgeColor,
-  getPlanByProductId,
-} from "./subscription-utils";
+import { formatDate, getStatusBadgeColor } from "./subscription-utils";
 
 interface PaymentHistoryCardProps {
   subscriptions: ISubscription[];
@@ -41,8 +37,7 @@ export const PaymentHistoryCard = ({
                 <div className="flex-1">
                   <div className="flex items-center space-x-3">
                     <div className="text-sm font-medium text-gray-900">
-                      {getPlanByProductId(subscription.productId)?.name ||
-                        "Unknown Plan"}
+                      {subscription.name || "Unknown Plan"}
                     </div>
                     <Badge
                       variant="outline"

@@ -7,6 +7,7 @@ import { ProductPlan } from "@/infrastructure/config/productsPlan";
 
 export interface ISubscription {
   id: string;
+  name: string;
   startDate: Date;
   endDate: Date | null;
   canceledAt: Date | null;
