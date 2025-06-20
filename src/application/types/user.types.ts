@@ -1,4 +1,8 @@
-import { PlanType } from "@/infrastructure/db/prisma/generated";
+import {
+  PlanType,
+  Subscription,
+  User,
+} from "@/infrastructure/db/prisma/generated";
 
 // User profile data (public-facing)
 export interface UserProfile {
@@ -28,4 +32,16 @@ export interface UpdateUserInput {
   emailVerified?: boolean;
   image?: string | null;
   planType?: PlanType;
+}
+
+export interface UserMembership {
+  name: string;
+  issuedDate: string;
+  expiresDate: string;
+  planType: PlanType;
+  subcriptions: Subscription[];
+}
+
+export interface UserWithSubscriptions extends User {
+  subscriptions: Subscription[];
 }

@@ -5,21 +5,13 @@ import {
   SubscriptionStatus,
 } from "@/infrastructure/db/prisma/generated";
 import { UserRepository } from "@/infrastructure/repo";
-import { CreateUserInput, UpdateUserInput } from "@/application/types";
-import { membershipCardConfig } from "@/infrastructure/config/membershipCard";
+import {
+  CreateUserInput,
+  UpdateUserInput,
+  UserMembership,
+  UserWithSubscriptions,
+} from "@/application/types";
 import { getUserSubscription } from "@/app/(user-settings)/components/subscription-mock-data";
-
-interface UserWithSubscriptions extends User {
-  subscriptions: Subscription[];
-}
-
-export interface UserMembership {
-  name: string;
-  issuedDate: string;
-  expiresDate: string;
-  planType: PlanType;
-  membershipData: (typeof membershipCardConfig)[PlanType];
-}
 
 export class UserService {
   private userRepository: UserRepository;
@@ -83,8 +75,7 @@ export class UserService {
       throw new Error("User not found");
     }
 
-    // Get the membership data based on the user's plan type
-    const membershipData = membershipCardConfig[user.planType];
+    const subcriptions = user.subscriptions;
 
     // For FREE members, use account creation date as issued date
     if (user.planType === PlanType.FREE) {
@@ -97,7 +88,7 @@ export class UserService {
         }),
         expiresDate: "N/A",
         planType: user.planType,
-        membershipData,
+        subcriptions,
       };
     }
 
@@ -130,7 +121,7 @@ export class UserService {
       issuedDate,
       expiresDate,
       planType: user.planType,
-      membershipData,
+      subcriptions,
     };
   }
 }

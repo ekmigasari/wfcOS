@@ -1,14 +1,15 @@
 import React from "react";
 import Image from "next/image";
-import {
-  // membershipCardConfig,
-  mockUserData,
-  MembershipCardData,
-} from "@/infrastructure/config/membershipCard";
+import { membershipCardConfig } from "@/infrastructure/config/membershipCard";
+import { UserMembership } from "@/application/types";
 
-export const MyMembership = (membershipData: MembershipCardData) => {
+interface MyMembershipProps {
+  userMembership: UserMembership;
+}
+
+export const MyMembership = ({ userMembership }: MyMembershipProps) => {
   // Get the membership data based on the mock user's plan type
-  // const membershipData = membershipCardConfig[mockUserData.planType];
+  const membershipData = membershipCardConfig[userMembership.planType];
 
   return (
     <div
@@ -33,7 +34,7 @@ export const MyMembership = (membershipData: MembershipCardData) => {
       <section className="flex flex-col gap-3 w-full">
         {/* Name */}
         <h4 className="text-lg font-bold uppercase truncate">
-          {mockUserData.name}
+          {userMembership.name}
         </h4>
         {/* Info */}
         <div className="text-xs flex justify-between md:justify-start md:gap-12">
@@ -50,11 +51,11 @@ export const MyMembership = (membershipData: MembershipCardData) => {
           <div className="flex flex-col gap-2">
             <div>
               <h6>Issued:</h6>
-              <p className="font-bold ">{mockUserData.issuedDate}</p>
+              <p className="font-bold ">{userMembership.issuedDate}</p>
             </div>
             <div>
               <h6>Expires:</h6>
-              <p className="font-bold ">{mockUserData.expiresDate}</p>
+              <p className="font-bold ">{userMembership.expiresDate}</p>
             </div>
           </div>
         </div>

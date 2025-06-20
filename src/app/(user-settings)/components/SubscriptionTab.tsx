@@ -2,14 +2,16 @@
 
 import useSWR from "swr";
 import { userService } from "@/application/services";
-import type { UserMembership } from "@/application/services/user.service";
+import type { UserMembership } from "@/application/types";
+import { PlanType } from "@/infrastructure/config/productsPlan";
 
 // Import separated components
 import { PaymentHistoryCard } from "./PaymentHistoryCard";
-import { NoDataState } from "./SubscriptionStates";
+import { LoadingState, NoDataState } from "./SubscriptionStates";
 import { AvailablePlans } from "./AvailablePlans";
 import { ProductPlans } from "./ProductPlans";
 import { MyMembership } from "./MyMembership";
+import { Suspense } from "react";
 
 // Remove mock data import since we'll use real data
 // import { getUserSubscription } from "./subscription-mock-data";
@@ -41,15 +43,19 @@ export const SubscriptionTab = () => {
   if (!data) {
     return <NoDataState />;
   }
+  console.log(data);
 
   return (
     <div className="mx-auto">
-      <MyMembership membershipData={data} />
-      <ProductPlans userPlanType={data.planType} />
-      <AvailablePlans userPlanType={data.planType} />
-
-      {/* Payment History Section */}
-      <PaymentHistoryCard subscriptions={[]} />
+      <Suspense fallback={<LoadingState />}>
+        <MyMembership userMembership={data} />
+        <ProductPlans userPlanType={data.planType as PlanType} />
+        <AvailablePlans userPlanType={data.planType as PlanType} />
+      </Suspense>
+      <Suspense>
+        {/* Payment History Section */}
+        <PaymentHistoryCard subscriptions={data.subcriptions} />
+      </Suspense>
     </div>
   );
 };
