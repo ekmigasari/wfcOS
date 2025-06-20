@@ -31,33 +31,6 @@ export const ErrorState = () => (
   </div>
 );
 
-export const LoadingState = () => (
-  <div className="max-w-4xl mx-auto p-6">
-    <Card>
-      <CardHeader>
-        <CardTitle>Loading Subscription Details</CardTitle>
-        <CardDescription>
-          Please wait while we fetch your subscription information...
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="animate-pulse space-y-6">
-          <div className="space-y-3">
-            <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-48 bg-gray-200 rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-);
-
 export const NoDataState = () => (
   <div className="max-w-4xl mx-auto p-6">
     <Card className="border-gray-200 bg-gray-50">

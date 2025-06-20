@@ -7,7 +7,6 @@ import type { UserMembership } from "@/application/types";
 // Import separated components
 import { PaymentHistoryCard } from "./PaymentHistoryCard";
 import { NoDataState } from "./SubscriptionStates";
-import { AvailablePlans } from "./AvailablePlans";
 import { ProductPlans } from "./ProductPlans";
 import { MyMembership } from "./MyMembership";
 import { Suspense } from "react";
@@ -39,11 +38,9 @@ export const SubscriptionTab = ({ userId }: { userId: string }) => {
       <Suspense>
         <MyMembership userMembership={data} />
         <ProductPlans userPlanType={data.planType as PlanType} />
-        <AvailablePlans userPlanType={data.planType as PlanType} />
         {/* Payment History Section */}
         <PaymentHistoryCard subscriptions={data.subcriptions} />
       </Suspense>
-      <Loading />
     </div>
   );
 };

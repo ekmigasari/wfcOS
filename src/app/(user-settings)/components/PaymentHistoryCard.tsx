@@ -20,12 +20,8 @@ export const PaymentHistoryCard = ({
     <div className="mt-12 space-y-5">
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-bold">Payment History</h3>
-
-        {/* <p className="text-xs text-gray-500 w-1/2">
-          your subscription and payment history
-        </p> */}
       </div>
-      {/* <Separator /> */}
+
       <div>
         {subscriptions && subscriptions.length > 0 ? (
           <div className="space-y-4">
