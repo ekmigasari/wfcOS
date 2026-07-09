@@ -1,14 +1,14 @@
 "use client";
 
+import { useAtomValue } from "jotai";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
 import {
   activeBackgroundAtom,
   isCustomBackgroundUrl,
 } from "@/application/atoms/backgroundAtom";
 import { cacheAssetInBackground } from "@/infrastructure/pwa/cacheAssets";
 import { getUploadedBackgroundObjectUrl } from "@/infrastructure/utils/backgroundImageStorage";
-import { useAtomValue } from "jotai";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
 
 export const DesktopBackground = () => {
   const settings = useAtomValue(activeBackgroundAtom);

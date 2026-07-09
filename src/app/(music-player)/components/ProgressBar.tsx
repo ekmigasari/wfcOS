@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { useAtom, useSetAtom } from "jotai";
+import { useEffect, useRef, useState } from "react";
 import {
   playerTimeAtom,
   setSeekPositionAtom,
   updatePlayerInternalsAtom,
 } from "@/application/atoms/musicPlayerAtom";
-import { Slider } from "@/presentation/components/ui/slider";
 import { cn } from "@/infrastructure/lib/utils";
+import { Slider } from "@/presentation/components/ui/slider";
 
 // Helper to format time (MM:SS)
 const formatTime = (seconds: number): string => {
@@ -137,8 +137,9 @@ const ProgressBar = () => {
               will-change: transform;
             }
 
-            ${isDragging
-              ? `
+            ${
+              isDragging
+                ? `
               [data-slot="slider-thumb"] {
                 transform: scale(1.2);
                 box-shadow: 0 0 0 4px rgba(var(--color-primary), 0.15);
@@ -149,7 +150,8 @@ const ProgressBar = () => {
                 transition: none !important;
               }
             `
-              : ""}
+                : ""
+            }
 
             .time-tooltip {
               position: absolute;

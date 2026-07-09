@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
 import {
   minimizedWindowsAtom,
   setWindowMinimizedStateAtom,

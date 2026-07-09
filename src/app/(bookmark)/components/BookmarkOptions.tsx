@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
 import { Edit, Trash2 } from "lucide-react";
+import React, { useEffect, useRef } from "react";
 
 interface BookmarkOptionsProps {
   bookmarkId: string;

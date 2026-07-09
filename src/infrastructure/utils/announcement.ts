@@ -71,13 +71,13 @@ export const getActiveAnnouncementTemplate =
     if (announcementConfig.templateMode === "selected") {
       return (
         announcementConfig.templates.find(
-          (template) => template.id === announcementConfig.selectedTemplateId,
+          (template) => template.id === announcementConfig.selectedTemplateId
         ) ?? announcementConfig.templates[0]
       );
     }
 
     const randomIndex = Math.floor(
-      Math.random() * announcementConfig.templates.length,
+      Math.random() * announcementConfig.templates.length
     );
     return announcementConfig.templates[randomIndex];
   };
@@ -88,7 +88,7 @@ export const shouldShowAnnouncement = (): boolean => {
   if (announcementConfig.displayMode === "every-visit") return true;
 
   const dismissState = loadFeatureState<AnnouncementDismissState>(
-    ANNOUNCEMENT_DISMISS_KEY,
+    ANNOUNCEMENT_DISMISS_KEY
   );
 
   return dismissState?.hiddenOnDate !== getTodayKey();

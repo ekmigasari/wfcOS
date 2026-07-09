@@ -36,13 +36,16 @@ const readBlob = async (): Promise<Blob | null> => {
     const store = transaction.objectStore(STORE_NAME);
     const request = store.get(CUSTOM_BACKGROUND_STORAGE_KEY);
 
-    request.onsuccess = () => resolve((request.result as Blob | undefined) ?? null);
+    request.onsuccess = () =>
+      resolve((request.result as Blob | undefined) ?? null);
     request.onerror = () => reject(request.error);
     transaction.oncomplete = () => db.close();
   });
 };
 
-export const saveUploadedBackground = async (dataUrl: string): Promise<string> => {
+export const saveUploadedBackground = async (
+  dataUrl: string
+): Promise<string> => {
   if (typeof window === "undefined" || !("indexedDB" in window)) {
     return dataUrl;
   }
@@ -64,7 +67,9 @@ export const saveUploadedBackground = async (dataUrl: string): Promise<string> =
   return CUSTOM_BACKGROUND_URL;
 };
 
-export const getUploadedBackgroundObjectUrl = async (): Promise<string | null> => {
+export const getUploadedBackgroundObjectUrl = async (): Promise<
+  string | null
+> => {
   const blob = await readBlob();
   return blob ? URL.createObjectURL(blob) : null;
 };

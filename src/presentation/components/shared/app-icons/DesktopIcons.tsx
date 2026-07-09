@@ -1,12 +1,12 @@
 "use client";
 
+import { useAtom } from "jotai";
+import { useState } from "react";
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
 import { useOnlineStatus } from "@/application/hooks";
 import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { playSound } from "@/infrastructure/lib/utils";
 import { openExternalUrl } from "@/infrastructure/utils/externalNavigation";
-import { useAtom } from "jotai";
-import { useState } from "react";
 import { AppIcon } from "./AppIcon";
 
 export const DesktopIcons = () => {

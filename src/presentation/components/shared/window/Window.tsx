@@ -1,19 +1,19 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
+import React, { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import {
-  openWindowIdsAtom,
-  windowRegistryAtom,
   closeWindowAtom,
   focusWindowAtom,
+  openWindowIdsAtom,
+  windowRegistryAtom,
 } from "@/application/atoms/windowAtoms";
-import { WindowBase } from "./WindowBase";
+import { useOnlineStatus } from "@/application/hooks";
 import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { playSound } from "@/infrastructure/lib/utils";
-import { useOnlineStatus } from "@/application/hooks";
+import { WindowBase } from "./WindowBase";
 
 // Sound type constants
 const CLOSE_SOUND = "window-close";

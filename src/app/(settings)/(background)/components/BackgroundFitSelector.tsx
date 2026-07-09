@@ -2,10 +2,10 @@ import React from "react";
 import { BackgroundFit } from "@/application/atoms/backgroundAtom";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/presentation/components/ui/select";
 
 const fitOptions: { value: BackgroundFit; label: string }[] = [

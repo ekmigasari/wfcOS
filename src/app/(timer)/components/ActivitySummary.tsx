@@ -1,11 +1,11 @@
+import { useSetAtom } from "jotai";
+import { ChartColumnIncreasing } from "lucide-react";
 import React from "react";
 import { formatDurationFromMinutes } from "@/app/(session-log)/sessionLogUtils"; // Assuming this utility is needed and path is correct
-import { ChartColumnIncreasing } from "lucide-react";
-import { Button } from "@/presentation/components/ui/button";
-import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
-import { useSetAtom } from "jotai";
+import { appRegistry } from "@/infrastructure/config/appRegistry";
 import { playSound } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
 
 interface ActivitySummaryProps {
   todaySessionCount: number;

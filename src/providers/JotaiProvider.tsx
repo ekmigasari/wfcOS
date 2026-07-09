@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import { Provider } from "jotai";
+import React from "react";
 
 export default function JotaiProvider({
   children,

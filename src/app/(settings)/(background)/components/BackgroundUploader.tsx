@@ -48,9 +48,12 @@ export const BackgroundUploader = ({
 
   return (
     <div
-        className={`cursor-pointer border-2 transition-colors relative ${
+      className={`cursor-pointer border-2 transition-colors relative ${
         uploadedImage &&
-        (tempSettings.url === uploadedImage || isCustomBackgroundUrl(tempSettings.url))
+        (
+          tempSettings.url === uploadedImage ||
+            isCustomBackgroundUrl(tempSettings.url)
+        )
           ? "border-primary"
           : "border-muted hover:border-primary/50 bg-muted"
       } rounded-md overflow-hidden flex items-center justify-center h-[60px] sm:h-[70px]`}

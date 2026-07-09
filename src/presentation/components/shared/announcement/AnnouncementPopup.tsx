@@ -1,6 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useOnlineStatus } from "@/application/hooks";
+import {
+  type AnnouncementTemplate,
+  announcementConfig,
+  getActiveAnnouncementTemplate,
+  hideAnnouncementForToday,
+  shouldShowAnnouncement,
+} from "@/infrastructure/utils/announcement";
+import { redirectToExternalUrl } from "@/infrastructure/utils/externalNavigation";
+import { Button } from "@/presentation/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,17 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/presentation/components/ui/dialog";
-import { Button } from "@/presentation/components/ui/button";
-import {
-  announcementConfig,
-  getActiveAnnouncementTemplate,
-  hideAnnouncementForToday,
-  shouldShowAnnouncement,
-  type AnnouncementTemplate,
-} from "@/infrastructure/utils/announcement";
 import { Label } from "@/presentation/components/ui/label";
-import { redirectToExternalUrl } from "@/infrastructure/utils/externalNavigation";
-import { useOnlineStatus } from "@/application/hooks";
 
 export const AnnouncementPopup = () => {
   const [template, setTemplate] = useState<AnnouncementTemplate | null>(null);

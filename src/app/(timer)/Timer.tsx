@@ -1,11 +1,10 @@
 "use client";
 
-import { useTimer } from "@/application/hooks/useTimer";
-import TimerDisplay from "./components/TimerDisplay";
-import TimerControls from "./components/TimerControls";
-import TimerSettings from "./components/TimerSettings";
-import TimerManager from "./TimerManager";
 import { useAtom, useAtomValue } from "jotai";
+import {
+  calculateCurrentMonthSessions,
+  calculateDayStreak,
+} from "@/app/(session-log)/sessionLogUtils";
 import {
   selectedTaskForTimerAtom,
   sortedSessionsAtom,
@@ -14,6 +13,9 @@ import {
   incompleteTasksAtom,
   TaskItem,
 } from "@/application/atoms/todoListAtom";
+import { useTimer } from "@/application/hooks/useTimer";
+import { Session } from "@/application/types/session.types";
+import { playSound } from "@/infrastructure/lib/utils";
 import {
   Select,
   SelectContent,
@@ -22,12 +24,10 @@ import {
   SelectValue,
 } from "@/presentation/components/ui/select";
 import ActivitySummary from "./components/ActivitySummary";
-import {
-  calculateCurrentMonthSessions,
-  calculateDayStreak,
-} from "@/app/(session-log)/sessionLogUtils";
-import { Session } from "@/application/types/session.types";
-import { playSound } from "@/infrastructure/lib/utils";
+import TimerControls from "./components/TimerControls";
+import TimerDisplay from "./components/TimerDisplay";
+import TimerSettings from "./components/TimerSettings";
+import TimerManager from "./TimerManager";
 
 export const Timer = () => {
   // Use the timer hook for state and actions

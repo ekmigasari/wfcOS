@@ -1,5 +1,9 @@
 "use client";
 
+import { useAtom } from "jotai";
+import { Lock } from "lucide-react";
+import Image from "next/image";
+import React, { useState } from "react";
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
 import { useOnlineStatus } from "@/application/hooks";
 import { appRegistry } from "@/infrastructure/config/appRegistry";
@@ -13,10 +17,6 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/presentation/components/ui/menubar";
-import { useAtom } from "jotai";
-import { Lock } from "lucide-react";
-import Image from "next/image";
-import React, { useState } from "react";
 import { useOpenChangelog } from "./ChangelogWindow";
 import { ResetDialog } from "./ResetDialog";
 

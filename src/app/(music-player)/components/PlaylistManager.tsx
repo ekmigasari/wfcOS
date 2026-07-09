@@ -1,27 +1,11 @@
 "use client";
 
 import {
-  type PersistedMusicPlayerState,
-  type VolatileMusicPlayerState,
-  addSongAtom,
-  getYoutubeId,
-  musicPlayerAtom,
-  persistedMusicPlayerAtom,
-  playPauseAtom,
-  playerTimeAtom,
-  removeSongAtom,
-  reorderPlaylistAtom,
-  sortPlaylistAtom,
-  updateSongTitleAtom,
-  volatileMusicPlayerAtom,
-} from "@/application/atoms/musicPlayerAtom";
-import { Song } from "@/application/atoms/musicPlayerAtom";
-import {
+  closestCenter,
   DndContext,
   DragEndEvent,
   KeyboardSensor,
   PointerSensor,
-  closestCenter,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -47,6 +31,22 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import {
+  addSongAtom,
+  getYoutubeId,
+  musicPlayerAtom,
+  type PersistedMusicPlayerState,
+  persistedMusicPlayerAtom,
+  playerTimeAtom,
+  playPauseAtom,
+  removeSongAtom,
+  reorderPlaylistAtom,
+  Song,
+  sortPlaylistAtom,
+  updateSongTitleAtom,
+  type VolatileMusicPlayerState,
+  volatileMusicPlayerAtom,
+} from "@/application/atoms/musicPlayerAtom";
 
 // Sortable Song Item Component Props
 interface SortableSongItemProps {

@@ -1,15 +1,15 @@
 import { atom } from "jotai";
 import { selectAtom } from "jotai/utils";
 import {
-  loadFeatureState,
-  saveFeatureState,
-} from "../../infrastructure/utils/storage";
-import { Position, Size } from "@/application/types/window"; // Assuming types are defined here
-import {
   handleTimerClose,
   handleTimerMinimize,
   handleTimerOpen,
 } from "@/application/atoms/timerAtom";
+import { Position, Size } from "@/application/types/window"; // Assuming types are defined here
+import {
+  loadFeatureState,
+  saveFeatureState,
+} from "../../infrastructure/utils/storage";
 
 const FEATURE_KEY = "windows";
 

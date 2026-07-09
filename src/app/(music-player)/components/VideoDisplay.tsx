@@ -1,5 +1,9 @@
 "use client";
 
+import { useAtom, useSetAtom } from "jotai";
+import { GripHorizontal, Maximize, Minimize } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import ReactPlayer, { YouTubeConfig } from "react-player/youtube";
 import {
   musicPlayerAtom,
   nextSongAtom,
@@ -9,10 +13,6 @@ import {
   updatePlayerInternalsAtom,
 } from "@/application/atoms/musicPlayerAtom";
 import { useOnlineStatus } from "@/application/hooks";
-import { useAtom, useSetAtom } from "jotai";
-import { GripHorizontal, Maximize, Minimize } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import ReactPlayer, { YouTubeConfig } from "react-player/youtube";
 
 // Keep a global reference to the YouTube player
 let globalYoutubePlayer: any = null;

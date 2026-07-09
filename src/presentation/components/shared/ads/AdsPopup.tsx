@@ -1,12 +1,12 @@
 "use client";
 
-import type { MouseEvent } from "react";
-import { useState, useEffect, useCallback, useRef } from "react";
 import { ArrowUpRight, X } from "lucide-react";
 import Image from "next/image";
-import { Button } from "@/presentation/components/ui/button";
+import type { MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { adData, adsPopupSettings } from "@/infrastructure/config/adsData";
 import { openExternalUrl } from "@/infrastructure/utils/externalNavigation";
+import { Button } from "@/presentation/components/ui/button";
 
 export const AdsPopup = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -53,7 +53,7 @@ export const AdsPopup = () => {
       cycleCompleteRef.current = false;
       scheduleReappear();
     },
-    [clearTimers, scheduleReappear],
+    [clearTimers, scheduleReappear]
   );
 
   const handleAdClick = useCallback(() => {

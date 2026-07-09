@@ -1,9 +1,9 @@
 import { atom, WritableAtom } from "jotai";
+import { selectedTaskForTimerAtom } from "@/application/atoms/sessionAtoms";
 import {
   loadFeatureState,
   saveFeatureState,
 } from "@/infrastructure/utils/storage";
-import { selectedTaskForTimerAtom } from "@/application/atoms/sessionAtoms";
 
 const FEATURE_KEY = "timer";
 const DEFAULT_WORK_TIME = 25 * 60; // 25 minutes
@@ -195,7 +195,7 @@ export const startPauseTimerAtom = atom(
           expectedEndTime: now + prev.timeRemaining * 1000,
           activeTaskId:
             prev.timerSetting === "work25"
-              ? prev.activeTaskId ?? selectedTaskId
+              ? (prev.activeTaskId ?? selectedTaskId)
               : null,
           completionLogged: false,
         };

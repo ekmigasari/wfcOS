@@ -1,9 +1,9 @@
 "use client";
 
-import { minimizedWindowsAtom } from "@/application/atoms/windowAtoms";
-import { Menubar } from "@/presentation/components/ui/menubar";
 import { useAtom } from "jotai";
 import React from "react";
+import { minimizedWindowsAtom } from "@/application/atoms/windowAtoms";
+import { Menubar } from "@/presentation/components/ui/menubar";
 import { MinimizedIcons } from "./MinimizedIcons";
 import { OfflineToggle } from "./OfflineToggle";
 import { SoundToggle } from "./SoundToggle";
