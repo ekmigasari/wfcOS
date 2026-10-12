@@ -50,6 +50,9 @@ importers:
       '@lexical/utils':
         specifier: ^0.52.0
         version: 0.52.0(typescript@7.0.2)
+      '@mediapipe/tasks-vision':
+        specifier: 1.0.1
+        version: 1.0.1
       '@next/third-parties':
         specifier: ^16.4.0
         version: 16.4.0(next@16.4.0(@playwright/test@1.64.0)(@types/node@26.6.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)
@@ -737,6 +740,9 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  '@mediapipe/tasks-vision@1.0.1':
+    resolution: {integrity: sha512-rvRE2FmAZ6ZxKSw7wq+e+jQDpN3t1B/tD2mJz9SmAzb1msoDkd4dMoE4wAh8Z30Um0PQwLiHr9QtomhmXk3aUQ==}
 
   '@next/env@16.4.0':
     resolution: {integrity: sha512-pyLlT5oafGlX8X7xjgGNXz5dNIDSxREm+qD6i9VLSZiZFopA/XWl8NM/KPmLx/8EG/++c49iid3gNWSQW1+2dQ==}
@@ -2786,6 +2792,8 @@ snapshots:
       yjs: 13.6.30
     optionalDependencies:
       typescript: 7.0.2
+
+  '@mediapipe/tasks-vision@1.0.1': {}
 
   '@next/env@16.4.0': {}
 

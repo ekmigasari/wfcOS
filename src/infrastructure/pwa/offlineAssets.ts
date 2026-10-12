@@ -8,6 +8,7 @@ export const CORE_ICON_URLS = [
   "/icons/board.png",
   "/icons/bookmark.png",
   "/icons/cafe.png",
+  "/icons/camera.png",
   "/icons/clock.png",
   "/icons/coffee.png",
   "/icons/default.png",

@@ -4,6 +4,7 @@ import Bookmark from "@/app/(bookmark)/Bookmark";
 import { GiveTips } from "@/app/(give-tips)/GiveTips";
 import { MusicPlayer } from "@/app/(music-player)/MusicPlayer";
 import Notepad from "@/app/(notepad)/Notepad";
+import Photobox from "@/app/(photobooth)/Photobox";
 import SessionLogApp from "@/app/(session-log)/SessionLogApp";
 import { BackgroundChanger } from "@/app/(settings)/(background)/background";
 import { SoundChanger } from "@/app/(settings)/(sound)/sound";
@@ -92,6 +93,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 600, height: 600 },
     minSize: { width: 320, height: 400 },
     component: Notepad,
+  },
+  photobox: {
+    name: "Photobox",
+    src: "/icons/camera.png",
+    defaultSize: { width: 900, height: 640 },
+    minSize: { width: 520, height: 480 },
+    component: Photobox,
   },
   bookmark: {
     name: "Bookmark",

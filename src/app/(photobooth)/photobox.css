@@ -1,0 +1,105 @@
+/* Photobox animations */
+
+@keyframes pb-flash {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+@keyframes pb-count-pop {
+  0% { transform: scale(1.8); opacity: 0; }
+  25% { transform: scale(1); opacity: 1; }
+  85% { transform: scale(0.95); opacity: 1; }
+  100% { transform: scale(0.7); opacity: 0; }
+}
+
+@keyframes pb-thumb-in {
+  0% { transform: scale(0.6) rotate(-6deg); opacity: 0; }
+  60% { transform: scale(1.06) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* Paper feeds out of the printer slot in small mechanical steps */
+@keyframes pb-print-feed {
+  0% { transform: translateY(-100%); }
+  10% { transform: translateY(-92%); }
+  14% { transform: translateY(-90%); }
+  30% { transform: translateY(-70%); }
+  34% { transform: translateY(-68%); }
+  50% { transform: translateY(-46%); }
+  54% { transform: translateY(-44%); }
+  70% { transform: translateY(-22%); }
+  74% { transform: translateY(-20%); }
+  92% { transform: translateY(-2%); }
+  100% { transform: translateY(0); }
+}
+
+/* Ink "develops" on the paper */
+@keyframes pb-ink-develop {
+  0% { filter: blur(4px) grayscale(1) brightness(1.7) contrast(0.5); opacity: 0.55; }
+  60% { filter: blur(1px) grayscale(0.4) brightness(1.2) contrast(0.85); opacity: 0.9; }
+  100% { filter: none; opacity: 1; }
+}
+
+@keyframes pb-printer-rumble {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 1px); }
+  50% { transform: translate(1px, 0); }
+  75% { transform: translate(0, -1px); }
+}
+
+@keyframes pb-led-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes pb-fade-up {
+  0% { transform: translateY(12px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.pb-flash {
+  animation: pb-flash 550ms ease-out forwards;
+}
+
+.pb-count {
+  animation: pb-count-pop 1000ms ease-out forwards;
+}
+
+.pb-thumb-in {
+  animation: pb-thumb-in 450ms ease-out;
+}
+
+.pb-print-feed {
+  animation: pb-print-feed var(--pb-print-duration, 3.6s) linear forwards;
+}
+
+.pb-ink {
+  animation: pb-ink-develop calc(var(--pb-print-duration, 3.6s) + 1.2s) ease-out forwards;
+}
+
+.pb-rumble {
+  animation: pb-printer-rumble 120ms linear infinite;
+}
+
+.pb-led {
+  animation: pb-led-blink 400ms ease-in-out infinite;
+}
+
+.pb-fade-up {
+  animation: pb-fade-up 350ms ease-out both;
+}
+
+.pb-pixelated {
+  image-rendering: pixelated;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-print-feed,
+  .pb-ink,
+  .pb-rumble,
+  .pb-led,
+  .pb-thumb-in {
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+  }
+}
