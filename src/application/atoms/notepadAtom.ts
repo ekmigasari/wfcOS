@@ -16,6 +16,7 @@ export interface Note {
 // Storage keys
 export const NOTEPAD_NOTES_LIST_KEY = "notepad_notes_list";
 export const NOTEPAD_ACTIVE_NOTE_ID_KEY = "notepad_active_note_id";
+export const NOTEPAD_SIDEBAR_KEY = "notepad_sidebar";
 
 // Helper to generate unique IDs
 const generateId = () =>
@@ -27,11 +28,17 @@ const generateId = () =>
 const baseNotesAtom = atom<Note[]>(
   loadFeatureState<Note[]>(NOTEPAD_NOTES_LIST_KEY) ?? []
 );
+// Keep notes sorted by last modified (copy to avoid mutating stored state)
+const sortNotes = (notes: Note[]) =>
+  [...notes].sort((a, b) => b.lastModified - a.lastModified);
+
 export const notesAtom = atom(
-  (get) => get(baseNotesAtom).sort((a, b) => b.lastModified - a.lastModified), // Keep notes sorted by last modified
+  (get) => sortNotes(get(baseNotesAtom)),
   (get, set, update: Note[] | ((prev: Note[]) => Note[])) => {
     const newNotes =
-      typeof update === "function" ? update(get(baseNotesAtom)) : update;
+      typeof update === "function"
+        ? update(sortNotes(get(baseNotesAtom)))
+        : update;
     set(baseNotesAtom, newNotes);
     saveFeatureState(NOTEPAD_NOTES_LIST_KEY, newNotes);
   }
@@ -63,6 +70,28 @@ export const activeNoteContentAtom = atom<string | null>((get) => {
   const notes = get(notesAtom);
   return notes.find((note) => note.id === activeId)?.content ?? null;
 });
+
+// Sidebar UI preferences (open state + width), persisted across sessions
+export interface NotepadSidebarState {
+  isOpen: boolean;
+  width: number;
+}
+
+export const NOTEPAD_SIDEBAR_DEFAULT_WIDTH = 240;
+
+const baseSidebarStateAtom = atom<NotepadSidebarState>({
+  isOpen: true,
+  width: NOTEPAD_SIDEBAR_DEFAULT_WIDTH,
+  ...loadFeatureState<Partial<NotepadSidebarState>>(NOTEPAD_SIDEBAR_KEY),
+});
+export const notepadSidebarAtom = atom(
+  (get) => get(baseSidebarStateAtom),
+  (get, set, update: Partial<NotepadSidebarState>) => {
+    const next = { ...get(baseSidebarStateAtom), ...update };
+    set(baseSidebarStateAtom, next);
+    saveFeatureState(NOTEPAD_SIDEBAR_KEY, next);
+  }
+);
 
 // --- Action Atoms ---
 
@@ -167,4 +196,35 @@ export const loadNoteContent = (
 ): string | null => {
   if (!noteId) return null;
   return notes.find((note) => note.id === noteId)?.content ?? null;
+};
+
+interface SerializedLexicalNode {
+  text?: string;
+  children?: SerializedLexicalNode[];
+}
+
+// Extract a short plain-text preview from serialized Lexical state
+export const getNotePreview = (content: string, maxLength = 80): string => {
+  try {
+    const root = (JSON.parse(content) as { root?: SerializedLexicalNode }).root;
+    const parts: string[] = [];
+    let length = 0;
+    const walk = (node: SerializedLexicalNode) => {
+      if (length >= maxLength) return;
+      if (node.text) {
+        parts.push(node.text);
+        length += node.text.length;
+      }
+      node.children?.forEach((child) => {
+        walk(child);
+        if (child.children && length < maxLength) {
+          parts.push(" ");
+        }
+      });
+    };
+    if (root) walk(root);
+    return parts.join("").replace(/\s+/g, " ").trim().slice(0, maxLength);
+  } catch {
+    return "";
+  }
 };

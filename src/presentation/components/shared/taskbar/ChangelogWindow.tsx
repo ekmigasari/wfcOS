@@ -17,6 +17,25 @@ export const ChangelogContent = () => {
 
       <div className="space-y-4 mt-4">
         <div>
+          <h3 className="text-lg font-semibold">Version 3.2.0</h3>
+          <ul className="list-disc pl-5 space-y-1 text-sm">
+            <p className="font-bold underline">Photobox</p>
+            <li>New Photobox app to take photo strips with your camera</li>
+            <li>Choose strip or grid layouts with filters and frames</li>
+            <li>Face effects: props, creatures, funny face and photo FX</li>
+            <li>Decorate photos with stickers and text</li>
+            <li>Save prints to the gallery and download them</li>
+            <p className="font-bold underline">Notepad</p>
+            <li>New header bar to toggle notes, rename and create notes</li>
+            <li>Sidebar remembers if it is open and its width</li>
+            <li>Search notes and see a preview of each note</li>
+            <li>Sidebar slides over the editor in small windows</li>
+            <p className="font-bold underline">Music Player</p>
+            <li>Fixed music pausing while the video is buffering</li>
+            <li>Fixed music reloading when switching between windows</li>
+            <p className="font-bold underline">Support</p>
+            <li>New donation channel for Indonesia via Saweria</li>
+          </ul>
           <h3 className="text-lg font-semibold">Version 3.1.0</h3>
           <ul className="list-disc pl-5 space-y-1 text-sm">
             <p className="font-bold underline">Offline Feature</p>
