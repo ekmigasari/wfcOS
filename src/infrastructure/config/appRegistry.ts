@@ -11,7 +11,7 @@ import { ChangelogWindow } from "@/presentation/components/shared/taskbar/Change
 import Bookmark from "@/app/(bookmark)/Bookmark";
 import { SettingsPanel } from "@/app/(settings)/SettingsPanel";
 import SessionLogApp from "@/app/(session-log)/SessionLogApp";
-import { StorageMigrationApp } from "@/app/(migration)/StorageMigrationApp";
+// import { StorageMigrationApp } from "@/app/(migration)/StorageMigrationApp";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -105,16 +105,16 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 300, height: 300 },
     component: SettingsPanel,
   },
-  migrateData: {
-    name: "Migrate Data",
-    src: "/icons/news.png",
-    defaultSize: { width: 460, height: 360 },
-    minSize: { width: 360, height: 360 },
-    component: StorageMigrationApp,
-    onlineOnly: true,
-    offlineMessage:
-      "Data migration needs internet because it sends your local data to the new website.",
-  },
+  // migrateData: {
+  //   name: "Migrate Data",
+  //   src: "/icons/news.png",
+  //   defaultSize: { width: 460, height: 360 },
+  //   minSize: { width: 360, height: 360 },
+  //   component: StorageMigrationApp,
+  //   onlineOnly: true,
+  //   offlineMessage:
+  //     "Data migration needs internet because it sends your local data to the new website.",
+  // },
   changelog: {
     name: "Changelog",
     src: "/icons/default.png",

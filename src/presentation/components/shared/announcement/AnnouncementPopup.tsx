@@ -53,9 +53,9 @@ export const AnnouncementPopup = () => {
     setOpen(false);
   };
 
-  const handleRedirect = () => {
-    redirectToExternalUrl("https://os.workfromcoffee.com");
-  };
+  // const handleRedirect = () => {
+  //   redirectToExternalUrl("https://os.workfromcoffee.com");
+  // };
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
@@ -103,13 +103,13 @@ export const AnnouncementPopup = () => {
           )}
 
         <DialogFooter className="flex-row justify-end gap-2">
-          <Button
+          {/* <Button
             variant="secondary"
             className="text-white"
             onClick={handleRedirect}
           >
             Go to New Site
-          </Button>
+          </Button> */}
           <Button className="text-white" onClick={handleClose}>
             {template.readyLabel || "Continue"}
           </Button>

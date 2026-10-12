@@ -28,16 +28,16 @@ const ANNOUNCEMENT_DISMISS_KEY = "announcement.dismiss";
 export const announcementConfig: AnnouncementConfig = {
   enabled: true,
   templateMode: "selected",
-  selectedTemplateId: "site-migration-notice",
+  selectedTemplateId: "welcome-monday",
   displayMode: "once-per-day",
   showDontShowAgainToday: true,
   templates: [
-    {
-      id: "site-migration-notice",
-      title: "New Website: os.workfromcoffee.com",
-      message:
-        "We are moving to os.workfromcoffee.com for better performance and improve our platform. Please make sure to move your data to the new website to continue enjoying our services. Thank you for using wfcOS",
-    },
+    // {
+    //   id: "site-migration-notice",
+    //   title: "New Website: os.workfromcoffee.com",
+    //   message:
+    //     "We are moving to os.workfromcoffee.com for better performance and improve our platform. Please make sure to move your data to the new website to continue enjoying our services. Thank you for using wfcOS",
+    // },
     {
       id: "welcome-monday",
       title: "Good Morning",

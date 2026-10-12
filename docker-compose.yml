@@ -1,73 +1,18 @@
-name: CI/CD WFCOS
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    env:
-      APP_DIR: /root/apps/wfcOS
-      REPO_SSH_URL: git@github.com:${{ github.repository }}.git
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Deploy to VPS
-        run: |
-          ssh -T -o StrictHostKeyChecking=no \
-            "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" \
-            "APP_DIR='${APP_DIR}' REPO_SSH_URL='${REPO_SSH_URL}' bash -s" <<'EOF'
-              set -euo pipefail
-              trap 'echo "Deploy failed. Current container status:"; docker compose ps || true; echo "Recent app logs:"; docker compose logs --tail=50 app || true' ERR
-
-              echo "Go to WFCOS project..."
-              cd "$APP_DIR"
-
-              echo "Point server checkout to repository..."
-              git remote set-url origin "$REPO_SSH_URL"
-
-              echo "Fetch latest code..."
-              git fetch origin main
-              git checkout main
-              git reset --hard origin/main
-
-              echo "Build and recreate application service..."
-              docker compose up -d --build --force-recreate app
-
-              echo "Check container..."
-              docker compose ps
-
-              RUNNING_APP_CONTAINER="$(docker compose ps -q app)"
-              test -n "$RUNNING_APP_CONTAINER"
-
-              echo "Recent app logs..."
-              docker compose logs --tail=20 app
-
-              echo "Wait for local app response..."
-              for i in $(seq 1 20); do
-                if curl -fsSI http://127.0.0.1:4500/ >/dev/null; then
-                  echo "App responded on attempt $i"
-                  break
-                fi
-                if [ "$i" -eq 20 ]; then
-                  echo "App did not become ready in time"
-                  exit 1
-                fi
-                sleep 2
-              done
-
-              echo "Deploy done!"
-          EOF
+services:
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-}
+        NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-}
+        NEXT_PUBLIC_STORAGE_MIGRATION_TARGET_URL: ${NEXT_PUBLIC_STORAGE_MIGRATION_TARGET_URL:-}
+    restart: unless-stopped
+    ports:
+      - "4500:3000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3000

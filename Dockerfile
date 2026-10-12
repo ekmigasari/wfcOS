@@ -1,73 +1,54 @@
-name: CI/CD WFCOS
+FROM node:22-alpine AS base
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+WORKDIR /app
 
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV HUSKY=0
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    env:
-      APP_DIR: /root/apps/wfcOS
-      REPO_SSH_URL: git@github.com:${{ github.repository }}.git
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+RUN apk add --no-cache libc6-compat
+RUN corepack enable
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+FROM base AS deps
 
-      - name: Deploy to VPS
-        run: |
-          ssh -T -o StrictHostKeyChecking=no \
-            "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" \
-            "APP_DIR='${APP_DIR}' REPO_SSH_URL='${REPO_SSH_URL}' bash -s" <<'EOF'
-              set -euo pipefail
-              trap 'echo "Deploy failed. Current container status:"; docker compose ps || true; echo "Recent app logs:"; docker compose logs --tail=50 app || true' ERR
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
-              echo "Go to WFCOS project..."
-              cd "$APP_DIR"
+FROM base AS builder
 
-              echo "Point server checkout to repository..."
-              git remote set-url origin "$REPO_SSH_URL"
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_GA_ID
+ARG NEXT_PUBLIC_STORAGE_MIGRATION_TARGET_URL
 
-              echo "Fetch latest code..."
-              git fetch origin main
-              git checkout main
-              git reset --hard origin/main
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID
+ENV NEXT_PUBLIC_STORAGE_MIGRATION_TARGET_URL=$NEXT_PUBLIC_STORAGE_MIGRATION_TARGET_URL
 
-              echo "Build and recreate application service..."
-              docker compose up -d --build --force-recreate app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN pnpm build
 
-              echo "Check container..."
-              docker compose ps
+FROM base AS runner
 
-              RUNNING_APP_CONTAINER="$(docker compose ps -q app)"
-              test -n "$RUNNING_APP_CONTAINER"
+ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
 
-              echo "Recent app logs..."
-              docker compose logs --tail=20 app
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_GA_ID
+ARG NEXT_PUBLIC_STORAGE_MIGRATION_TARGET_URL
 
-              echo "Wait for local app response..."
-              for i in $(seq 1 20); do
-                if curl -fsSI http://127.0.0.1:4500/ >/dev/null; then
-                  echo "App responded on attempt $i"
-                  break
-                fi
-                if [ "$i" -eq 20 ]; then
-                  echo "App did not become ready in time"
-                  exit 1
-                fi
-                sleep 2
-              done
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID
+ENV NEXT_PUBLIC_STORAGE_MIGRATION_TARGET_URL=$NEXT_PUBLIC_STORAGE_MIGRATION_TARGET_URL
 
-              echo "Deploy done!"
-          EOF
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.ts ./next.config.ts
+
+EXPOSE 3000
+
+CMD ["pnpm", "start"]
