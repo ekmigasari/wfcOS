@@ -36,6 +36,7 @@ const VideoDisplay = ({ isVisible }: VideoDisplayProps) => {
 
   const playerRef = useRef<ReactPlayer>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isBufferingRef = useRef(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [videoHeight, setVideoHeight] = useState(DEFAULT_VIDEO_HEIGHT);
@@ -288,10 +289,18 @@ const VideoDisplay = ({ isVisible }: VideoDisplayProps) => {
                 setLoading(false);
               }}
               onPause={() => {
-                if (playerState.isPlaying) togglePlayPause();
+                if (playerState.isPlaying && !isBufferingRef.current) {
+                  togglePlayPause();
+                }
               }}
-              onBuffer={() => setLoading(true)}
-              onBufferEnd={() => setLoading(false)}
+              onBuffer={() => {
+                isBufferingRef.current = true;
+                setLoading(true);
+              }}
+              onBufferEnd={() => {
+                isBufferingRef.current = false;
+                setLoading(false);
+              }}
               onDuration={(duration) => {
                 updatePlayerInternals({ duration });
               }}

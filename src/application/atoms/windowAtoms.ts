@@ -99,12 +99,14 @@ export const minimizedWindowsAtom = atom(
       .sort((a, b) => (a?.appId ?? "").localeCompare(b?.appId ?? "")) // Add null checks
 );
 
+// Sort by stable ID — NOT by zIndex. zIndex sort changes DOM order on focus,
+// which causes iframes (e.g. YouTube) to reload. CSS z-index handles visual stacking.
 export const openWindowIdsAtom = selectAtom(
   windowRegistryAtom,
   (registry) =>
     Object.values(registry)
       .filter((win) => win?.isOpen)
-      .sort((a, b) => (a?.zIndex ?? 0) - (b?.zIndex ?? 0))
+      .sort((a, b) => a.id.localeCompare(b.id))
       .map((win) => win.id),
   (prev, next) =>
     prev.length === next.length &&
