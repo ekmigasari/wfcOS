@@ -1,13 +1,13 @@
 import { useAtom } from "jotai";
 import {
-  timerAtom,
-  startPauseTimerAtom,
   resetTimerAtom,
-  setTimerSettingAtom,
+  restartAndGoAtom,
   setCustomDurationAtom,
   setCustomTitleAtom,
-  restartAndGoAtom,
+  setTimerSettingAtom,
+  startPauseTimerAtom,
   stopAlarmAtom,
+  timerAtom,
 } from "@/application/atoms/timerAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 

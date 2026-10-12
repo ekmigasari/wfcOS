@@ -1,10 +1,10 @@
 "use client";
 
-import { sortedSessionsAtom } from "@/application/atoms/sessionAtoms";
-import { type ChartConfig } from "@/presentation/components/ui/chart";
 import { useAtomValue } from "jotai";
 import dynamic from "next/dynamic";
 import React from "react";
+import { sortedSessionsAtom } from "@/application/atoms/sessionAtoms";
+import { type ChartConfig } from "@/presentation/components/ui/chart";
 import {
   getMonthlyChartData,
   getWeeklyChartData,

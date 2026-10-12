@@ -50,7 +50,7 @@ export interface VolatileMusicPlayerState {
 // Default songs
 const defaultSongs: Song[] = [
   {
-    url: "https://www.youtube.com/watch?v=Fp5ghKduTK8",
+    url: "https://www.youtube.com/watch?v=HGl75kurxok",
     title: "Ghibli Piano",
     id: "Fp5ghKduTK8",
     seqId: 1,

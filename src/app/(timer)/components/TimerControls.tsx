@@ -62,8 +62,8 @@ export const TimerControls = ({
           isRunning
             ? "bg-orange-500 hover:bg-orange-600"
             : buttonLabel === "Restart"
-            ? "bg-green-500 hover:bg-green-600"
-            : "bg-primary hover:bg-secondary"
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-primary hover:bg-secondary"
         }`}
       >
         {buttonLabel}

@@ -1,15 +1,15 @@
 "use client";
 
+import { useAtomValue, useSetAtom } from "jotai";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import dynamic from "next/dynamic";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   activeNoteIdAtom,
   createNewNote,
   notesAtom,
 } from "@/application/atoms/notepadAtom";
 import { playSound } from "@/infrastructure/lib/utils";
-import { useAtomValue, useSetAtom } from "jotai";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import dynamic from "next/dynamic";
-import React, { useCallback, useEffect, useState } from "react";
 import { NoteListSidebar } from "./components/NoteListSidebar";
 
 const loadNotepadEditor = () =>

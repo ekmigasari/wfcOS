@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  updateWindowPositionSizeAtom,
   focusWindowAtom,
   setWindowMinimizedStateAtom,
+  updateWindowPositionSizeAtom,
 } from "@/application/atoms/windowAtoms";
-import { Position, Size } from "@/application/types/window";
-import { WindowUI } from "./WindowUI";
 import { useDeviceDetect } from "@/application/hooks";
+import { Position, Size } from "@/application/types/window";
 import { playSound, stopSound } from "@/infrastructure/lib/utils";
+import { WindowUI } from "./WindowUI";
 
 // Sound type constants
 const DRAG_SOUND = "window-drag";

@@ -1,15 +1,15 @@
-import { ArrowDownIcon, ArrowRightIcon, GripVertical } from "lucide-react";
 import {
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { TaskItem } from "@/application/atoms/todoListAtom";
-import { SortableTaskItem } from "./TaskItem";
-import { EmptyDropArea } from "./EmptyDropArea";
 import { useAtomValue } from "jotai";
+import { ArrowDownIcon, ArrowRightIcon, GripVertical } from "lucide-react";
 import { getTaskSessionCountAtom } from "@/application/atoms/sessionAtoms";
+import { TaskItem } from "@/application/atoms/todoListAtom";
+import { EmptyDropArea } from "./EmptyDropArea";
+import { SortableTaskItem } from "./TaskItem";
 
 type CategorySectionProps = {
   title: string;

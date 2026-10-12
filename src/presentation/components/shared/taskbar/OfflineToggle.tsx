@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  AlertCircle,
+  CheckCircle2,
+  Download,
+  LoaderCircle,
+  RefreshCw,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { playSound } from "@/infrastructure/lib/utils";
 import {
   areAssetsCached,
@@ -22,14 +30,6 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/presentation/components/ui/menubar";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Download,
-  LoaderCircle,
-  RefreshCw,
-} from "lucide-react";
-import React, { useEffect, useState } from "react";
 
 type OfflineState =
   | "idle"

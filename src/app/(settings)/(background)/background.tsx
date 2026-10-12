@@ -1,25 +1,24 @@
-import React, { useState, useEffect } from "react";
 import { useAtom } from "jotai";
+import React, { useEffect, useState } from "react";
 import {
-  backgroundSettingsAtom,
-  BackgroundSettings,
-  previewBackgroundAtom,
   BackgroundFit,
+  BackgroundSettings,
+  backgroundSettingsAtom,
   CUSTOM_BACKGROUND_URL,
   isCustomBackgroundUrl,
+  previewBackgroundAtom,
 } from "@/application/atoms/backgroundAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 import {
   getUploadedBackgroundObjectUrl,
   saveUploadedBackground,
 } from "@/infrastructure/utils/backgroundImageStorage";
-
+import { SettingsActionButtons } from "@/presentation/components/shared/settings/SettingsActionButtons";
+import { BackgroundFitSelector } from "./components/BackgroundFitSelector";
 // Import the components
 import { BackgroundSelector } from "./components/BackgroundSelector";
-import { NoImageOption } from "./components/NoImageOption";
 import { BackgroundUploader } from "./components/BackgroundUploader";
-import { BackgroundFitSelector } from "./components/BackgroundFitSelector";
-import { SettingsActionButtons } from "@/presentation/components/shared/settings/SettingsActionButtons";
+import { NoImageOption } from "./components/NoImageOption";
 
 // Main component
 interface BackgroundChangerProps {

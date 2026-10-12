@@ -18,8 +18,11 @@ export const ToolbarBlockTypeSelect: React.FC<ToolbarBlockTypeSelectProps> = ({
   onBlockTypeChange,
 }) => {
   return (
-    <Select value={blockType} onValueChange={onBlockTypeChange}>
-      <SelectTrigger className="w-[150px] h-8 text-xs px-2 mr-1">
+    <Select
+      value={blockType}
+      onValueChange={onBlockTypeChange as (value: string) => void}
+    >
+      <SelectTrigger className="w-37.5 h-8 text-xs px-2 mr-1">
         <SelectValue placeholder="Block Type" />
       </SelectTrigger>
       <SelectContent>

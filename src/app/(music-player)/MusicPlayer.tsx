@@ -1,9 +1,9 @@
 "use client";
 
-import { musicPlayerAtom } from "@/application/atoms/musicPlayerAtom";
-import { useOnlineStatus } from "@/application/hooks";
 import { useAtom } from "jotai";
 import dynamic from "next/dynamic";
+import { musicPlayerAtom } from "@/application/atoms/musicPlayerAtom";
+import { useOnlineStatus } from "@/application/hooks";
 import PlayerControls from "./components/PlayerControls";
 import PlaylistManager from "./components/PlaylistManager";
 import ProgressBar from "./components/ProgressBar";

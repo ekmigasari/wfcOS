@@ -1,5 +1,5 @@
-import { Session } from "@/application/types/session.types";
 import { TaskItem } from "@/application/atoms/todoListAtom";
+import { Session } from "@/application/types/session.types";
 
 // Helper function to format duration from minutes to hours and minutes
 export const formatDurationFromMinutes = (totalMinutes: number): string => {

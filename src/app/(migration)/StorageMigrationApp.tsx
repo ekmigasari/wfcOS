@@ -36,14 +36,14 @@ export function StorageMigrationApp() {
 
       if (event.data.success) {
         setStatus(
-          `Migration complete. Your data has been copied to ${STORAGE_MIGRATION_TARGET_URL}. You can now continue in os.workfromcoffee.com.`,
+          `Migration complete. Your data has been copied to ${STORAGE_MIGRATION_TARGET_URL}. You can now continue in os.workfromcoffee.com.`
         );
         return;
       }
 
       setStatus(
         event.data.error ||
-          "The new site rejected the migration payload. Please refresh it and try again.",
+          "The new site rejected the migration payload. Please refresh it and try again."
       );
     };
 
@@ -70,7 +70,7 @@ export function StorageMigrationApp() {
       setStatus(
         window.navigator.onLine
           ? "Your browser blocked the new tab. Please allow popups and try again."
-          : "Migration needs an internet connection to reach the new website.",
+          : "Migration needs an internet connection to reach the new website."
       );
       return;
     }
@@ -97,7 +97,7 @@ export function StorageMigrationApp() {
         }
         setIsMigrating(false);
         setStatus(
-          "Timed out while sending your data. Keep the new tab open, refresh it, and try again.",
+          "Timed out while sending your data. Keep the new tab open, refresh it, and try again."
         );
         return;
       }

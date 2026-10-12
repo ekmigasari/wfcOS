@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "@/presentation/styles/globals.css";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { siteUrl } from "@/infrastructure/config/site";
 import { ServiceWorkerRegistration } from "@/presentation/components/shared/service-worker/ServiceWorkerRegistration";
 import JotaiProvider from "@/providers/JotaiProvider";
-import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const viewport = {
   themeColor: "#2d2417",

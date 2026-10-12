@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/presentation/components/ui/select";
-import { fontSizes, fontFamilies } from "../../constants/richTextConstants";
+import { fontFamilies, fontSizes } from "../../constants/richTextConstants";
 
 interface ToolbarFontSelectProps {
   fontFamily: string;

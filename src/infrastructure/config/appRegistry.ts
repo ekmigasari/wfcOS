@@ -1,16 +1,18 @@
-import { Size } from "@/application/types/window";
 import React from "react";
-import { Timer } from "@/app/(timer)/Timer";
+import { AmbiencePlayer } from "@/app/(ambience)/ambiencePlayer";
+import Bookmark from "@/app/(bookmark)/Bookmark";
+import { GiveTips } from "@/app/(give-tips)/GiveTips";
+import { MusicPlayer } from "@/app/(music-player)/MusicPlayer";
+import Notepad from "@/app/(notepad)/Notepad";
+import SessionLogApp from "@/app/(session-log)/SessionLogApp";
 import { BackgroundChanger } from "@/app/(settings)/(background)/background";
 import { SoundChanger } from "@/app/(settings)/(sound)/sound";
-import { MusicPlayer } from "@/app/(music-player)/MusicPlayer";
-import TodoList from "@/app/(to-do-list)/todoList";
-import { AmbiencePlayer } from "@/app/(ambience)/ambiencePlayer";
-import Notepad from "@/app/(notepad)/Notepad";
-import { ChangelogWindow } from "@/presentation/components/shared/taskbar/ChangelogWindow";
-import Bookmark from "@/app/(bookmark)/Bookmark";
 import { SettingsPanel } from "@/app/(settings)/SettingsPanel";
-import SessionLogApp from "@/app/(session-log)/SessionLogApp";
+import { Timer } from "@/app/(timer)/Timer";
+import TodoList from "@/app/(to-do-list)/todoList";
+import { Size } from "@/application/types/window";
+import { ChangelogWindow } from "@/presentation/components/shared/taskbar/ChangelogWindow";
+
 // import { StorageMigrationApp } from "@/app/(migration)/StorageMigrationApp";
 
 interface AppRegistryEntry {
@@ -150,10 +152,9 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   giveTips: {
     name: "Buy Us a Coffee",
     src: "/icons/tips.png",
-    defaultSize: { width: 400, height: 600 },
-    minSize: { width: 320, height: 400 },
-    component: SessionLogApp,
-    externalUrl: "https://workfromcoffee.gumroad.com/coffee",
+    defaultSize: { width: 320, height: 360 },
+    minSize: { width: 280, height: 320 },
+    component: GiveTips,
   },
 };
 

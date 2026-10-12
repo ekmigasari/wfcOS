@@ -1,18 +1,18 @@
 "use client";
 
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useAtom } from "jotai";
-import { useState, useRef } from "react";
+import { GripVertical, MoreVertical } from "lucide-react";
+import { useRef, useState } from "react";
 import {
   BookmarkItem,
   bookmarksAtom,
   deleteBookmarkAtom,
 } from "@/application/atoms/bookmarkAtom";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MoreVertical } from "lucide-react";
-import { BookmarkOptions } from "./BookmarkOptions";
 import { playSound } from "@/infrastructure/lib/utils";
 import { openExternalUrl } from "@/infrastructure/utils/externalNavigation";
+import { BookmarkOptions } from "./BookmarkOptions";
 
 // --- Type for the state holding active options data ---
 interface ActiveOptionsState {

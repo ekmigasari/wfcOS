@@ -25,16 +25,16 @@ export const adsPopupSettings = {
 } as const;
 
 export const adData: AdItem[] = [
-  {
-    id: 1,
-    title: "Dazzboard App",
-    description: "A better way to manage your projects and clients",
-    url: "https://dazzboard.co",
-    thumbnail: {
-      type: "image",
-      content: "/ads/dazzboard.png",
-    },
-  },
+  // {
+  //   id: 1,
+  //   title: "Dazzboard App",
+  //   description: "A better way to manage your projects and clients",
+  //   url: "https://dazzboard.co",
+  //   thumbnail: {
+  //     type: "image",
+  //     content: "/ads/dazzboard.png",
+  //   },
+  // },
   {
     id: 2,
     title: "Promote Your Product",

@@ -1,8 +1,8 @@
-import React from "react";
-import { Button } from "@/presentation/components/ui/button";
-import { cn } from "@/infrastructure/lib/utils";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react";
 import { ElementFormatType } from "lexical";
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight } from "lucide-react";
+import React from "react";
+import { cn } from "@/infrastructure/lib/utils";
+import { Button } from "@/presentation/components/ui/button";
 
 interface ToolbarAlignButtonsProps {
   formatElement: (align: ElementFormatType) => void;
@@ -20,10 +20,7 @@ export const ToolbarAlignButtons: React.FC<ToolbarAlignButtonsProps> = ({
         size="sm"
         title="Align Left"
         onClick={() => formatElement("left")}
-        className={cn(
-          "p-1 h-8 w-8",
-          textAlign === "left" ? "bg-gray-200" : ""
-        )}
+        className={cn("p-1 h-8 w-8", textAlign === "left" ? "bg-gray-200" : "")}
       >
         <AlignLeft className="h-4 w-4" />
       </Button>
@@ -65,4 +62,4 @@ export const ToolbarAlignButtons: React.FC<ToolbarAlignButtonsProps> = ({
       </Button>
     </div>
   );
-}; 
+};

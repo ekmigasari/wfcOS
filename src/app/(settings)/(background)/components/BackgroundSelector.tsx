@@ -1,9 +1,9 @@
+import Image from "next/image";
+import React from "react";
 import { BackgroundSettings } from "@/application/atoms/backgroundAtom";
 import { playSound } from "@/infrastructure/lib/utils";
 import { cacheAssetInBackground } from "@/infrastructure/pwa/cacheAssets";
 import { BACKGROUND_URLS } from "@/infrastructure/pwa/offlineAssets";
-import Image from "next/image";
-import React from "react";
 
 const backgrounds = [...BACKGROUND_URLS];
 
