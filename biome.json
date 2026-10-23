@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
@@ -35,6 +35,13 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/.next", "!**/node_modules", "!**/*.css"]
+    "includes": [
+      "**",
+      "!**/.next",
+      "!**/node_modules",
+      "!**/*.css",
+      "!**/*.md",
+      "!pnpm-lock.yaml"
+    ]
   }
 }
